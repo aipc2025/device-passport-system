@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -11,7 +12,7 @@ async function bootstrap() {
 
   // CORS
   app.enableCors({
-    origin: process.env.CORS_ORIGINS?.split(',') || ['http://localhost:5173'],
+    origin: process.env.CORS_ORIGINS?.split(',') || ['http://localhost:5173', 'http://localhost:5174'],
     credentials: true,
   });
 
@@ -26,6 +27,9 @@ async function bootstrap() {
       },
     }),
   );
+
+  // Transform interceptor - wraps all responses in { success, data, timestamp }
+  app.useGlobalInterceptors(new TransformInterceptor());
 
   // Swagger documentation
   const config = new DocumentBuilder()

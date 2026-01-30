@@ -44,7 +44,7 @@ async function seed() {
     city: 'Shanghai',
     country: 'China',
     phone: '+86-21-12345678',
-    email: 'info@medtech.com',
+    email: 'info@luna.top',
     website: 'https://medtech.com',
   });
 
@@ -55,7 +55,7 @@ async function seed() {
     address: 'Werner-von-Siemens-Str. 1',
     city: 'Munich',
     country: 'Germany',
-    email: 'contact@siemens.com',
+    email: 'contact@luna.top',
     website: 'https://siemens.com',
   });
 
@@ -67,7 +67,7 @@ async function seed() {
     city: 'Suzhou',
     country: 'China',
     phone: '+86-512-87654321',
-    email: 'contact@abc-mfg.com',
+    email: 'contact@luna.top',
   });
 
   console.log('Seeding users...');
@@ -75,7 +75,7 @@ async function seed() {
   const hashedPassword = await bcrypt.hash('password123', 10);
 
   const adminUser = await userRepo.save({
-    email: 'admin@medtech.com',
+    email: 'admin@luna.top',
     password: hashedPassword,
     name: 'System Admin',
     role: UserRole.ADMIN,
@@ -83,7 +83,7 @@ async function seed() {
   });
 
   const operatorUser = await userRepo.save({
-    email: 'operator@medtech.com',
+    email: 'operator@luna.top',
     password: hashedPassword,
     name: 'John Operator',
     role: UserRole.OPERATOR,
@@ -91,7 +91,7 @@ async function seed() {
   });
 
   const engineerUser = await userRepo.save({
-    email: 'engineer@medtech.com',
+    email: 'engineer@luna.top',
     password: hashedPassword,
     name: 'Mike Engineer',
     role: UserRole.ENGINEER,
@@ -99,7 +99,7 @@ async function seed() {
   });
 
   const qcUser = await userRepo.save({
-    email: 'qc@medtech.com',
+    email: 'qc@luna.top',
     password: hashedPassword,
     name: 'Lisa QC',
     role: UserRole.QC_INSPECTOR,
@@ -107,7 +107,7 @@ async function seed() {
   });
 
   const customerUser = await userRepo.save({
-    email: 'customer@abc-mfg.com',
+    email: 'customer@luna.top',
     password: hashedPassword,
     name: 'Tom Customer',
     role: UserRole.CUSTOMER,
@@ -182,11 +182,11 @@ async function seed() {
   console.log('Seed completed successfully!');
   console.log('');
   console.log('Test accounts:');
-  console.log('  Admin: admin@medtech.com / password123');
-  console.log('  Operator: operator@medtech.com / password123');
-  console.log('  Engineer: engineer@medtech.com / password123');
-  console.log('  QC Inspector: qc@medtech.com / password123');
-  console.log('  Customer: customer@abc-mfg.com / password123');
+  console.log('  Admin: admin@luna.top / password123');
+  console.log('  Operator: operator@luna.top / password123');
+  console.log('  Engineer: engineer@luna.top / password123');
+  console.log('  QC Inspector: qc@luna.top / password123');
+  console.log('  Customer: customer@luna.top / password123');
 
   await AppDataSource.destroy();
 }

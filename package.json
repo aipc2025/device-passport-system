@@ -1,0 +1,50 @@
+{
+  "name": "device-passport-system",
+  "version": "1.0.0",
+  "description": "B2B Device Passport Traceability System",
+  "private": true,
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "dev:api": "turbo run dev --filter=@device-passport/api",
+    "dev:web": "turbo run dev --filter=@device-passport/web",
+    "build": "turbo run build",
+    "build:api": "turbo run build --filter=@device-passport/api",
+    "build:web": "turbo run build --filter=@device-passport/web",
+    "test": "turbo run test",
+    "test:api": "turbo run test --filter=@device-passport/api",
+    "test:web": "turbo run test --filter=@device-passport/web",
+    "test:e2e": "turbo run test:e2e",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "typecheck": "turbo run typecheck",
+    "db:migrate": "pnpm --filter @device-passport/api run migration:run",
+    "db:migrate:generate": "pnpm --filter @device-passport/api run migration:generate",
+    "db:seed": "pnpm --filter @device-passport/api run seed",
+    "db:reset": "pnpm --filter @device-passport/api run db:reset",
+    "clean": "turbo run clean && rimraf node_modules",
+    "prepare": "husky install"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "husky": "^9.0.0",
+    "lint-staged": "^15.2.0",
+    "prettier": "^3.2.0",
+    "rimraf": "^5.0.5",
+    "turbo": "^2.0.0",
+    "typescript": "^5.3.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "prettier --write",
+      "eslint --fix"
+    ],
+    "*.{json,md}": [
+      "prettier --write"
+    ]
+  }
+}

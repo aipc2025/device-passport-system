@@ -1,29 +1,88 @@
+import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { ArrowLeft, Package } from 'lucide-react';
-import { useMutation } from '@tanstack/react-query';
-import { passportApi } from '../../services/api';
+import { ArrowLeft, Package, ChevronDown, ChevronUp } from 'lucide-react';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
+import { passportApi, organizationApi } from '../../services/api';
 import { ProductLine, OriginCode } from '@device-passport/shared';
 import toast from 'react-hot-toast';
+import MapPicker from '../../components/common/MapPicker';
+
+interface LocationData {
+  lat: number;
+  lng: number;
+  address?: string;
+}
 
 interface CreatePassportForm {
   productLine: ProductLine;
   originCode: OriginCode;
   deviceName: string;
   deviceModel: string;
+  supplierId?: string;
   manufacturer: string;
   manufacturerPartNumber?: string;
   serialNumber?: string;
   manufactureDate?: string;
   warrantyExpiryDate?: string;
   currentLocation?: string;
+  locationLat?: number;
+  locationLng?: number;
+  // Buyer information
+  buyerCompany?: string;
+  buyerContact?: string;
+  buyerPhone?: string;
+  buyerCountry?: string;
+  buyerAddress?: string;
+  buyerAddressLat?: number;
+  buyerAddressLng?: number;
+  buyerEmail?: string;
 }
 
 const productLines = Object.values(ProductLine);
 const originCodes = Object.values(OriginCode);
 
+const COUNTRY_LIST = [
+  { code: 'CN', name: 'China' },
+  { code: 'DE', name: 'Germany' },
+  { code: 'JP', name: 'Japan' },
+  { code: 'US', name: 'United States' },
+  { code: 'KR', name: 'South Korea' },
+  { code: 'TW', name: 'Taiwan' },
+  { code: 'IT', name: 'Italy' },
+  { code: 'FR', name: 'France' },
+  { code: 'GB', name: 'United Kingdom' },
+  { code: 'CH', name: 'Switzerland' },
+  { code: 'VN', name: 'Vietnam' },
+  { code: 'TH', name: 'Thailand' },
+  { code: 'MY', name: 'Malaysia' },
+  { code: 'SG', name: 'Singapore' },
+  { code: 'AU', name: 'Australia' },
+  { code: 'CA', name: 'Canada' },
+  { code: 'IN', name: 'India' },
+  { code: 'BR', name: 'Brazil' },
+  { code: 'MX', name: 'Mexico' },
+  { code: 'ES', name: 'Spain' },
+];
+
+interface Supplier {
+  id: string;
+  code: string;
+  name: string;
+}
+
 export default function PassportCreate() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
+  const [showBuyerInfo, setShowBuyerInfo] = useState(false);
+  const [deviceLocation, setDeviceLocation] = useState<LocationData | undefined>();
+  const [buyerLocation, setBuyerLocation] = useState<LocationData | undefined>();
+
+  const { data: suppliers } = useQuery({
+    queryKey: ['suppliers'],
+    queryFn: () => organizationApi.getSuppliers(),
+  });
 
   const {
     register,
@@ -31,10 +90,11 @@ export default function PassportCreate() {
     formState: { errors },
   } = useForm<CreatePassportForm>();
 
+
   const createMutation = useMutation({
     mutationFn: (data: CreatePassportForm) => passportApi.create(data as unknown as Record<string, unknown>),
     onSuccess: (data) => {
-      toast.success('Device passport created successfully!');
+      toast.success(t('passport.createTitle') + ' - Success!');
       navigate(`/passports/${data.id}`);
     },
     onError: (error: unknown) => {
@@ -44,17 +104,39 @@ export default function PassportCreate() {
   });
 
   const onSubmit = (data: CreatePassportForm) => {
+    // Add location data
+    if (deviceLocation) {
+      data.locationLat = deviceLocation.lat;
+      data.locationLng = deviceLocation.lng;
+      if (deviceLocation.address) {
+        data.currentLocation = deviceLocation.address;
+      }
+    }
+    if (buyerLocation) {
+      data.buyerAddressLat = buyerLocation.lat;
+      data.buyerAddressLng = buyerLocation.lng;
+      if (buyerLocation.address) {
+        data.buyerAddress = buyerLocation.address;
+      }
+    }
+    // Populate manufacturer from selected supplier
+    if (data.supplierId && suppliers) {
+      const selectedSupplier = suppliers.find((s: Supplier) => s.id === data.supplierId);
+      if (selectedSupplier) {
+        data.manufacturer = selectedSupplier.name;
+      }
+    }
     createMutation.mutate(data);
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="max-w-3xl mx-auto">
       <Link
         to="/passports"
         className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-6"
       >
         <ArrowLeft className="h-4 w-4 mr-1" />
-        Back to Passports
+        {t('passport.backToPassports')}
       </Link>
 
       <div className="card">
@@ -62,8 +144,8 @@ export default function PassportCreate() {
           <div className="flex items-center gap-3">
             <Package className="h-8 w-8 text-primary-600" />
             <div>
-              <h1 className="text-xl font-bold text-gray-900">Create Device Passport</h1>
-              <p className="text-gray-600">Enter device information to generate a new passport</p>
+              <h1 className="text-xl font-bold text-gray-900">{t('passport.createTitle')}</h1>
+              <p className="text-gray-600">{t('passport.createDescription')}</p>
             </div>
           </div>
         </div>
@@ -71,18 +153,18 @@ export default function PassportCreate() {
         <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-6">
           {/* Product Info */}
           <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-gray-900">Product Classification</h2>
+            <h2 className="text-lg font-semibold text-gray-900">{t('passport.productClassification')}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="label">Product Line *</label>
+                <label className="label">{t('passport.productType')} *</label>
                 <select
                   className="input"
-                  {...register('productLine', { required: 'Required' })}
+                  {...register('productLine', { required: t('common.required') })}
                 >
-                  <option value="">Select product line</option>
+                  <option value="">{t('passport.selectProductType')}</option>
                   {productLines.map((pl) => (
                     <option key={pl} value={pl}>
-                      {pl}
+                      {pl} - {t(`productTypes.${pl}`)}
                     </option>
                   ))}
                 </select>
@@ -91,12 +173,12 @@ export default function PassportCreate() {
                 )}
               </div>
               <div>
-                <label className="label">Origin Country *</label>
+                <label className="label">{t('passport.originCountry')} *</label>
                 <select
                   className="input"
-                  {...register('originCode', { required: 'Required' })}
+                  {...register('originCode', { required: t('common.required') })}
                 >
-                  <option value="">Select origin</option>
+                  <option value="">{t('passport.selectOrigin')}</option>
                   {originCodes.map((oc) => (
                     <option key={oc} value={oc}>
                       {oc}
@@ -112,14 +194,14 @@ export default function PassportCreate() {
 
           {/* Device Info */}
           <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-gray-900">Device Information</h2>
+            <h2 className="text-lg font-semibold text-gray-900">{t('passport.deviceInformation')}</h2>
             <div>
-              <label className="label">Device Name *</label>
+              <label className="label">{t('passport.deviceName')} *</label>
               <input
                 type="text"
                 className="input"
-                placeholder="e.g., Siemens S7-1500 PLC"
-                {...register('deviceName', { required: 'Required' })}
+                placeholder="e.g., Automated Packaging Line"
+                {...register('deviceName', { required: t('common.required') })}
               />
               {errors.deviceName && (
                 <p className="mt-1 text-sm text-red-600">{errors.deviceName.message}</p>
@@ -127,42 +209,47 @@ export default function PassportCreate() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="label">Device Model *</label>
+                <label className="label">{t('passport.deviceModel')} *</label>
                 <input
                   type="text"
                   className="input"
-                  placeholder="e.g., S7-1500"
-                  {...register('deviceModel', { required: 'Required' })}
+                  placeholder="e.g., PKG-2000"
+                  {...register('deviceModel', { required: t('common.required') })}
                 />
                 {errors.deviceModel && (
                   <p className="mt-1 text-sm text-red-600">{errors.deviceModel.message}</p>
                 )}
               </div>
               <div>
-                <label className="label">Manufacturer *</label>
-                <input
-                  type="text"
+                <label className="label">{t('passport.manufacturer')} *</label>
+                <select
                   className="input"
-                  placeholder="e.g., Siemens"
-                  {...register('manufacturer', { required: 'Required' })}
-                />
-                {errors.manufacturer && (
-                  <p className="mt-1 text-sm text-red-600">{errors.manufacturer.message}</p>
+                  {...register('supplierId', { required: t('common.required') })}
+                >
+                  <option value="">{t('passport.selectManufacturer')}</option>
+                  {suppliers?.map((supplier: Supplier) => (
+                    <option key={supplier.id} value={supplier.id}>
+                      {supplier.code} - {supplier.name}
+                    </option>
+                  ))}
+                </select>
+                {errors.supplierId && (
+                  <p className="mt-1 text-sm text-red-600">{errors.supplierId.message}</p>
                 )}
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="label">Manufacturer Part Number</label>
+                <label className="label">{t('passport.manufacturerPartNumber')}</label>
                 <input
                   type="text"
                   className="input"
-                  placeholder="e.g., 6ES7511-1AK02-0AB0"
+                  placeholder="e.g., LI-PKG-2000-001"
                   {...register('manufacturerPartNumber')}
                 />
               </div>
               <div>
-                <label className="label">Serial Number</label>
+                <label className="label">{t('passport.serialNumber')}</label>
                 <input
                   type="text"
                   className="input"
@@ -173,40 +260,135 @@ export default function PassportCreate() {
             </div>
           </div>
 
-          {/* Dates */}
+          {/* Dates & Location */}
           <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-gray-900">Dates & Location</h2>
+            <h2 className="text-lg font-semibold text-gray-900">{t('passport.datesAndLocation')}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="label">Manufacture Date</label>
+                <label className="label">{t('passport.manufactureDate')}</label>
                 <input type="date" className="input" {...register('manufactureDate')} />
               </div>
               <div>
-                <label className="label">Warranty Expiry Date</label>
+                <label className="label">{t('passport.warrantyExpiryDate')}</label>
                 <input type="date" className="input" {...register('warrantyExpiryDate')} />
               </div>
             </div>
             <div>
-              <label className="label">Current Location</label>
-              <input
-                type="text"
-                className="input"
-                placeholder="e.g., Warehouse A, Shelf 12"
-                {...register('currentLocation')}
-              />
+              <label className="label">{t('passport.currentLocation')}</label>
+              <div className="space-y-2">
+                <input
+                  type="text"
+                  className="input"
+                  placeholder="e.g., Warehouse A, Shelf 12"
+                  {...register('currentLocation')}
+                />
+                <MapPicker
+                  value={deviceLocation}
+                  onChange={setDeviceLocation}
+                  placeholder={t('passport.selectLocationOnMap')}
+                />
+              </div>
             </div>
+          </div>
+
+          {/* Buyer Information (Collapsible) */}
+          <div className="space-y-4">
+            <button
+              type="button"
+              className="flex items-center justify-between w-full text-left"
+              onClick={() => setShowBuyerInfo(!showBuyerInfo)}
+            >
+              <h2 className="text-lg font-semibold text-gray-900">{t('buyer.title')}</h2>
+              {showBuyerInfo ? (
+                <ChevronUp className="h-5 w-5 text-gray-500" />
+              ) : (
+                <ChevronDown className="h-5 w-5 text-gray-500" />
+              )}
+            </button>
+
+            {showBuyerInfo && (
+              <div className="space-y-4 pl-4 border-l-2 border-gray-200">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="label">{t('buyer.companyName')}</label>
+                    <input
+                      type="text"
+                      className="input"
+                      placeholder="e.g., ABC Manufacturing Co."
+                      {...register('buyerCompany')}
+                    />
+                  </div>
+                  <div>
+                    <label className="label">{t('buyer.contactPerson')}</label>
+                    <input
+                      type="text"
+                      className="input"
+                      placeholder="e.g., John Smith"
+                      {...register('buyerContact')}
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="label">{t('buyer.phone')}</label>
+                    <input
+                      type="tel"
+                      className="input"
+                      placeholder="e.g., +1-555-123-4567"
+                      {...register('buyerPhone')}
+                    />
+                  </div>
+                  <div>
+                    <label className="label">{t('buyer.email')}</label>
+                    <input
+                      type="email"
+                      className="input"
+                      placeholder="e.g., john@example.com"
+                      {...register('buyerEmail')}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="label">{t('buyer.country')}</label>
+                  <select className="input" {...register('buyerCountry')}>
+                    <option value="">{t('buyer.selectCountry')}</option>
+                    {COUNTRY_LIST.map((country) => (
+                      <option key={country.code} value={country.code}>
+                        {country.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="label">{t('buyer.address')}</label>
+                  <div className="space-y-2">
+                    <input
+                      type="text"
+                      className="input"
+                      placeholder="e.g., 123 Industrial Blvd, City, State 12345"
+                      {...register('buyerAddress')}
+                    />
+                    <MapPicker
+                      value={buyerLocation}
+                      onChange={setBuyerLocation}
+                      placeholder={t('buyer.selectBuyerLocation')}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="flex justify-end gap-3 pt-4 border-t">
             <Link to="/passports" className="btn-secondary">
-              Cancel
+              {t('common.cancel')}
             </Link>
             <button
               type="submit"
               disabled={createMutation.isPending}
               className="btn-primary"
             >
-              {createMutation.isPending ? 'Creating...' : 'Create Passport'}
+              {createMutation.isPending ? t('passport.creating') : t('passport.createPassport')}
             </button>
           </div>
         </form>

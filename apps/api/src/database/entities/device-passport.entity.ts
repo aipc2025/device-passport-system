@@ -83,6 +83,40 @@ export class DevicePassport {
   @Column({ name: 'current_location', nullable: true })
   currentLocation: string;
 
+  @Column({ name: 'location_lat', type: 'decimal', precision: 10, scale: 7, nullable: true })
+  locationLat: number;
+
+  @Column({ name: 'location_lng', type: 'decimal', precision: 10, scale: 7, nullable: true })
+  locationLng: number;
+
+  @Column({ name: 'location_updated_at', type: 'timestamp', nullable: true })
+  locationUpdatedAt: Date;
+
+  // Buyer information fields
+  @Column({ name: 'buyer_company', nullable: true })
+  buyerCompany: string;
+
+  @Column({ name: 'buyer_contact', nullable: true })
+  buyerContact: string;
+
+  @Column({ name: 'buyer_phone', nullable: true })
+  buyerPhone: string;
+
+  @Column({ name: 'buyer_country', nullable: true })
+  buyerCountry: string;
+
+  @Column({ name: 'buyer_address', nullable: true })
+  buyerAddress: string;
+
+  @Column({ name: 'buyer_address_lat', type: 'decimal', precision: 10, scale: 7, nullable: true })
+  buyerAddressLat: number;
+
+  @Column({ name: 'buyer_address_lng', type: 'decimal', precision: 10, scale: 7, nullable: true })
+  buyerAddressLng: number;
+
+  @Column({ name: 'buyer_email', nullable: true })
+  buyerEmail: string;
+
   @Column({ name: 'blockchain_hash', nullable: true })
   blockchainHash: string;
 

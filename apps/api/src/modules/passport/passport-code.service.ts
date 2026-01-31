@@ -6,6 +6,7 @@ import {
   OriginCode,
   generatePassportCode,
   validatePassportCode,
+  formatYearMonth,
 } from '@device-passport/shared';
 import { SequenceCounter } from '../../database/entities';
 import { ConfigService } from '@nestjs/config';
@@ -24,7 +25,10 @@ export class PassportCodeService {
   }
 
   async generateCode(productLine: ProductLine, originCode: OriginCode): Promise<string> {
-    const year = new Date().getFullYear();
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth() + 1; // JavaScript months are 0-indexed
+    const yearMonth = formatYearMonth(year, month);
 
     // Use transaction to ensure atomic sequence increment
     const queryRunner = this.dataSource.createQueryRunner();
@@ -36,7 +40,7 @@ export class PassportCodeService {
       let counter = await queryRunner.manager.findOne(SequenceCounter, {
         where: {
           companyCode: this.companyCode,
-          year,
+          yearMonth,
           productLine,
           originCode,
         },
@@ -47,7 +51,7 @@ export class PassportCodeService {
         // Create new counter
         counter = queryRunner.manager.create(SequenceCounter, {
           companyCode: this.companyCode,
-          year,
+          yearMonth,
           productLine,
           originCode,
           currentSequence: 0,
@@ -64,6 +68,7 @@ export class PassportCodeService {
       return generatePassportCode(
         this.companyCode,
         year,
+        month,
         productLine,
         originCode,
         counter.currentSequence,

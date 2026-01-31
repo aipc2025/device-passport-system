@@ -1,11 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { Package, ClipboardList, CheckCircle, AlertTriangle, Plus } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { passportApi, serviceOrderApi } from '../../services/api';
 import { useAuthStore } from '../../store/auth.store';
 import { UserRole, DeviceStatus, ServiceOrderStatus } from '@device-passport/shared';
 
 export default function Dashboard() {
+  const { t } = useTranslation();
   const { user, hasRole } = useAuthStore();
 
   const { data: passports } = useQuery({
@@ -20,14 +22,14 @@ export default function Dashboard() {
 
   const stats = [
     {
-      name: 'Total Devices',
+      name: t('dashboard.totalDevices'),
       value: passports?.meta?.total || 0,
       icon: Package,
       color: 'bg-blue-500',
       href: '/passports',
     },
     {
-      name: 'In Service',
+      name: t('dashboard.inService'),
       value:
         passports?.data?.filter((p: { status: DeviceStatus }) => p.status === DeviceStatus.IN_SERVICE)
           .length || 0,
@@ -36,7 +38,7 @@ export default function Dashboard() {
       href: '/passports?status=IN_SERVICE',
     },
     {
-      name: 'Open Orders',
+      name: t('dashboard.openOrders'),
       value:
         serviceOrders?.data?.filter(
           (o: { status: ServiceOrderStatus }) =>
@@ -47,7 +49,7 @@ export default function Dashboard() {
       href: '/service-orders',
     },
     {
-      name: 'QC Pending',
+      name: t('dashboard.qcPending'),
       value:
         passports?.data?.filter((p: { status: DeviceStatus }) => p.status === DeviceStatus.IN_QC)
           .length || 0,
@@ -62,13 +64,13 @@ export default function Dashboard() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600">Welcome back, {user?.name}</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('dashboard.title')}</h1>
+          <p className="text-gray-600">{t('dashboard.welcome')}, {user?.name}</p>
         </div>
         {hasRole([UserRole.OPERATOR]) && (
           <Link to="/passports/create" className="btn-primary">
             <Plus className="h-4 w-4 mr-2" />
-            Create Passport
+            {t('passport.create')}
           </Link>
         )}
       </div>
@@ -95,9 +97,9 @@ export default function Dashboard() {
         {/* Recent Passports */}
         <div className="card">
           <div className="p-4 border-b flex justify-between items-center">
-            <h2 className="text-lg font-semibold">Recent Device Passports</h2>
+            <h2 className="text-lg font-semibold">{t('dashboard.recentPassports')}</h2>
             <Link to="/passports" className="text-sm text-primary-600 hover:text-primary-500">
-              View all
+              {t('dashboard.viewAll')}
             </Link>
           </div>
           <div className="divide-y">
@@ -120,7 +122,7 @@ export default function Dashboard() {
               </Link>
             ))}
             {(!passports?.data || passports.data.length === 0) && (
-              <p className="p-4 text-gray-500 text-center">No device passports yet</p>
+              <p className="p-4 text-gray-500 text-center">{t('dashboard.noPassportsYet')}</p>
             )}
           </div>
         </div>
@@ -128,9 +130,9 @@ export default function Dashboard() {
         {/* Recent Service Orders */}
         <div className="card">
           <div className="p-4 border-b flex justify-between items-center">
-            <h2 className="text-lg font-semibold">Recent Service Orders</h2>
+            <h2 className="text-lg font-semibold">{t('dashboard.recentOrders')}</h2>
             <Link to="/service-orders" className="text-sm text-primary-600 hover:text-primary-500">
-              View all
+              {t('dashboard.viewAll')}
             </Link>
           </div>
           <div className="divide-y">
@@ -153,7 +155,7 @@ export default function Dashboard() {
               </Link>
             ))}
             {(!serviceOrders?.data || serviceOrders.data.length === 0) && (
-              <p className="p-4 text-gray-500 text-center">No service orders yet</p>
+              <p className="p-4 text-gray-500 text-center">{t('dashboard.noOrdersYet')}</p>
             )}
           </div>
         </div>

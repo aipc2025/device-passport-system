@@ -9,7 +9,7 @@ import {
 import { ProductLine, OriginCode } from '@device-passport/shared';
 
 @Entity('sequence_counters')
-@Unique(['companyCode', 'year', 'productLine', 'originCode'])
+@Unique(['companyCode', 'yearMonth', 'productLine', 'originCode'])
 export class SequenceCounter {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -17,8 +17,8 @@ export class SequenceCounter {
   @Column({ name: 'company_code', length: 3 })
   companyCode: string;
 
-  @Column()
-  year: number;
+  @Column({ name: 'year_month', length: 4, default: '0000' })
+  yearMonth: string; // Format: YYMM (e.g., "2601" for Jan 2026)
 
   @Column({
     name: 'product_line',

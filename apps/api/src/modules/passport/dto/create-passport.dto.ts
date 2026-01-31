@@ -5,12 +5,14 @@ import {
   IsUUID,
   IsDateString,
   IsObject,
+  IsNumber,
+  IsEmail,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ProductLine, OriginCode } from '@device-passport/shared';
 
 export class CreatePassportDto {
-  @ApiProperty({ enum: ProductLine, example: ProductLine.PLC })
+  @ApiProperty({ enum: ProductLine, example: ProductLine.PKG })
   @IsEnum(ProductLine)
   productLine: ProductLine;
 
@@ -18,15 +20,15 @@ export class CreatePassportDto {
   @IsEnum(OriginCode)
   originCode: OriginCode;
 
-  @ApiProperty({ example: 'Siemens S7-1500 PLC' })
+  @ApiProperty({ example: 'Automated Packaging Line' })
   @IsString()
   deviceName: string;
 
-  @ApiProperty({ example: 'S7-1500' })
+  @ApiProperty({ example: 'PKG-2000' })
   @IsString()
   deviceModel: string;
 
-  @ApiProperty({ example: 'Siemens' })
+  @ApiProperty({ example: 'LUNA INDUSTRY' })
   @IsString()
   manufacturer: string;
 
@@ -67,4 +69,55 @@ export class CreatePassportDto {
   @IsOptional()
   @IsString()
   currentLocation?: string;
+
+  @ApiPropertyOptional({ example: 21.0285, description: 'Location latitude' })
+  @IsOptional()
+  @IsNumber()
+  locationLat?: number;
+
+  @ApiPropertyOptional({ example: 105.8542, description: 'Location longitude' })
+  @IsOptional()
+  @IsNumber()
+  locationLng?: number;
+
+  // Buyer information fields
+  @ApiPropertyOptional({ example: 'ABC Manufacturing Co.' })
+  @IsOptional()
+  @IsString()
+  buyerCompany?: string;
+
+  @ApiPropertyOptional({ example: 'John Smith' })
+  @IsOptional()
+  @IsString()
+  buyerContact?: string;
+
+  @ApiPropertyOptional({ example: '+1-555-123-4567' })
+  @IsOptional()
+  @IsString()
+  buyerPhone?: string;
+
+  @ApiPropertyOptional({ example: 'US' })
+  @IsOptional()
+  @IsString()
+  buyerCountry?: string;
+
+  @ApiPropertyOptional({ example: '123 Industrial Blvd, City, State 12345' })
+  @IsOptional()
+  @IsString()
+  buyerAddress?: string;
+
+  @ApiPropertyOptional({ example: 40.7128, description: 'Buyer address latitude' })
+  @IsOptional()
+  @IsNumber()
+  buyerAddressLat?: number;
+
+  @ApiPropertyOptional({ example: -74.0060, description: 'Buyer address longitude' })
+  @IsOptional()
+  @IsNumber()
+  buyerAddressLng?: number;
+
+  @ApiPropertyOptional({ example: 'john.smith@abcmfg.com' })
+  @IsOptional()
+  @IsEmail()
+  buyerEmail?: string;
 }

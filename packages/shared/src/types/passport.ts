@@ -2,14 +2,15 @@ import { DeviceStatus, ProductLine, OriginCode } from '../enums';
 
 /**
  * Device passport code structure
- * Format: DP-{COMPANY}-{YEAR}-{PRODUCT}-{ORIGIN}-{SEQUENCE}-{CHECKSUM}
- * Example: DP-MED-2025-PLC-DE-000001-A7
+ * Format: DP-{COMPANY}-{YYMM}-{PRODUCT_TYPE}-{ORIGIN}-{SEQUENCE}-{CHECKSUM}
+ * Example: DP-MED-2601-PKG-CN-000001-A7
+ * YYMM = Year (last 2 digits) + Month (2 digits), e.g., 2601 for Jan 2026
  */
 export interface PassportCodeParts {
   prefix: 'DP';
   companyCode: string;
-  year: number;
-  productLine: ProductLine;
+  yearMonth: string; // Format: YYMM (e.g., "2601" for Jan 2026)
+  productType: ProductLine;
   originCode: OriginCode;
   sequence: number;
   checksum: string;

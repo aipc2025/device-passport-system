@@ -2,8 +2,9 @@ import { PassportCodeParts, ProductLine, OriginCode } from '../index';
 
 /**
  * Passport code utilities
- * Format: DP-{COMPANY}-{YEAR}-{PRODUCT}-{ORIGIN}-{SEQUENCE}-{CHECKSUM}
- * Example: DP-MED-2025-PLC-DE-000001-A7
+ * Format: DP-{COMPANY}-{YYMM}-{PRODUCT_TYPE}-{ORIGIN}-{SEQUENCE}-{CHECKSUM}
+ * Example: DP-MED-2601-PKG-CN-000001-A7
+ * YYMM = Year (last 2 digits) + Month (2 digits)
  */
 
 const PASSPORT_PREFIX = 'DP';
@@ -46,12 +47,49 @@ export function calculateChecksum(codeWithoutChecksum: string): string {
 }
 
 /**
+ * Format year and month to YYMM format
+ * e.g., 2026, 1 => "2601"
+ */
+export function formatYearMonth(year: number, month: number): string {
+  const yy = (year % 100).toString().padStart(2, '0');
+  const mm = month.toString().padStart(2, '0');
+  return `${yy}${mm}`;
+}
+
+/**
+ * Parse YYMM format to year and month
+ * e.g., "2601" => { year: 2026, month: 1 }
+ */
+export function parseYearMonth(yearMonth: string): { year: number; month: number } | null {
+  if (!/^\d{4}$/.test(yearMonth)) {
+    return null;
+  }
+  const yy = parseInt(yearMonth.substring(0, 2), 10);
+  const mm = parseInt(yearMonth.substring(2, 4), 10);
+
+  if (mm < 1 || mm > 12) {
+    return null;
+  }
+
+  // Assume 20xx century
+  const year = 2000 + yy;
+  return { year, month: mm };
+}
+
+/**
  * Generate a complete passport code
+ * @param companyCode - 3-letter company code
+ * @param year - Full year (e.g., 2026)
+ * @param month - Month (1-12)
+ * @param productType - Product type code
+ * @param originCode - Origin country code
+ * @param sequence - Sequence number
  */
 export function generatePassportCode(
   companyCode: string,
   year: number,
-  productLine: ProductLine,
+  month: number,
+  productType: ProductLine,
   originCode: OriginCode,
   sequence: number
 ): string {
@@ -62,15 +100,21 @@ export function generatePassportCode(
   if (year < 2000 || year > 2099) {
     throw new Error('Year must be between 2000 and 2099');
   }
+  if (month < 1 || month > 12) {
+    throw new Error('Month must be between 1 and 12');
+  }
   if (sequence < 0 || sequence > 999999) {
     throw new Error('Sequence must be between 0 and 999999');
   }
+
+  // Format year-month as YYMM
+  const yearMonth = formatYearMonth(year, month);
 
   // Format sequence with leading zeros
   const sequenceStr = sequence.toString().padStart(6, '0');
 
   // Build code without checksum
-  const codeWithoutChecksum = `${PASSPORT_PREFIX}-${companyCode.toUpperCase()}-${year}-${productLine}-${originCode}-${sequenceStr}`;
+  const codeWithoutChecksum = `${PASSPORT_PREFIX}-${companyCode.toUpperCase()}-${yearMonth}-${productType}-${originCode}-${sequenceStr}`;
 
   // Calculate and append checksum
   const checksum = calculateChecksum(codeWithoutChecksum);
@@ -82,19 +126,26 @@ export function generatePassportCode(
  * Parse a passport code into its components
  */
 export function parsePassportCode(code: string): PassportCodeParts | null {
+  // Updated regex: YYMM instead of YYYY, product type can be 2-3 chars
   const regex =
-    /^(DP)-([A-Z]{3})-(\d{4})-([A-Z]{3})-([A-Z]{2})-(\d{6})-([A-Z0-9]{2})$/;
+    /^(DP)-([A-Z]{3})-(\d{4})-([A-Z]{2,3})-([A-Z]{2})-(\d{6})-([A-Z0-9]{2})$/;
   const match = code.toUpperCase().match(regex);
 
   if (!match) {
     return null;
   }
 
-  const [, prefix, companyCode, yearStr, productLineStr, originCodeStr, sequenceStr, checksum] =
+  const [, prefix, companyCode, yearMonth, productTypeStr, originCodeStr, sequenceStr, checksum] =
     match;
 
-  // Validate product line
-  if (!Object.values(ProductLine).includes(productLineStr as ProductLine)) {
+  // Validate year-month format
+  const parsedYM = parseYearMonth(yearMonth);
+  if (!parsedYM) {
+    return null;
+  }
+
+  // Validate product type
+  if (!Object.values(ProductLine).includes(productTypeStr as ProductLine)) {
     return null;
   }
 
@@ -106,8 +157,8 @@ export function parsePassportCode(code: string): PassportCodeParts | null {
   return {
     prefix: prefix as 'DP',
     companyCode,
-    year: parseInt(yearStr, 10),
-    productLine: productLineStr as ProductLine,
+    yearMonth,
+    productType: productTypeStr as ProductLine,
     originCode: originCodeStr as OriginCode,
     sequence: parseInt(sequenceStr, 10),
     checksum,
@@ -132,7 +183,7 @@ export function validatePassportCode(code: string): {
   }
 
   // Build code without checksum and verify
-  const codeWithoutChecksum = `${parts.prefix}-${parts.companyCode}-${parts.year}-${parts.productLine}-${parts.originCode}-${parts.sequence.toString().padStart(6, '0')}`;
+  const codeWithoutChecksum = `${parts.prefix}-${parts.companyCode}-${parts.yearMonth}-${parts.productType}-${parts.originCode}-${parts.sequence.toString().padStart(6, '0')}`;
 
   const expectedChecksum = calculateChecksum(codeWithoutChecksum);
 

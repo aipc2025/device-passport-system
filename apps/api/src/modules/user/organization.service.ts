@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Organization } from '../../database/entities';
 import { CreateOrganizationDto, UpdateOrganizationDto } from './dto';
+import { OrganizationType } from '@device-passport/shared';
 
 @Injectable()
 export class OrganizationService {
@@ -15,9 +16,13 @@ export class OrganizationService {
     private organizationRepository: Repository<Organization>,
   ) {}
 
-  async findAll(): Promise<Organization[]> {
+  async findAll(type?: OrganizationType): Promise<Organization[]> {
+    const where: Record<string, unknown> = { isActive: true };
+    if (type) {
+      where.type = type;
+    }
     return this.organizationRepository.find({
-      where: { isActive: true },
+      where,
       order: { name: 'ASC' },
     });
   }

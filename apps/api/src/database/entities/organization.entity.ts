@@ -43,6 +43,15 @@ export class Organization {
   @Column({ nullable: true })
   website: string;
 
+  @Column({ name: 'contact_person', nullable: true })
+  contactPerson: string;
+
+  @Column({ name: 'backup_contact', nullable: true })
+  backupContact: string;
+
+  @Column({ name: 'backup_phone', nullable: true })
+  backupPhone: string;
+
   @Column({ name: 'is_active', default: true })
   isActive: boolean;
 

@@ -1,25 +1,31 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import {
-  QrCode,
   LayoutDashboard,
   Package,
   ClipboardList,
   LogOut,
+  Building2,
+  UserCheck,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../../store/auth.store';
 import { UserRole } from '@device-passport/shared';
+import LanguageSwitcher from '../common/LanguageSwitcher';
 import clsx from 'clsx';
 
-const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, roles: [UserRole.CUSTOMER] },
-  { name: 'Device Passports', href: '/passports', icon: Package, roles: [UserRole.CUSTOMER] },
-  { name: 'Service Orders', href: '/service-orders', icon: ClipboardList, roles: [UserRole.CUSTOMER] },
-];
-
 export default function DashboardLayout() {
+  const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout, hasRole } = useAuthStore();
+
+  const navigation = [
+    { name: t('common.dashboard'), href: '/dashboard', icon: LayoutDashboard, roles: [UserRole.CUSTOMER] },
+    { name: t('nav.devicePassports'), href: '/passports', icon: Package, roles: [UserRole.CUSTOMER] },
+    { name: t('nav.serviceOrders'), href: '/service-orders', icon: ClipboardList, roles: [UserRole.CUSTOMER] },
+    { name: t('nav.suppliers'), href: '/suppliers', icon: Building2, roles: [UserRole.ADMIN] },
+    { name: t('nav.registrations'), href: '/registrations', icon: UserCheck, roles: [UserRole.ADMIN] },
+  ];
 
   const handleLogout = () => {
     logout();
@@ -36,8 +42,8 @@ export default function DashboardLayout() {
           {/* Logo */}
           <div className="flex items-center h-16 px-4 bg-gray-800">
             <Link to="/dashboard" className="flex items-center space-x-2">
-              <QrCode className="h-8 w-8 text-primary-400" />
-              <span className="text-lg font-bold text-white">Device Passport</span>
+              <img src="/luna-logo.png" alt="Luna Industry" className="h-8 w-auto" />
+              <span className="text-lg font-bold text-white">{t('common.appName')}</span>
             </Link>
           </div>
 
@@ -63,6 +69,11 @@ export default function DashboardLayout() {
             })}
           </nav>
 
+          {/* Language Switcher */}
+          <div className="px-4 py-2 border-t border-gray-700">
+            <LanguageSwitcher variant="dark" />
+          </div>
+
           {/* User menu */}
           <div className="border-t border-gray-700 p-4">
             <div className="flex items-center">
@@ -80,6 +91,7 @@ export default function DashboardLayout() {
               <button
                 onClick={handleLogout}
                 className="p-1 rounded-md text-gray-400 hover:text-white hover:bg-gray-700"
+                title={t('common.logout')}
               >
                 <LogOut className="h-5 w-5" />
               </button>
@@ -96,7 +108,7 @@ export default function DashboardLayout() {
             to="/"
             className="text-sm text-gray-500 hover:text-gray-700"
           >
-            Back to Public Site
+            {t('common.backToPublicSite')}
           </Link>
         </header>
 

@@ -92,4 +92,15 @@ export class PassportController {
   async delete(@Param('id') id: string) {
     return this.passportService.delete(id);
   }
+
+  @Patch(':id/location')
+  @Roles(UserRole.OPERATOR)
+  @ApiOperation({ summary: 'Update device GPS location (for GPS tracking integration)' })
+  async updateLocation(
+    @Param('id') id: string,
+    @Body() locationDto: { lat: number; lng: number; address?: string },
+    @CurrentUser() user: TokenPayload,
+  ) {
+    return this.passportService.updateLocation(id, locationDto, user.sub);
+  }
 }

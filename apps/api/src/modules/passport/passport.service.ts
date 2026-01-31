@@ -252,4 +252,36 @@ export class PassportService {
     const passport = await this.findById(id);
     await this.passportRepository.remove(passport);
   }
+
+  async updateLocation(
+    id: string,
+    locationDto: { lat: number; lng: number; address?: string },
+    userId: string,
+  ): Promise<DevicePassport> {
+    const passport = await this.findById(id);
+    const previousLocation = passport.currentLocation;
+
+    // Update location fields
+    passport.locationLat = locationDto.lat;
+    passport.locationLng = locationDto.lng;
+    passport.locationUpdatedAt = new Date();
+    if (locationDto.address) {
+      passport.currentLocation = locationDto.address;
+    }
+    passport.updatedBy = userId;
+
+    const updatedPassport = await this.passportRepository.save(passport);
+
+    // Create lifecycle event for location change
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    await this.lifecycleService.create({
+      passportId: id,
+      eventType: LifecycleEventType.LOCATION_CHANGE,
+      previousLocation,
+      newLocation: locationDto.address || `${locationDto.lat}, ${locationDto.lng}`,
+      description: `GPS location updated to ${locationDto.lat}, ${locationDto.lng}`,
+    }, userId, user?.name || 'System', user?.role || 'SYSTEM');
+
+    return updatedPassport;
+  }
 }

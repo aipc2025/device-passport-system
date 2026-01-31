@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Plus, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { passportApi } from '../../services/api';
 import { useAuthStore } from '../../store/auth.store';
 import { UserRole, DeviceStatus, ProductLine, PassportListItem } from '@device-passport/shared';
@@ -27,6 +28,7 @@ const statusColors: Record<string, string> = {
 };
 
 export default function PassportList() {
+  const { t } = useTranslation();
   const { hasRole } = useAuthStore();
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState(searchParams.get('search') || '');
@@ -63,13 +65,13 @@ export default function PassportList() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Device Passports</h1>
-          <p className="text-gray-600">Manage device passports and their lifecycle</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('passport.title')}</h1>
+          <p className="text-gray-600">{t('passport.description')}</p>
         </div>
         {hasRole([UserRole.OPERATOR]) && (
           <Link to="/passports/create" className="btn-primary">
             <Plus className="h-4 w-4 mr-2" />
-            Create Passport
+            {t('passport.create')}
           </Link>
         )}
       </div>
@@ -82,7 +84,7 @@ export default function PassportList() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search by code, name, or model..."
+                placeholder={t('common.search') + '...'}
                 className="input pl-10"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -103,7 +105,7 @@ export default function PassportList() {
               setSearchParams(params);
             }}
           >
-            <option value="">All Status</option>
+            <option value="">{t('common.allStatus')}</option>
             {Object.values(DeviceStatus).map((s) => (
               <option key={s} value={s}>
                 {s.replace(/_/g, ' ')}
@@ -124,10 +126,10 @@ export default function PassportList() {
               setSearchParams(params);
             }}
           >
-            <option value="">All Product Lines</option>
+            <option value="">{t('common.allProductTypes')}</option>
             {Object.values(ProductLine).map((pl) => (
               <option key={pl} value={pl}>
-                {pl}
+                {pl} - {t(`productTypes.${pl}`)}
               </option>
             ))}
           </select>
@@ -141,22 +143,22 @@ export default function PassportList() {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Passport Code
+                  {t('passport.passportCode')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Device
+                  {t('passport.device')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Product Line
+                  {t('passport.productType')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
+                  {t('passport.status')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Location
+                  {t('passport.location')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Created
+                  {t('passport.createdAt')}
                 </th>
               </tr>
             </thead>
@@ -164,13 +166,13 @@ export default function PassportList() {
               {isLoading ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
-                    Loading...
+                    {t('common.loading')}
                   </td>
                 </tr>
               ) : data?.data?.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
-                    No device passports found
+                    {t('passport.noPassports')}
                   </td>
                 </tr>
               ) : (
@@ -213,8 +215,8 @@ export default function PassportList() {
         {data?.meta && data.meta.totalPages > 1 && (
           <div className="px-6 py-4 border-t flex items-center justify-between">
             <div className="text-sm text-gray-500">
-              Showing {(page - 1) * 10 + 1} to {Math.min(page * 10, data.meta.total)} of{' '}
-              {data.meta.total} results
+              {t('common.showing')} {(page - 1) * 10 + 1} {t('common.to')} {Math.min(page * 10, data.meta.total)} {t('common.of')}{' '}
+              {data.meta.total} {t('common.results')}
             </div>
             <div className="flex gap-2">
               <button

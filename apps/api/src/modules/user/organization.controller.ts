@@ -6,14 +6,15 @@ import {
   Delete,
   Body,
   Param,
+  Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { OrganizationService } from './organization.service';
 import { CreateOrganizationDto, UpdateOrganizationDto } from './dto';
 import { JwtAuthGuard, RolesGuard } from '../../common/guards';
 import { Roles } from '../../common/decorators';
-import { UserRole } from '@device-passport/shared';
+import { UserRole, OrganizationType } from '@device-passport/shared';
 
 @ApiTags('organizations')
 @Controller('organizations')
@@ -25,8 +26,16 @@ export class OrganizationController {
   @Get()
   @Roles(UserRole.OPERATOR)
   @ApiOperation({ summary: 'Get all organizations' })
-  async findAll() {
-    return this.organizationService.findAll();
+  @ApiQuery({ name: 'type', enum: OrganizationType, required: false })
+  async findAll(@Query('type') type?: OrganizationType) {
+    return this.organizationService.findAll(type);
+  }
+
+  @Get('suppliers')
+  @Roles(UserRole.OPERATOR)
+  @ApiOperation({ summary: 'Get all suppliers (manufacturers)' })
+  async findAllSuppliers() {
+    return this.organizationService.findAll(OrganizationType.SUPPLIER);
   }
 
   @Get(':id')

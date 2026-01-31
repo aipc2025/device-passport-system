@@ -115,37 +115,40 @@ async function seed() {
   });
 
   console.log('Seeding sequence counters...');
-  // Create sequence counter
+  // Create sequence counter (using YYMM format)
+  const now = new Date();
+  const yearMonth = `${(now.getFullYear() % 100).toString().padStart(2, '0')}${(now.getMonth() + 1).toString().padStart(2, '0')}`;
+
   await sequenceRepo.save({
     companyCode: 'MED',
-    year: new Date().getFullYear(),
-    productLine: ProductLine.PLC,
-    originCode: OriginCode.DE,
+    yearMonth,
+    productLine: ProductLine.PKG,
+    originCode: OriginCode.CN,
     currentSequence: 2,
   });
 
   console.log('Seeding device passports...');
-  // Generate passport codes using the official algorithm
-  const passportCode1 = generatePassportCode('MED', 2025, ProductLine.PLC, OriginCode.DE, 1);
-  const passportCode2 = generatePassportCode('MED', 2025, ProductLine.PLC, OriginCode.DE, 2);
+  // Generate passport codes using the official algorithm (year, month, productType)
+  const passportCode1 = generatePassportCode('MED', 2026, 1, ProductLine.PKG, OriginCode.CN, 1);
+  const passportCode2 = generatePassportCode('MED', 2026, 1, ProductLine.IP, OriginCode.DE, 2);
 
   console.log('  Generated codes:', passportCode1, passportCode2);
 
   // Create sample passports
   await passportRepo.save({
     passportCode: passportCode1,
-    productLine: ProductLine.PLC,
-    originCode: OriginCode.DE,
+    productLine: ProductLine.PKG,
+    originCode: OriginCode.CN,
     status: DeviceStatus.IN_SERVICE,
-    deviceName: 'Siemens S7-1500 PLC',
-    deviceModel: 'S7-1500',
-    manufacturer: 'Siemens',
-    manufacturerPartNumber: '6ES7511-1AK02-0AB0',
+    deviceName: 'Automated Packaging Line PKG-2000',
+    deviceModel: 'PKG-2000',
+    manufacturer: 'LUNA INDUSTRY',
+    manufacturerPartNumber: 'LI-PKG-2000-001',
     serialNumber: 'SN-2025-001',
     specifications: {
-      voltage: '24V DC',
-      memory: '150KB',
-      interfaces: ['PROFINET', 'PROFIBUS'],
+      voltage: '380V AC',
+      capacity: '2000 units/hour',
+      interfaces: ['PLC', 'HMI'],
     },
     manufactureDate: new Date('2025-01-10'),
     warrantyExpiryDate: new Date('2027-01-10'),
@@ -158,18 +161,18 @@ async function seed() {
 
   await passportRepo.save({
     passportCode: passportCode2,
-    productLine: ProductLine.PLC,
+    productLine: ProductLine.IP,
     originCode: OriginCode.DE,
     status: DeviceStatus.IN_QC,
-    deviceName: 'Siemens S7-1200 PLC',
-    deviceModel: 'S7-1200',
+    deviceName: 'Siemens S7-1500 PLC Controller',
+    deviceModel: 'S7-1500',
     manufacturer: 'Siemens',
-    manufacturerPartNumber: '6ES7214-1AG40-0XB0',
+    manufacturerPartNumber: '6ES7511-1AK02-0AB0',
     serialNumber: 'SN-2025-002',
     specifications: {
       voltage: '24V DC',
-      memory: '75KB',
-      interfaces: ['PROFINET'],
+      memory: '150KB',
+      interfaces: ['PROFINET', 'PROFIBUS'],
     },
     manufactureDate: new Date('2025-01-15'),
     warrantyExpiryDate: new Date('2027-01-15'),

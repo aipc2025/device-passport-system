@@ -11,7 +11,12 @@ import Scan from './pages/Scan';
 import DevicePublic from './pages/DevicePublic';
 import ServiceRequest from './pages/ServiceRequest';
 import Login from './pages/Login';
-import Register from './pages/Register';
+
+// Registration pages
+import RegistrationTypeSelection from './pages/registration';
+import CompanyRegistration from './pages/registration/CompanyRegistration';
+import ExpertRegistration from './pages/registration/ExpertRegistration';
+import RegistrationSuccess from './pages/registration/RegistrationSuccess';
 
 // Protected pages
 import Dashboard from './pages/admin/Dashboard';
@@ -20,6 +25,8 @@ import PassportCreate from './pages/admin/PassportCreate';
 import PassportDetail from './pages/admin/PassportDetail';
 import ServiceOrderList from './pages/admin/ServiceOrderList';
 import ServiceOrderDetail from './pages/admin/ServiceOrderDetail';
+import SupplierList from './pages/admin/SupplierList';
+import PendingRegistrations from './pages/admin/PendingRegistrations';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -42,7 +49,10 @@ function App() {
           <Route path="/scan/:code" element={<DevicePublic />} />
           <Route path="/service-request" element={<ServiceRequest />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          <Route path="/register" element={<RegistrationTypeSelection />} />
+          <Route path="/register/company" element={<CompanyRegistration />} />
+          <Route path="/register/expert" element={<ExpertRegistration />} />
+          <Route path="/registration/success" element={<RegistrationSuccess />} />
         </Route>
 
         {/* Protected routes */}
@@ -59,6 +69,8 @@ function App() {
           <Route path="/passports/:id" element={<PassportDetail />} />
           <Route path="/service-orders" element={<ServiceOrderList />} />
           <Route path="/service-orders/:id" element={<ServiceOrderDetail />} />
+          <Route path="/suppliers" element={<SupplierList />} />
+          <Route path="/registrations" element={<PendingRegistrations />} />
         </Route>
 
         {/* Fallback */}

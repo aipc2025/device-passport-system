@@ -8,28 +8,32 @@ import clsx from 'clsx';
 
 interface ServiceRequest {
   id: string;
-  code: string;
+  requestCode: string;
   title: string;
   description: string;
   serviceType: string;
-  urgency: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
-  location: string;
-  estimatedDuration: string;
+  urgency: 'LOW' | 'NORMAL' | 'HIGH' | 'URGENT';
+  serviceLocation?: string;
+  locationLat?: number;
+  locationLng?: number;
   requiredSkills: string[];
-  budget?: number;
+  budgetMin?: number;
+  budgetMax?: number;
   budgetCurrency?: string;
   deadline?: string;
+  preferredDate?: string;
   createdAt: string;
   organization?: {
     id: string;
     name: string;
   };
-  applicantCount: number;
+  viewCount: number;
+  applicationCount: number;
 }
 
-const urgencyConfig = {
+const urgencyConfig: Record<string, { color: string; label: string }> = {
   LOW: { color: 'bg-green-100 text-green-800', label: 'Low' },
-  MEDIUM: { color: 'bg-yellow-100 text-yellow-800', label: 'Medium' },
+  NORMAL: { color: 'bg-blue-100 text-blue-800', label: 'Normal' },
   HIGH: { color: 'bg-orange-100 text-orange-800', label: 'High' },
   URGENT: { color: 'bg-red-100 text-red-800', label: 'Urgent' },
 };
@@ -92,8 +96,8 @@ export default function ServiceHall() {
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
             >
               <option value="">{t('expert.allTypes', 'All Types')}</option>
-              {serviceTypes?.map((type: string) => (
-                <option key={type} value={type}>{type}</option>
+              {serviceTypes?.map((type: { value: string; label: string }) => (
+                <option key={type.value} value={type.value}>{type.label}</option>
               ))}
             </select>
           </div>
@@ -121,10 +125,10 @@ export default function ServiceHall() {
             <div key={i} className="bg-gray-100 rounded-lg h-40 animate-pulse" />
           ))}
         </div>
-      ) : requests && requests.length > 0 ? (
+      ) : requests?.data && requests.data.length > 0 ? (
         <div className="space-y-4">
-          {requests.map((request: ServiceRequest) => {
-            const urgency = urgencyConfig[request.urgency] || urgencyConfig.MEDIUM;
+          {requests.data.map((request: ServiceRequest) => {
+            const urgency = urgencyConfig[request.urgency] || urgencyConfig.NORMAL;
 
             return (
               <div
@@ -135,7 +139,7 @@ export default function ServiceHall() {
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2 flex-wrap">
                       <span className="text-sm text-gray-500">
-                        {request.code}
+                        {request.requestCode}
                       </span>
                       <span className={clsx(
                         'px-2 py-0.5 text-xs font-medium rounded-full',
@@ -161,13 +165,17 @@ export default function ServiceHall() {
                     )}
                   </div>
                   <div className="text-right">
-                    {request.budget && (
+                    {(request.budgetMin || request.budgetMax) && (
                       <p className="text-lg font-semibold text-green-600">
-                        {request.budgetCurrency || 'USD'} {request.budget.toLocaleString()}
+                        {request.budgetCurrency || 'USD'}{' '}
+                        {request.budgetMin && request.budgetMax
+                          ? `${request.budgetMin.toLocaleString()} - ${request.budgetMax.toLocaleString()}`
+                          : (request.budgetMax || request.budgetMin || 0).toLocaleString()
+                        }
                       </p>
                     )}
                     <p className="text-xs text-gray-400 mt-1">
-                      {request.applicantCount} {t('expert.applicants', 'applicants')}
+                      {request.applicationCount} {t('expert.applicants', 'applicants')}
                     </p>
                   </div>
                 </div>
@@ -179,16 +187,16 @@ export default function ServiceHall() {
 
                 {/* Details */}
                 <div className="flex flex-wrap gap-4 text-sm text-gray-500 mb-4">
-                  {request.location && (
+                  {request.serviceLocation && (
                     <span className="flex items-center gap-1">
                       <MapPin className="w-4 h-4" />
-                      {request.location}
+                      {request.serviceLocation}
                     </span>
                   )}
-                  {request.estimatedDuration && (
+                  {request.preferredDate && (
                     <span className="flex items-center gap-1">
                       <Clock className="w-4 h-4" />
-                      {request.estimatedDuration}
+                      {t('expert.preferredDate', 'Preferred')}: {new Date(request.preferredDate).toLocaleDateString()}
                     </span>
                   )}
                   {request.deadline && (

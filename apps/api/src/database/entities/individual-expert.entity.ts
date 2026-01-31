@@ -65,6 +65,23 @@ export class IndividualExpert {
   @Column({ type: 'jsonb', nullable: true })
   certifications: string[];
 
+  // Expert Passport Code (EP-TECH-2501-000001-A7)
+  @Column({ name: 'expert_code', unique: true, nullable: true })
+  expertCode: string;
+
+  @Column({ name: 'expert_code_generated_at', nullable: true })
+  expertCodeGeneratedAt: Date;
+
+  // Service Availability
+  @Column({ name: 'is_available', default: true })
+  isAvailable: boolean;
+
+  @Column({ name: 'skill_tags', type: 'jsonb', default: '[]' })
+  skillTags: string[];
+
+  @Column({ name: 'service_radius', type: 'int', default: 50 })
+  serviceRadius: number; // Service radius in km
+
   // Location
   @Column({ name: 'current_location', nullable: true })
   currentLocation: string;
@@ -74,6 +91,19 @@ export class IndividualExpert {
 
   @Column({ name: 'location_lng', type: 'decimal', precision: 10, scale: 7, nullable: true })
   locationLng: number;
+
+  @Column({ name: 'last_location_update_at', nullable: true })
+  lastLocationUpdateAt: Date;
+
+  // Rating (aggregated from service records)
+  @Column({ name: 'avg_rating', type: 'decimal', precision: 3, scale: 2, nullable: true })
+  avgRating: number;
+
+  @Column({ name: 'total_reviews', type: 'int', default: 0 })
+  totalReviews: number;
+
+  @Column({ name: 'completed_services', type: 'int', default: 0 })
+  completedServices: number;
 
   // Admin fields
   @Column({ name: 'personal_notes', type: 'text', nullable: true })

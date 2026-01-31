@@ -22,6 +22,7 @@ import {
   UpdateRegistrationStatusDto,
 } from './dto';
 import { UploadService } from '../upload/upload.service';
+import { ExpertCodeService } from '../expert/expert-code.service';
 import {
   RegistrationStatus,
   RegistrationType,
@@ -69,6 +70,7 @@ export class RegistrationService {
     @InjectRepository(UploadedFile)
     private readonly uploadedFileRepository: Repository<UploadedFile>,
     private readonly uploadService: UploadService,
+    private readonly expertCodeService: ExpertCodeService,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -466,10 +468,17 @@ export class RegistrationService {
     expert.reviewedBy = adminUserId;
     expert.reviewedAt = new Date();
 
-    await this.expertRepository.save(expert);
-
-    // If approved, upgrade user role
+    // If approved, generate expert passport code and upgrade user role
     if (dto.status === RegistrationStatus.APPROVED) {
+      // Generate expert passport code (EP-TECH-YYMM-NNNNNN-CC)
+      if (!expert.expertCode) {
+        const expertCode = await this.expertCodeService.generateCode(expert.expertTypes);
+        expert.expertCode = expertCode;
+        expert.expertCodeGeneratedAt = new Date();
+      }
+
+      await this.expertRepository.save(expert);
+
       const user = await this.userRepository.findOne({
         where: { id: expert.userId },
       });
@@ -479,6 +488,8 @@ export class RegistrationService {
         user.role = UserRole.ENGINEER;
         await this.userRepository.save(user);
       }
+    } else {
+      await this.expertRepository.save(expert);
     }
   }
 

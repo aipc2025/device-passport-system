@@ -483,3 +483,99 @@ export const PURCHASE_FREQUENCY_NAMES: Record<PurchaseFrequency, string> = {
   [PurchaseFrequency.YEARLY]: 'Yearly',
   [PurchaseFrequency.AS_NEEDED]: 'As Needed',
 };
+
+// ============================================
+// Expert Service System Enums
+// ============================================
+
+/**
+ * Public service request status
+ */
+export enum ServiceRequestStatus {
+  DRAFT = 'DRAFT',
+  OPEN = 'OPEN',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED',
+  EXPIRED = 'EXPIRED',
+}
+
+/**
+ * Service request status display names
+ */
+export const SERVICE_REQUEST_STATUS_NAMES: Record<ServiceRequestStatus, string> = {
+  [ServiceRequestStatus.DRAFT]: 'Draft',
+  [ServiceRequestStatus.OPEN]: 'Open',
+  [ServiceRequestStatus.IN_PROGRESS]: 'In Progress',
+  [ServiceRequestStatus.COMPLETED]: 'Completed',
+  [ServiceRequestStatus.CANCELLED]: 'Cancelled',
+  [ServiceRequestStatus.EXPIRED]: 'Expired',
+};
+
+/**
+ * Service request urgency level
+ */
+export enum ServiceUrgency {
+  LOW = 'LOW',
+  NORMAL = 'NORMAL',
+  HIGH = 'HIGH',
+  URGENT = 'URGENT',
+}
+
+/**
+ * Service urgency display names
+ */
+export const SERVICE_URGENCY_NAMES: Record<ServiceUrgency, string> = {
+  [ServiceUrgency.LOW]: 'Low',
+  [ServiceUrgency.NORMAL]: 'Normal',
+  [ServiceUrgency.HIGH]: 'High',
+  [ServiceUrgency.URGENT]: 'Urgent',
+};
+
+/**
+ * Expert application status for service requests
+ */
+export enum ExpertApplicationStatus {
+  PENDING = 'PENDING',
+  ACCEPTED = 'ACCEPTED',
+  REJECTED = 'REJECTED',
+  WITHDRAWN = 'WITHDRAWN',
+}
+
+/**
+ * Expert application status display names
+ */
+export const EXPERT_APPLICATION_STATUS_NAMES: Record<ExpertApplicationStatus, string> = {
+  [ExpertApplicationStatus.PENDING]: 'Pending',
+  [ExpertApplicationStatus.ACCEPTED]: 'Accepted',
+  [ExpertApplicationStatus.REJECTED]: 'Rejected',
+  [ExpertApplicationStatus.WITHDRAWN]: 'Withdrawn',
+};
+
+/**
+ * Expert match type (for expert-to-service matching)
+ */
+export enum ExpertMatchType {
+  SERVICE_TO_EXPERT = 'SERVICE_TO_EXPERT',
+  EXPERT_TO_SERVICE = 'EXPERT_TO_SERVICE',
+}
+
+/**
+ * Expert match status
+ */
+export enum ExpertMatchStatus {
+  NEW = 'NEW',
+  VIEWED = 'VIEWED',
+  APPLIED = 'APPLIED',
+  DISMISSED = 'DISMISSED',
+}
+
+/**
+ * Expert match status display names
+ */
+export const EXPERT_MATCH_STATUS_NAMES: Record<ExpertMatchStatus, string> = {
+  [ExpertMatchStatus.NEW]: 'New',
+  [ExpertMatchStatus.VIEWED]: 'Viewed',
+  [ExpertMatchStatus.APPLIED]: 'Applied',
+  [ExpertMatchStatus.DISMISSED]: 'Dismissed',
+};

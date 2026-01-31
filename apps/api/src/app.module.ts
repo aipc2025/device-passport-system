@@ -17,6 +17,8 @@ import { MatchingModule } from './modules/matching/matching.module';
 import { InquiryModule } from './modules/inquiry/inquiry.module';
 import { SavedModule } from './modules/saved/saved.module';
 import { ExpertModule } from './modules/expert/expert.module';
+import { ServiceRequestModule } from './modules/service-request/service-request.module';
+import { ExpertMatchingModule } from './modules/expert-matching/expert-matching.module';
 import databaseConfig from './config/database.config';
 import jwtConfig from './config/jwt.config';
 
@@ -67,6 +69,8 @@ import jwtConfig from './config/jwt.config';
     InquiryModule,
     SavedModule,
     ExpertModule,
+    ServiceRequestModule,
+    ExpertMatchingModule,
   ],
 })
 export class AppModule {}

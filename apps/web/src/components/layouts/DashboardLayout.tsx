@@ -89,6 +89,7 @@ export default function DashboardLayout() {
       expertOnly: true,
       children: [
         { name: t('nav.expertProfile', 'My Profile'), href: '/expert/profile' },
+        { name: t('nav.expertPassport', 'My Passport'), href: '/expert/passport' },
         { name: t('nav.serviceRecords', 'Service Records'), href: '/expert/service-records' },
         { name: t('nav.expertMatches', 'Matches'), href: '/expert/matches' },
       ],

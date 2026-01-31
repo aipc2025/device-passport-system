@@ -519,6 +519,26 @@ export const expertApi = {
     const response = await api.patch(`/experts/${expertId}`, data);
     return response.data.data || response.data;
   },
+  // Expert Passport
+  getPassport: async (expertId: string) => {
+    const response = await api.get(`/experts/${expertId}/passport`);
+    return response.data.data || response.data;
+  },
+  // Location management
+  updateLocation: async (expertId: string, data: { latitude?: number; longitude?: number; currentLocation?: string }) => {
+    const response = await api.patch(`/experts/${expertId}/location`, data);
+    return response.data.data || response.data;
+  },
+  // Availability management
+  updateAvailability: async (expertId: string, data: { isAvailable?: boolean; serviceRadius?: number }) => {
+    const response = await api.patch(`/experts/${expertId}/availability`, data);
+    return response.data.data || response.data;
+  },
+  // Skills management
+  updateSkills: async (expertId: string, skillTags: string[]) => {
+    const response = await api.patch(`/experts/${expertId}/skills`, { skillTags });
+    return response.data.data || response.data;
+  },
   // Service records
   getServiceRecords: async (expertId: string) => {
     const response = await api.get(`/experts/${expertId}/service-records`);
@@ -534,8 +554,12 @@ export const expertApi = {
     return response.data.data || response.data;
   },
   // Service Hall (public service requests)
-  getPublicServiceRequests: async (params?: { search?: string; serviceType?: string; urgency?: string }) => {
+  getPublicServiceRequests: async (params?: { search?: string; serviceType?: string; urgency?: string; limit?: number; offset?: number }) => {
     const response = await api.get('/service-requests/public', { params });
+    return response.data.data || response.data;
+  },
+  getServiceRequestDetail: async (id: string) => {
+    const response = await api.get(`/service-requests/public/${id}`);
     return response.data.data || response.data;
   },
   getServiceTypes: async () => {
@@ -544,6 +568,27 @@ export const expertApi = {
   },
   applyForService: async (serviceRequestId: string, data?: Record<string, unknown>) => {
     const response = await api.post(`/service-requests/${serviceRequestId}/apply`, data);
+    return response.data.data || response.data;
+  },
+  getMyApplications: async () => {
+    const response = await api.get('/service-requests/applications/my');
+    return response.data.data || response.data;
+  },
+  withdrawApplication: async (applicationId: string) => {
+    const response = await api.delete(`/service-requests/applications/${applicationId}`);
+    return response.data.data || response.data;
+  },
+  // Expert Matching
+  getExpertMatches: async (limit = 50) => {
+    const response = await api.get('/expert-matching/expert/my', { params: { limit } });
+    return response.data.data || response.data;
+  },
+  viewExpertMatch: async (matchId: string) => {
+    const response = await api.post(`/expert-matching/${matchId}/view`);
+    return response.data.data || response.data;
+  },
+  dismissExpertMatch: async (matchId: string) => {
+    const response = await api.post(`/expert-matching/${matchId}/dismiss`);
     return response.data.data || response.data;
   },
 };

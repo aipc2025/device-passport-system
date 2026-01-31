@@ -82,6 +82,8 @@ export interface TokenPayload {
   email: string;
   role: UserRole;
   organizationId?: string;
+  isExpert?: boolean;
+  expertId?: string;
   iat?: number;
   exp?: number;
 }

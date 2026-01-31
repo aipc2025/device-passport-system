@@ -88,4 +88,86 @@ export class ExpertService {
     // Implementation for dismissing an expert match
     // This would update the match status to DISMISSED
   }
+
+  // ==========================================
+  // Location & Availability Methods
+  // ==========================================
+
+  async updateLocation(
+    expertId: string,
+    userId: string,
+    data: { latitude?: number; longitude?: number; currentLocation?: string },
+  ): Promise<IndividualExpert> {
+    const expert = await this.getProfile(expertId, userId);
+
+    if (data.latitude !== undefined) {
+      expert.locationLat = data.latitude;
+    }
+    if (data.longitude !== undefined) {
+      expert.locationLng = data.longitude;
+    }
+    if (data.currentLocation !== undefined) {
+      expert.currentLocation = data.currentLocation;
+    }
+    expert.lastLocationUpdateAt = new Date();
+
+    return this.expertRepository.save(expert);
+  }
+
+  async updateAvailability(
+    expertId: string,
+    userId: string,
+    data: { isAvailable?: boolean; serviceRadius?: number },
+  ): Promise<IndividualExpert> {
+    const expert = await this.getProfile(expertId, userId);
+
+    if (data.isAvailable !== undefined) {
+      expert.isAvailable = data.isAvailable;
+    }
+    if (data.serviceRadius !== undefined) {
+      expert.serviceRadius = data.serviceRadius;
+    }
+
+    return this.expertRepository.save(expert);
+  }
+
+  async updateSkills(
+    expertId: string,
+    userId: string,
+    skillTags: string[],
+  ): Promise<IndividualExpert> {
+    const expert = await this.getProfile(expertId, userId);
+    expert.skillTags = skillTags;
+    return this.expertRepository.save(expert);
+  }
+
+  // ==========================================
+  // Public lookup (for scanning)
+  // ==========================================
+
+  async getPublicProfile(expertCode: string): Promise<Partial<IndividualExpert> | null> {
+    const expert = await this.expertRepository.findOne({
+      where: { expertCode },
+    });
+
+    if (!expert) {
+      return null;
+    }
+
+    // Return only public information
+    return {
+      expertCode: expert.expertCode,
+      personalName: expert.personalName,
+      expertTypes: expert.expertTypes,
+      professionalField: expert.professionalField,
+      yearsOfExperience: expert.yearsOfExperience,
+      skillTags: expert.skillTags,
+      avgRating: expert.avgRating,
+      totalReviews: expert.totalReviews,
+      completedServices: expert.completedServices,
+      isAvailable: expert.isAvailable,
+      currentLocation: expert.currentLocation,
+      registrationStatus: expert.registrationStatus,
+    };
+  }
 }

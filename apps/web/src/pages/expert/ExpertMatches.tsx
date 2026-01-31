@@ -44,12 +44,12 @@ export default function ExpertMatches() {
 
   const { data: matches, isLoading } = useQuery({
     queryKey: ['expert-matches', user?.expertId],
-    queryFn: () => expertApi.getMatches(user?.expertId!, 50),
+    queryFn: () => expertApi.getExpertMatches(50),
     enabled: !!user?.expertId,
   });
 
   const dismissMutation = useMutation({
-    mutationFn: (id: string) => expertApi.dismissMatch(id),
+    mutationFn: (id: string) => expertApi.dismissExpertMatch(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['expert-matches'] });
       toast.success(t('matching.dismissed', 'Match dismissed'));

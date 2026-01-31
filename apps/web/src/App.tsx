@@ -54,7 +54,7 @@ import CreateInquiry from './pages/inquiries/CreateInquiry';
 import MatchDetail from './pages/matching/MatchDetail';
 
 // Expert pages
-import { ExpertProfile, ServiceRecords, ExpertMatches, ServiceHall } from './pages/expert';
+import { ExpertProfile, ExpertPassport, ServiceRecords, ExpertMatches, ServiceHall } from './pages/expert';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -127,6 +127,7 @@ function App() {
 
           {/* Expert routes */}
           <Route path="/expert/profile" element={<ExpertProfile />} />
+          <Route path="/expert/passport" element={<ExpertPassport />} />
           <Route path="/expert/service-records" element={<ServiceRecords />} />
           <Route path="/expert/matches" element={<ExpertMatches />} />
           <Route path="/expert/service-hall" element={<ServiceHall />} />

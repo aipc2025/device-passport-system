@@ -12,6 +12,7 @@ import {
   UploadedFile,
 } from '../../database/entities';
 import { UploadModule } from '../upload/upload.module';
+import { ExpertModule } from '../expert/expert.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { UploadModule } from '../upload/upload.module';
       UploadedFile,
     ]),
     UploadModule,
+    ExpertModule,
   ],
   controllers: [RegistrationController],
   providers: [RegistrationService],

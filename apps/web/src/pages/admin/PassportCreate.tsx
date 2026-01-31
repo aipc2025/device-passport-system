@@ -18,6 +18,7 @@ interface LocationData {
 interface CreatePassportForm {
   productLine: ProductLine;
   originCode: OriginCode;
+  customOriginCode?: string;
   deviceName: string;
   deviceModel: string;
   supplierId?: string;
@@ -34,6 +35,7 @@ interface CreatePassportForm {
   buyerContact?: string;
   buyerPhone?: string;
   buyerCountry?: string;
+  customBuyerCountry?: string;
   buyerAddress?: string;
   buyerAddressLat?: number;
   buyerAddressLng?: number;
@@ -78,6 +80,8 @@ export default function PassportCreate() {
   const [showBuyerInfo, setShowBuyerInfo] = useState(false);
   const [deviceLocation, setDeviceLocation] = useState<LocationData | undefined>();
   const [buyerLocation, setBuyerLocation] = useState<LocationData | undefined>();
+  const [showCustomOrigin, setShowCustomOrigin] = useState(false);
+  const [showCustomBuyerCountry, setShowCustomBuyerCountry] = useState(false);
 
   const { data: suppliers } = useQuery({
     queryKey: ['suppliers'],
@@ -125,6 +129,14 @@ export default function PassportCreate() {
       if (selectedSupplier) {
         data.manufacturer = selectedSupplier.name;
       }
+    }
+    // Handle custom buyer country
+    if (data.buyerCountry === 'OTHER' && data.customBuyerCountry) {
+      data.buyerCountry = data.customBuyerCountry;
+    }
+    // Convert custom origin code to uppercase
+    if (data.customOriginCode) {
+      data.customOriginCode = data.customOriginCode.toUpperCase();
     }
     createMutation.mutate(data);
   };
@@ -177,16 +189,39 @@ export default function PassportCreate() {
                 <select
                   className="input"
                   {...register('originCode', { required: t('common.required') })}
+                  onChange={(e) => {
+                    setShowCustomOrigin(e.target.value === 'OTHER');
+                  }}
                 >
                   <option value="">{t('passport.selectOrigin')}</option>
                   {originCodes.map((oc) => (
                     <option key={oc} value={oc}>
-                      {oc}
+                      {oc === 'OTHER' ? t('common.other', 'Other') : oc}
                     </option>
                   ))}
                 </select>
                 {errors.originCode && (
                   <p className="mt-1 text-sm text-red-600">{errors.originCode.message}</p>
+                )}
+                {showCustomOrigin && (
+                  <div className="mt-2">
+                    <input
+                      type="text"
+                      className="input"
+                      placeholder={t('passport.enterCountryCode', 'Enter country code (2 letters)')}
+                      maxLength={2}
+                      {...register('customOriginCode', {
+                        required: showCustomOrigin ? t('common.required') : false,
+                        pattern: {
+                          value: /^[A-Za-z]{2}$/,
+                          message: t('passport.countryCodeFormat', 'Must be 2 letters'),
+                        },
+                      })}
+                    />
+                    {errors.customOriginCode && (
+                      <p className="mt-1 text-sm text-red-600">{errors.customOriginCode.message}</p>
+                    )}
+                  </div>
                 )}
               </div>
             </div>
@@ -213,7 +248,7 @@ export default function PassportCreate() {
                 <input
                   type="text"
                   className="input"
-                  placeholder="e.g., PKG-2000"
+                  placeholder="e.g., PF-2000"
                   {...register('deviceModel', { required: t('common.required') })}
                 />
                 {errors.deviceModel && (
@@ -244,7 +279,7 @@ export default function PassportCreate() {
                 <input
                   type="text"
                   className="input"
-                  placeholder="e.g., LI-PKG-2000-001"
+                  placeholder="e.g., LI-PF-2000-001"
                   {...register('manufacturerPartNumber')}
                 />
               </div>
@@ -350,14 +385,31 @@ export default function PassportCreate() {
                 </div>
                 <div>
                   <label className="label">{t('buyer.country')}</label>
-                  <select className="input" {...register('buyerCountry')}>
+                  <select
+                    className="input"
+                    {...register('buyerCountry')}
+                    onChange={(e) => {
+                      setShowCustomBuyerCountry(e.target.value === 'OTHER');
+                    }}
+                  >
                     <option value="">{t('buyer.selectCountry')}</option>
                     {COUNTRY_LIST.map((country) => (
                       <option key={country.code} value={country.code}>
                         {country.name}
                       </option>
                     ))}
+                    <option value="OTHER">{t('common.other', 'Other')}</option>
                   </select>
+                  {showCustomBuyerCountry && (
+                    <div className="mt-2">
+                      <input
+                        type="text"
+                        className="input"
+                        placeholder={t('buyer.enterCountryName', 'Enter country name')}
+                        {...register('customBuyerCountry')}
+                      />
+                    </div>
+                  )}
                 </div>
                 <div>
                   <label className="label">{t('buyer.address')}</label>

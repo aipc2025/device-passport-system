@@ -134,7 +134,7 @@
     "confirmLocation": "Xác Nhận Vị Trí"
   },
   "productTypes": {
-    "PKG": "Đóng Gói & Chiết Rót",
+    "PF": "Đóng Gói & Chiết Rót",
     "QI": "Kiểm Tra Chất Lượng",
     "MP": "Gia Công Kim Loại",
     "PP": "Gia Công Nhựa",
@@ -179,7 +179,7 @@
     "title": "Quét Hộ Chiếu Thiết Bị",
     "subtitle": "Nhập mã hộ chiếu thiết bị để xem thông tin và lịch sử",
     "enterCode": "Mã Hộ Chiếu",
-    "placeholder": "DP-MED-2601-PKG-VN-000001-A7",
+    "placeholder": "DP-MED-2601-PF-VN-000001-A7",
     "required": "Mã hộ chiếu là bắt buộc",
     "scanning": "Đang tìm kiếm...",
     "scanButton": "Tìm Thiết Bị",
@@ -190,7 +190,7 @@
     "formatDP": "Tiền tố Hộ Chiếu Thiết Bị",
     "formatCompany": "Mã công ty (3 chữ cái)",
     "formatYearMonth": "Năm và Tháng",
-    "formatProduct": "Loại sản phẩm (PKG, QI, MP, v.v.)",
+    "formatProduct": "Loại sản phẩm (PF, QI, MP, v.v.)",
     "formatOrigin": "Mã quốc gia xuất xứ",
     "formatSequence": "Số thứ tự",
     "formatChecksum": "Mã kiểm tra"

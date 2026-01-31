@@ -35,7 +35,7 @@ export enum DeviceStatus {
  * Product type codes for passport generation
  */
 export enum ProductLine {
-  PKG = 'PKG', // Packaging Filling
+  PF = 'PF',   // Packaging Filling
   QI = 'QI',   // Quality Inspection
   MP = 'MP',   // Metal Processing
   PP = 'PP',   // Plastics Processing
@@ -102,6 +102,8 @@ export enum OriginCode {
   FR = 'FR', // France
   GB = 'GB', // United Kingdom
   CH = 'CH', // Switzerland
+  VN = 'VN', // Vietnam
+  OTHER = 'OTHER', // Other (custom)
 }
 
 /**
@@ -141,7 +143,7 @@ export const ROLE_PERMISSION_LEVELS: Record<UserRole, number> = {
  * Product type display names
  */
 export const PRODUCT_TYPE_NAMES: Record<ProductLine, string> = {
-  [ProductLine.PKG]: 'Packaging Filling',
+  [ProductLine.PF]: 'Packaging Filling',
   [ProductLine.QI]: 'Quality Inspection',
   [ProductLine.MP]: 'Metal Processing',
   [ProductLine.PP]: 'Plastics Processing',
@@ -156,7 +158,7 @@ export const PRODUCT_TYPE_NAMES: Record<ProductLine, string> = {
  * Product type descriptions
  */
 export const PRODUCT_TYPE_DESCRIPTIONS: Record<ProductLine, string> = {
-  [ProductLine.PKG]: 'Automated packaging and filling solutions designed to improve efficiency, accuracy, and speed in various industries.',
+  [ProductLine.PF]: 'Automated packaging and filling solutions designed to improve efficiency, accuracy, and speed in various industries.',
   [ProductLine.QI]: 'Advanced inspection and testing systems to ensure product quality and compliance.',
   [ProductLine.MP]: 'Precision metalworking machinery and automation solutions for cutting, welding, stamping, and forming.',
   [ProductLine.PP]: 'Automated systems for injection molding, extrusion, blow molding, and plastic part handling.',

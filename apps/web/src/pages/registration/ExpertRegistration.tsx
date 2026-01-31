@@ -77,7 +77,7 @@ export default function ExpertRegistration() {
       const submitData = {
         email: expertData.email,
         password: expertData.password,
-        expertType: expertData.expertType,
+        expertTypes: expertData.expertTypes,
         personalName: expertData.personalName,
         idNumber: expertData.idNumber,
         phone: expertData.phone,

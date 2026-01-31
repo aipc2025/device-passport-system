@@ -24,11 +24,18 @@ export class PassportCodeService {
     this.companyCode = this.configService.get('COMPANY_CODE') || 'MED';
   }
 
-  async generateCode(productLine: ProductLine, originCode: OriginCode): Promise<string> {
+  async generateCode(productLine: ProductLine, originCode: OriginCode | string, supplierCode?: string): Promise<string> {
     const now = new Date();
     const year = now.getFullYear();
     const month = now.getMonth() + 1; // JavaScript months are 0-indexed
     const yearMonth = formatYearMonth(year, month);
+
+    // Use supplier code if provided, otherwise use default company code
+    const companyCode = supplierCode?.toUpperCase() || this.companyCode;
+
+    // For "OTHER" origin code, we'll still use it in the sequence counter
+    // but the actual code will be stored in the passport entity
+    const effectiveOriginCode = originCode as OriginCode;
 
     // Use transaction to ensure atomic sequence increment
     const queryRunner = this.dataSource.createQueryRunner();
@@ -39,10 +46,10 @@ export class PassportCodeService {
       // Lock the row for update
       let counter = await queryRunner.manager.findOne(SequenceCounter, {
         where: {
-          companyCode: this.companyCode,
+          companyCode,
           yearMonth,
           productLine,
-          originCode,
+          originCode: effectiveOriginCode,
         },
         lock: { mode: 'pessimistic_write' },
       });
@@ -50,10 +57,10 @@ export class PassportCodeService {
       if (!counter) {
         // Create new counter
         counter = queryRunner.manager.create(SequenceCounter, {
-          companyCode: this.companyCode,
+          companyCode,
           yearMonth,
           productLine,
-          originCode,
+          originCode: effectiveOriginCode,
           currentSequence: 0,
         });
       }
@@ -66,11 +73,11 @@ export class PassportCodeService {
 
       // Generate passport code
       return generatePassportCode(
-        this.companyCode,
+        companyCode,
         year,
         month,
         productLine,
-        originCode,
+        effectiveOriginCode,
         counter.currentSequence,
       );
     } catch (error) {

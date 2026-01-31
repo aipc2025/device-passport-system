@@ -229,7 +229,17 @@
     "paymentTerms": "Preferred Payment Terms",
     "paymentTermsPlaceholder": "e.g., Net 30, LC at sight, 30% advance + 70% before shipment",
     "infoTitle": "How We Use This Information",
-    "infoText": "Your purchasing requirements help us recommend suitable suppliers and products. This information is shared with potential suppliers to facilitate better matches."
+    "infoText": "Your purchasing requirements help us recommend suitable suppliers and products. This information is shared with potential suppliers to facilitate better matches.",
+    "title": "Buyer Information",
+    "companyName": "Company Name",
+    "contactPerson": "Contact Person",
+    "phone": "Phone",
+    "email": "Email",
+    "country": "Country",
+    "selectCountry": "Select country",
+    "enterCountryName": "Enter country name",
+    "address": "Address",
+    "selectBuyerLocation": "Select buyer location on map (optional)"
   },
   "review": {
     "title": "Review Your Registration",
@@ -450,6 +460,8 @@
     "selectLocationOnMap": "Select location on map (optional)",
     "creating": "Creating...",
     "createPassport": "Create Passport",
+    "enterCountryCode": "Enter country code (2 letters)",
+    "countryCodeFormat": "Must be 2 letters",
     "passportCode": "Passport Code",
     "device": "Device",
     "status": "Status",
@@ -466,7 +478,7 @@
     "confirmLocation": "Confirm Location"
   },
   "productTypes": {
-    "PKG": "Packaging Filling",
+    "PF": "Packaging Filling",
     "QI": "Quality Inspection",
     "MP": "Metal Processing",
     "PP": "Plastics Processing",
@@ -511,7 +523,7 @@
     "title": "Scan Device Passport",
     "subtitle": "Enter the device passport code to view its information and history",
     "enterCode": "Passport Code",
-    "placeholder": "DP-MED-2601-PKG-CN-000001-A7",
+    "placeholder": "DP-MED-2601-PF-CN-000001-A7",
     "required": "Passport code is required",
     "scanning": "Searching...",
     "scanButton": "Search Device",
@@ -522,7 +534,7 @@
     "formatDP": "Device Passport prefix",
     "formatCompany": "Company code (3 letters)",
     "formatYearMonth": "Year and Month",
-    "formatProduct": "Product type (PKG, QI, MP, etc.)",
+    "formatProduct": "Product type (PF, QI, MP, etc.)",
     "formatOrigin": "Origin country code",
     "formatSequence": "Sequence number",
     "formatChecksum": "Checksum"

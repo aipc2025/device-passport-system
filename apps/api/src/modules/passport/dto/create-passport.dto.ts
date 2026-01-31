@@ -12,13 +12,18 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ProductLine, OriginCode } from '@device-passport/shared';
 
 export class CreatePassportDto {
-  @ApiProperty({ enum: ProductLine, example: ProductLine.PKG })
+  @ApiProperty({ enum: ProductLine, example: ProductLine.PF })
   @IsEnum(ProductLine)
   productLine: ProductLine;
 
   @ApiProperty({ enum: OriginCode, example: OriginCode.DE })
   @IsEnum(OriginCode)
   originCode: OriginCode;
+
+  @ApiPropertyOptional({ example: 'TH', description: 'Custom origin code when originCode is OTHER' })
+  @IsOptional()
+  @IsString()
+  customOriginCode?: string;
 
   @ApiProperty({ example: 'Automated Packaging Line' })
   @IsString()

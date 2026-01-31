@@ -3,7 +3,7 @@ import { PassportCodeParts, ProductLine, OriginCode } from '../index';
 /**
  * Passport code utilities
  * Format: DP-{COMPANY}-{YYMM}-{PRODUCT_TYPE}-{ORIGIN}-{SEQUENCE}-{CHECKSUM}
- * Example: DP-MED-2601-PKG-CN-000001-A7
+ * Example: DP-MED-2601-PF-CN-000001-A7
  * YYMM = Year (last 2 digits) + Month (2 digits)
  */
 

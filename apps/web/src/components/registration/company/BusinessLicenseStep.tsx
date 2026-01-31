@@ -321,12 +321,16 @@ export default function BusinessLicenseStep() {
               </div>
               <div className="p-4">
                 <MapPicker
-                  initialLocation={
+                  value={
                     companyData.businessAddress?.latitude && companyData.businessAddress?.longitude
                       ? { lat: companyData.businessAddress.latitude, lng: companyData.businessAddress.longitude }
                       : undefined
                   }
-                  onSelect={handleBusinessAddressSelect}
+                  onChange={(location) => {
+                    if (location) {
+                      handleBusinessAddressSelect(location as { lat: number; lng: number; address: string });
+                    }
+                  }}
                 />
               </div>
             </div>

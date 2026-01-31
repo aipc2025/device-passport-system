@@ -35,6 +35,9 @@ export class DevicePassport {
   })
   originCode: OriginCode;
 
+  @Column({ name: 'custom_origin_code', length: 2, nullable: true })
+  customOriginCode: string;
+
   @Column({
     type: 'enum',
     enum: DeviceStatus,

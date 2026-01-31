@@ -15,7 +15,7 @@ import {
   PassportListItem,
   generateQRCodeContent,
 } from '@device-passport/shared';
-import { DevicePassport, User } from '../../database/entities';
+import { DevicePassport, User, Organization } from '../../database/entities';
 import { CreatePassportDto, UpdatePassportDto, UpdateStatusDto } from './dto';
 import { PassportCodeService } from './passport-code.service';
 import { LifecycleService } from '../lifecycle/lifecycle.service';
@@ -30,6 +30,8 @@ export class PassportService {
     private passportRepository: Repository<DevicePassport>,
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    @InjectRepository(Organization)
+    private organizationRepository: Repository<Organization>,
     private passportCodeService: PassportCodeService,
     private lifecycleService: LifecycleService,
     private configService: ConfigService,
@@ -146,17 +148,30 @@ export class PassportService {
     createPassportDto: CreatePassportDto,
     userId: string,
   ): Promise<DevicePassport> {
-    const { productLine, originCode, ...rest } = createPassportDto;
+    const { productLine, originCode, supplierId, ...rest } = createPassportDto;
 
-    // Generate passport code
+    // Look up supplier code if supplierId is provided
+    let supplierCode: string | undefined;
+    if (supplierId) {
+      const supplier = await this.organizationRepository.findOne({
+        where: { id: supplierId },
+      });
+      if (supplier) {
+        supplierCode = supplier.code;
+      }
+    }
+
+    // Generate passport code using supplier's 3-letter code
     const passportCode = await this.passportCodeService.generateCode(
       productLine,
       originCode,
+      supplierCode,
     );
 
     // Create passport
     const passport = this.passportRepository.create({
       ...rest,
+      supplierId,
       passportCode,
       productLine,
       originCode,

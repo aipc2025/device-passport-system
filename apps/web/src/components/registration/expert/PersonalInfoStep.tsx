@@ -246,12 +246,16 @@ export default function PersonalInfoStep() {
               </div>
               <div className="p-4">
                 <MapPicker
-                  initialLocation={
+                  value={
                     expertData.locationLat && expertData.locationLng
                       ? { lat: expertData.locationLat, lng: expertData.locationLng }
                       : undefined
                   }
-                  onSelect={handleLocationSelect}
+                  onChange={(location) => {
+                    if (location) {
+                      handleLocationSelect(location as { lat: number; lng: number; address: string });
+                    }
+                  }}
                 />
               </div>
             </div>

@@ -174,13 +174,13 @@ async function seed() {
   const yearMonth = `${(now.getFullYear() % 100).toString().padStart(2, '0')}${(now.getMonth() + 1).toString().padStart(2, '0')}`;
 
   const existingSequence = await sequenceRepo.findOne({
-    where: { companyCode: 'MED', yearMonth, productLine: ProductLine.PKG, originCode: OriginCode.CN },
+    where: { companyCode: 'MED', yearMonth, productLine: ProductLine.PF, originCode: OriginCode.CN },
   });
   if (!existingSequence) {
     await sequenceRepo.save({
       companyCode: 'MED',
       yearMonth,
-      productLine: ProductLine.PKG,
+      productLine: ProductLine.PF,
       originCode: OriginCode.CN,
       currentSequence: 2,
     });
@@ -188,7 +188,7 @@ async function seed() {
 
   console.log('Seeding device passports...');
   // Generate passport codes using the official algorithm (year, month, productType)
-  const passportCode1 = generatePassportCode('MED', 2026, 1, ProductLine.PKG, OriginCode.CN, 1);
+  const passportCode1 = generatePassportCode('MED', 2026, 1, ProductLine.PF, OriginCode.CN, 1);
   const passportCode2 = generatePassportCode('MED', 2026, 1, ProductLine.IP, OriginCode.DE, 2);
 
   console.log('  Generated codes:', passportCode1, passportCode2);
@@ -198,13 +198,13 @@ async function seed() {
   if (!existingPassport1) {
     await passportRepo.save({
       passportCode: passportCode1,
-      productLine: ProductLine.PKG,
+      productLine: ProductLine.PF,
       originCode: OriginCode.CN,
       status: DeviceStatus.IN_SERVICE,
-      deviceName: 'Automated Packaging Line PKG-2000',
-      deviceModel: 'PKG-2000',
+      deviceName: 'Automated Packaging Line PF-2000',
+      deviceModel: 'PF-2000',
       manufacturer: 'LUNA INDUSTRY',
-      manufacturerPartNumber: 'LI-PKG-2000-001',
+      manufacturerPartNumber: 'LI-PF-2000-001',
       serialNumber: 'SN-2025-001',
       specifications: {
         voltage: '380V AC',

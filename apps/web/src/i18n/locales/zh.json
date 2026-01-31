@@ -134,7 +134,7 @@
     "confirmLocation": "确认位置"
   },
   "productTypes": {
-    "PKG": "包装灌装",
+    "PF": "包装灌装",
     "QI": "质量检测",
     "MP": "金属加工",
     "PP": "塑料加工",
@@ -179,7 +179,7 @@
     "title": "扫描设备护照",
     "subtitle": "输入设备护照代码以查看其信息和历史记录",
     "enterCode": "护照代码",
-    "placeholder": "DP-MED-2601-PKG-CN-000001-A7",
+    "placeholder": "DP-MED-2601-PF-CN-000001-A7",
     "required": "护照代码为必填项",
     "scanning": "搜索中...",
     "scanButton": "搜索设备",
@@ -190,7 +190,7 @@
     "formatDP": "设备护照前缀",
     "formatCompany": "公司代码（3个字母）",
     "formatYearMonth": "年月",
-    "formatProduct": "产品类型（PKG、QI、MP等）",
+    "formatProduct": "产品类型（PF、QI、MP等）",
     "formatOrigin": "原产国代码",
     "formatSequence": "序列号",
     "formatChecksum": "校验码"

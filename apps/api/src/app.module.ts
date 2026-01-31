@@ -12,6 +12,11 @@ import { ScanModule } from './modules/scan/scan.module';
 import { ProductTypeModule } from './modules/product-type/product-type.module';
 import { UploadModule } from './modules/upload/upload.module';
 import { RegistrationModule } from './modules/registration/registration.module';
+import { MarketplaceModule } from './modules/marketplace/marketplace.module';
+import { MatchingModule } from './modules/matching/matching.module';
+import { InquiryModule } from './modules/inquiry/inquiry.module';
+import { SavedModule } from './modules/saved/saved.module';
+import { ExpertModule } from './modules/expert/expert.module';
 import databaseConfig from './config/database.config';
 import jwtConfig from './config/jwt.config';
 
@@ -57,6 +62,11 @@ import jwtConfig from './config/jwt.config';
     ProductTypeModule,
     UploadModule,
     RegistrationModule,
+    MarketplaceModule,
+    MatchingModule,
+    InquiryModule,
+    SavedModule,
+    ExpertModule,
   ],
 })
 export class AppModule {}

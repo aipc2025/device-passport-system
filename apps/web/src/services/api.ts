@@ -155,10 +155,13 @@ export const productTypeApi = {
 
 // Upload API
 export const uploadApi = {
-  uploadFile: async (file: File, fileCategory: string) => {
+  uploadFile: async (file: File, fileCategory: string, passportCode?: string) => {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('fileCategory', fileCategory);
+    if (passportCode) {
+      formData.append('passportCode', passportCode);
+    }
     const response = await api.post('/upload/public', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
@@ -290,5 +293,257 @@ export const serviceOrderApi = {
   addRecord: async (id: string, data: Record<string, unknown>) => {
     const response = await api.post(`/service-orders/${id}/records`, data);
     return response.data.data;
+  },
+};
+
+// ==========================================
+// Marketplace APIs
+// ==========================================
+
+export interface MarketplaceSearchParams {
+  keyword?: string;
+  category?: string;
+  hsCode?: string;
+  priceMin?: number;
+  priceMax?: number;
+  region?: string;
+  userLat?: number;
+  userLng?: number;
+  maxDistanceKm?: number;
+  sortBy?: 'createdAt' | 'price' | 'distance' | 'viewCount';
+  sortOrder?: 'ASC' | 'DESC';
+  page?: number;
+  limit?: number;
+  featuredFirst?: boolean;
+}
+
+// Marketplace Products API
+export const marketplaceProductApi = {
+  // Public endpoints
+  search: async (params?: MarketplaceSearchParams) => {
+    const response = await api.get('/marketplace/products', { params });
+    return response.data.data || response.data;
+  },
+  getFeatured: async (limit = 12) => {
+    const response = await api.get('/marketplace/products/featured', { params: { limit } });
+    return response.data.data || response.data;
+  },
+  getById: async (id: string) => {
+    const response = await api.get(`/marketplace/products/${id}`);
+    return response.data.data || response.data;
+  },
+  // Supplier endpoints
+  getMyProducts: async () => {
+    const response = await api.get('/marketplace/products/my/list');
+    return response.data.data || response.data;
+  },
+  create: async (data: Record<string, unknown>) => {
+    const response = await api.post('/marketplace/products', data);
+    return response.data.data || response.data;
+  },
+  update: async (id: string, data: Record<string, unknown>) => {
+    const response = await api.patch(`/marketplace/products/${id}`, data);
+    return response.data.data || response.data;
+  },
+  delete: async (id: string) => {
+    const response = await api.delete(`/marketplace/products/${id}`);
+    return response.data.data || response.data;
+  },
+  pause: async (id: string) => {
+    const response = await api.post(`/marketplace/products/${id}/pause`);
+    return response.data.data || response.data;
+  },
+  activate: async (id: string) => {
+    const response = await api.post(`/marketplace/products/${id}/activate`);
+    return response.data.data || response.data;
+  },
+};
+
+// Marketplace Requirements (RFQ) API
+export const marketplaceRfqApi = {
+  // Public endpoints
+  search: async (params?: MarketplaceSearchParams) => {
+    const response = await api.get('/marketplace/requirements', { params });
+    return response.data.data || response.data;
+  },
+  getRecent: async (limit = 12) => {
+    const response = await api.get('/marketplace/requirements/recent', { params: { limit } });
+    return response.data.data || response.data;
+  },
+  getById: async (id: string) => {
+    const response = await api.get(`/marketplace/requirements/${id}`);
+    return response.data.data || response.data;
+  },
+  // Buyer endpoints
+  getMyRfqs: async () => {
+    const response = await api.get('/marketplace/requirements/my/list');
+    return response.data.data || response.data;
+  },
+  create: async (data: Record<string, unknown>) => {
+    const response = await api.post('/marketplace/requirements', data);
+    return response.data.data || response.data;
+  },
+  update: async (id: string, data: Record<string, unknown>) => {
+    const response = await api.patch(`/marketplace/requirements/${id}`, data);
+    return response.data.data || response.data;
+  },
+  delete: async (id: string) => {
+    const response = await api.delete(`/marketplace/requirements/${id}`);
+    return response.data.data || response.data;
+  },
+};
+
+// Matching API
+export const matchingApi = {
+  getRecommendations: async (role: 'supplier' | 'buyer', limit = 20, includeViewed = false) => {
+    const response = await api.get('/matching/recommendations', {
+      params: { role, limit, includeViewed },
+    });
+    return response.data.data || response.data;
+  },
+  getMatchById: async (id: string, role: 'supplier' | 'buyer') => {
+    const response = await api.get(`/matching/recommendations/${id}`, {
+      params: { role },
+    });
+    return response.data.data || response.data;
+  },
+  dismissMatch: async (id: string) => {
+    const response = await api.post(`/matching/recommendations/${id}/dismiss`);
+    return response.data.data || response.data;
+  },
+  triggerMatching: async () => {
+    const response = await api.post('/matching/trigger');
+    return response.data.data || response.data;
+  },
+  getStats: async () => {
+    const response = await api.get('/matching/stats');
+    return response.data.data || response.data;
+  },
+  // Admin endpoint to forward buyer requirement to specific suppliers
+  forwardRequirement: async (requirementId: string, supplierOrgIds: string[], matchSource?: string) => {
+    const response = await api.post(`/matching/forward-requirement/${requirementId}`, {
+      supplierOrgIds,
+      matchSource,
+    });
+    return response.data.data || response.data;
+  },
+};
+
+// Inquiry API
+export const inquiryApi = {
+  getAll: async () => {
+    const response = await api.get('/inquiries');
+    return response.data;
+  },
+  getSent: async () => {
+    const response = await api.get('/inquiries/sent');
+    return response.data;
+  },
+  getReceived: async () => {
+    const response = await api.get('/inquiries/received');
+    return response.data;
+  },
+  getUnreadCount: async () => {
+    const response = await api.get('/inquiries/unread-count');
+    return response.data;
+  },
+  getById: async (id: string) => {
+    const response = await api.get(`/inquiries/${id}`);
+    return response.data;
+  },
+  create: async (data: Record<string, unknown>) => {
+    const response = await api.post('/inquiries', data);
+    return response.data;
+  },
+  updateStatus: async (id: string, data: { status: string; closeReason?: string }) => {
+    const response = await api.patch(`/inquiries/${id}/status`, data);
+    return response.data;
+  },
+  getMessages: async (id: string) => {
+    const response = await api.get(`/inquiries/${id}/messages`);
+    return response.data;
+  },
+  sendMessage: async (id: string, data: Record<string, unknown>) => {
+    const response = await api.post(`/inquiries/${id}/messages`, data);
+    return response.data;
+  },
+  markAsRead: async (id: string) => {
+    const response = await api.patch(`/inquiries/${id}/messages/read`);
+    return response.data;
+  },
+};
+
+// Saved Items API
+export const savedApi = {
+  getAll: async () => {
+    const response = await api.get('/saved');
+    return response.data;
+  },
+  getSuppliers: async () => {
+    const response = await api.get('/saved/suppliers');
+    return response.data;
+  },
+  getProducts: async () => {
+    const response = await api.get('/saved/products');
+    return response.data;
+  },
+  getRfqs: async () => {
+    const response = await api.get('/saved/rfqs');
+    return response.data;
+  },
+  checkSaved: async (type: string, itemId: string) => {
+    const response = await api.get('/saved/check', { params: { type, itemId } });
+    return response.data;
+  },
+  save: async (data: { itemType: string; itemId: string; notes?: string }) => {
+    const response = await api.post('/saved', data);
+    return response.data;
+  },
+  remove: async (id: string) => {
+    const response = await api.delete(`/saved/${id}`);
+    return response.data;
+  },
+};
+
+// ==========================================
+// Expert APIs
+// ==========================================
+
+export const expertApi = {
+  // Profile management
+  getProfile: async (expertId: string) => {
+    const response = await api.get(`/experts/${expertId}`);
+    return response.data.data || response.data;
+  },
+  updateProfile: async (expertId: string, data: Record<string, unknown>) => {
+    const response = await api.patch(`/experts/${expertId}`, data);
+    return response.data.data || response.data;
+  },
+  // Service records
+  getServiceRecords: async (expertId: string) => {
+    const response = await api.get(`/experts/${expertId}/service-records`);
+    return response.data.data || response.data;
+  },
+  // Matches
+  getMatches: async (expertId: string, limit = 50) => {
+    const response = await api.get(`/experts/${expertId}/matches`, { params: { limit } });
+    return response.data.data || response.data;
+  },
+  dismissMatch: async (matchId: string) => {
+    const response = await api.post(`/experts/matches/${matchId}/dismiss`);
+    return response.data.data || response.data;
+  },
+  // Service Hall (public service requests)
+  getPublicServiceRequests: async (params?: { search?: string; serviceType?: string; urgency?: string }) => {
+    const response = await api.get('/service-requests/public', { params });
+    return response.data.data || response.data;
+  },
+  getServiceTypes: async () => {
+    const response = await api.get('/service-requests/types');
+    return response.data.data || response.data;
+  },
+  applyForService: async (serviceRequestId: string, data?: Record<string, unknown>) => {
+    const response = await api.post(`/service-requests/${serviceRequestId}/apply`, data);
+    return response.data.data || response.data;
   },
 };

@@ -74,7 +74,9 @@ export default function FileUploader({
 
       for (const file of filesToUpload) {
         const result = await uploadApi.uploadFile(file, fileCategory);
-        uploadedFiles.push(result);
+        // API returns { success, data: { id, ... }, timestamp }, extract data
+        const fileData = result.data || result;
+        uploadedFiles.push(fileData);
       }
 
       const newFiles = [...files, ...uploadedFiles];
@@ -85,8 +87,10 @@ export default function FileUploader({
       } else {
         onChange(uploadedFiles[0]?.id);
       }
-    } catch (err) {
-      setError('Failed to upload file. Please try again.');
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } }; message?: string };
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to upload file. Please try again.';
+      setError(errorMessage);
       console.error('Upload error:', err);
     } finally {
       setUploading(false);

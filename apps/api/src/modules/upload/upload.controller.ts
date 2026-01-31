@@ -132,7 +132,7 @@ export class UploadController {
   @Post('public')
   @UseInterceptors(FileInterceptor('file'))
   @ApiConsumes('multipart/form-data')
-  @ApiOperation({ summary: 'Upload a file without authentication (for registration)' })
+  @ApiOperation({ summary: 'Upload a file without authentication (for registration or service request)' })
   @ApiBody({
     schema: {
       type: 'object',
@@ -145,15 +145,21 @@ export class UploadController {
           type: 'string',
           enum: Object.values(FileCategory),
         },
+        passportCode: {
+          type: 'string',
+          description: 'Optional passport code for service attachments naming',
+        },
       },
     },
   })
   async uploadPublic(
     @UploadedFile() file: Express.Multer.File,
     @Body('fileCategory') fileCategory: FileCategory,
+    @Body('passportCode') passportCode?: string,
   ) {
     const options: UploadOptions = {
       fileCategory: fileCategory || FileCategory.OTHER,
+      passportCode,
     };
 
     const uploadedFile = await this.uploadService.uploadFile(file, options);

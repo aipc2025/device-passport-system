@@ -273,6 +273,7 @@ export enum FileCategory {
   PRODUCT_IMAGE = 'PRODUCT_IMAGE',
   RESUME = 'RESUME',
   CERTIFICATE = 'CERTIFICATE',
+  SERVICE_ATTACHMENT = 'SERVICE_ATTACHMENT',
   OTHER = 'OTHER',
 }
 
@@ -306,4 +307,179 @@ export const REGISTRATION_STATUS_NAMES: Record<RegistrationStatus, string> = {
   [RegistrationStatus.APPROVED]: 'Approved',
   [RegistrationStatus.REJECTED]: 'Rejected',
   [RegistrationStatus.SUSPENDED]: 'Suspended',
+};
+
+// ============================================
+// B2B Marketplace Enums
+// ============================================
+
+/**
+ * Marketplace product listing status
+ */
+export enum MarketplaceListingStatus {
+  DRAFT = 'DRAFT',
+  PENDING_REVIEW = 'PENDING_REVIEW',
+  ACTIVE = 'ACTIVE',
+  PAUSED = 'PAUSED',
+  EXPIRED = 'EXPIRED',
+  REMOVED = 'REMOVED',
+}
+
+/**
+ * Marketplace listing status display names
+ */
+export const MARKETPLACE_LISTING_STATUS_NAMES: Record<MarketplaceListingStatus, string> = {
+  [MarketplaceListingStatus.DRAFT]: 'Draft',
+  [MarketplaceListingStatus.PENDING_REVIEW]: 'Pending Review',
+  [MarketplaceListingStatus.ACTIVE]: 'Active',
+  [MarketplaceListingStatus.PAUSED]: 'Paused',
+  [MarketplaceListingStatus.EXPIRED]: 'Expired',
+  [MarketplaceListingStatus.REMOVED]: 'Removed',
+};
+
+/**
+ * RFQ (Request for Quotation) status
+ */
+export enum RFQStatus {
+  DRAFT = 'DRAFT',
+  OPEN = 'OPEN',
+  CLOSED = 'CLOSED',
+  FULFILLED = 'FULFILLED',
+  CANCELLED = 'CANCELLED',
+  EXPIRED = 'EXPIRED',
+}
+
+/**
+ * RFQ status display names
+ */
+export const RFQ_STATUS_NAMES: Record<RFQStatus, string> = {
+  [RFQStatus.DRAFT]: 'Draft',
+  [RFQStatus.OPEN]: 'Open',
+  [RFQStatus.CLOSED]: 'Closed',
+  [RFQStatus.FULFILLED]: 'Fulfilled',
+  [RFQStatus.CANCELLED]: 'Cancelled',
+  [RFQStatus.EXPIRED]: 'Expired',
+};
+
+/**
+ * Match type - direction of the match
+ */
+export enum MatchType {
+  PRODUCT_TO_BUYER = 'PRODUCT_TO_BUYER',
+  REQUIREMENT_TO_SUPPLIER = 'REQUIREMENT_TO_SUPPLIER',
+}
+
+/**
+ * Match status - user interaction state
+ */
+export enum MatchStatus {
+  NEW = 'NEW',
+  VIEWED = 'VIEWED',
+  CONTACTED = 'CONTACTED',
+  DISMISSED = 'DISMISSED',
+}
+
+/**
+ * Match status display names
+ */
+export const MATCH_STATUS_NAMES: Record<MatchStatus, string> = {
+  [MatchStatus.NEW]: 'New',
+  [MatchStatus.VIEWED]: 'Viewed',
+  [MatchStatus.CONTACTED]: 'Contacted',
+  [MatchStatus.DISMISSED]: 'Dismissed',
+};
+
+/**
+ * Match source - how the match was created
+ */
+export enum MatchSource {
+  AI_MATCHED = 'AI_MATCHED',
+  PLATFORM_RECOMMENDED = 'PLATFORM_RECOMMENDED',
+  BUYER_SPECIFIED = 'BUYER_SPECIFIED',
+}
+
+/**
+ * Match source display names
+ */
+export const MATCH_SOURCE_NAMES: Record<MatchSource, string> = {
+  [MatchSource.AI_MATCHED]: 'AI Matched',
+  [MatchSource.PLATFORM_RECOMMENDED]: 'Platform Recommended',
+  [MatchSource.BUYER_SPECIFIED]: 'Buyer Specified',
+};
+
+/**
+ * Inquiry status
+ */
+export enum InquiryStatus {
+  PENDING = 'PENDING',
+  RESPONDED = 'RESPONDED',
+  NEGOTIATING = 'NEGOTIATING',
+  ACCEPTED = 'ACCEPTED',
+  REJECTED = 'REJECTED',
+  EXPIRED = 'EXPIRED',
+}
+
+/**
+ * Inquiry status display names
+ */
+export const INQUIRY_STATUS_NAMES: Record<InquiryStatus, string> = {
+  [InquiryStatus.PENDING]: 'Pending',
+  [InquiryStatus.RESPONDED]: 'Responded',
+  [InquiryStatus.NEGOTIATING]: 'Negotiating',
+  [InquiryStatus.ACCEPTED]: 'Accepted',
+  [InquiryStatus.REJECTED]: 'Rejected',
+  [InquiryStatus.EXPIRED]: 'Expired',
+};
+
+/**
+ * Inquiry message type
+ */
+export enum InquiryMessageType {
+  MESSAGE = 'MESSAGE',
+  QUOTE = 'QUOTE',
+  COUNTER_OFFER = 'COUNTER_OFFER',
+  ACCEPTANCE = 'ACCEPTANCE',
+  REJECTION = 'REJECTION',
+  SYSTEM = 'SYSTEM',
+}
+
+/**
+ * Inquiry message type display names
+ */
+export const INQUIRY_MESSAGE_TYPE_NAMES: Record<InquiryMessageType, string> = {
+  [InquiryMessageType.MESSAGE]: 'Message',
+  [InquiryMessageType.QUOTE]: 'Quote',
+  [InquiryMessageType.COUNTER_OFFER]: 'Counter Offer',
+  [InquiryMessageType.ACCEPTANCE]: 'Acceptance',
+  [InquiryMessageType.REJECTION]: 'Rejection',
+  [InquiryMessageType.SYSTEM]: 'System',
+};
+
+/**
+ * Saved item type for favorites/bookmarks
+ */
+export enum SavedItemType {
+  SUPPLIER = 'SUPPLIER',
+  PRODUCT = 'PRODUCT',
+  RFQ = 'RFQ',
+}
+
+/**
+ * Saved item type display names
+ */
+export const SAVED_ITEM_TYPE_NAMES: Record<SavedItemType, string> = {
+  [SavedItemType.SUPPLIER]: 'Supplier',
+  [SavedItemType.PRODUCT]: 'Product',
+  [SavedItemType.RFQ]: 'RFQ',
+};
+
+/**
+ * Purchase frequency display names
+ */
+export const PURCHASE_FREQUENCY_NAMES: Record<PurchaseFrequency, string> = {
+  [PurchaseFrequency.ONE_TIME]: 'One Time',
+  [PurchaseFrequency.MONTHLY]: 'Monthly',
+  [PurchaseFrequency.QUARTERLY]: 'Quarterly',
+  [PurchaseFrequency.YEARLY]: 'Yearly',
+  [PurchaseFrequency.AS_NEEDED]: 'As Needed',
 };

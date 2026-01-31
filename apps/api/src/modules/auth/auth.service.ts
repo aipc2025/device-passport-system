@@ -7,7 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { User } from '../../database/entities';
+import { User, IndividualExpert } from '../../database/entities';
 import { LoginDto, RegisterDto } from './dto';
 import { TokenPayload, AuthResponse, UserRole } from '@device-passport/shared';
 
@@ -16,6 +16,8 @@ export class AuthService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    @InjectRepository(IndividualExpert)
+    private expertRepository: Repository<IndividualExpert>,
     private jwtService: JwtService,
   ) {}
 
@@ -37,10 +39,15 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    // Check if user is an individual expert
+    const expert = await this.expertRepository.findOne({
+      where: { userId: user.id },
+    });
+
     // Update last login
     await this.userRepository.update(user.id, { lastLoginAt: new Date() });
 
-    return this.generateTokens(user);
+    return this.generateTokens(user, expert);
   }
 
   async register(registerDto: RegisterDto): Promise<AuthResponse> {
@@ -83,7 +90,12 @@ export class AuthService {
         throw new UnauthorizedException('Invalid token');
       }
 
-      return this.generateTokens(user);
+      // Check if user is an individual expert
+      const expert = await this.expertRepository.findOne({
+        where: { userId: user.id },
+      });
+
+      return this.generateTokens(user, expert);
     } catch {
       throw new UnauthorizedException('Invalid token');
     }
@@ -95,7 +107,7 @@ export class AuthService {
     });
   }
 
-  private generateTokens(user: User): AuthResponse {
+  private generateTokens(user: User, expert?: IndividualExpert | null): AuthResponse {
     const payload: TokenPayload = {
       sub: user.id,
       email: user.email,
@@ -111,8 +123,15 @@ export class AuthService {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...userWithoutPassword } = user;
 
+    // Add expert info if available
+    const userResponse = {
+      ...userWithoutPassword,
+      isExpert: !!expert,
+      expertId: expert?.id,
+    };
+
     return {
-      user: userWithoutPassword as Omit<User, 'password'>,
+      user: userResponse as Omit<User, 'password'>,
       accessToken,
       refreshToken,
       expiresIn: 7 * 24 * 60 * 60, // 7 days in seconds

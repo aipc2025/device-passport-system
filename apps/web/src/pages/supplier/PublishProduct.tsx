@@ -1,0 +1,318 @@
+import { useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
+import { ArrowLeft, Save } from 'lucide-react';
+import { marketplaceProductApi } from '../../services/api';
+import { ProductLine, PRODUCT_TYPE_NAMES, MarketplaceListingStatus } from '@device-passport/shared';
+import toast from 'react-hot-toast';
+
+interface ProductFormData {
+  listingTitle: string;
+  description?: string;
+  productCategory?: ProductLine;
+  hsCode?: string;
+  showPrice: boolean;
+  minPrice?: number;
+  maxPrice?: number;
+  priceCurrency: string;
+  priceUnit?: string;
+  minOrderQuantity?: number;
+  supplyRegion?: string;
+  leadTimeDays?: number;
+  status: MarketplaceListingStatus;
+}
+
+export default function PublishProduct() {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<ProductFormData>({
+    defaultValues: {
+      showPrice: true,
+      priceCurrency: 'USD',
+      status: MarketplaceListingStatus.DRAFT,
+    },
+  });
+
+  const showPrice = watch('showPrice');
+
+  const createMutation = useMutation({
+    mutationFn: (data: ProductFormData) => marketplaceProductApi.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['my-marketplace-products'] });
+      toast.success(t('supplier.productCreated', 'Product published successfully'));
+      navigate('/supplier/products');
+    },
+    onError: () => {
+      toast.error(t('supplier.productCreateFailed', 'Failed to publish product'));
+    },
+  });
+
+  const onSubmit = (data: ProductFormData) => {
+    createMutation.mutate(data);
+  };
+
+  return (
+    <div className="max-w-3xl mx-auto px-4 py-6">
+      {/* Header */}
+      <div className="mb-6">
+        <button
+          onClick={() => navigate(-1)}
+          className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-4"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          {t('common.back', 'Back')}
+        </button>
+        <h1 className="text-2xl font-bold text-gray-900">
+          {t('supplier.publishProduct', 'Publish Product')}
+        </h1>
+        <p className="text-gray-600 mt-1">
+          {t('supplier.publishProductDesc', 'Add a new product to the marketplace')}
+        </p>
+      </div>
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        {/* Basic Info */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">
+            {t('supplier.basicInfo', 'Basic Information')}
+          </h2>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t('supplier.listingTitle', 'Listing Title')} *
+              </label>
+              <input
+                type="text"
+                {...register('listingTitle', { required: true, maxLength: 200 })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                placeholder={t('supplier.titlePlaceholder', 'Enter product title')}
+              />
+              {errors.listingTitle && (
+                <p className="mt-1 text-sm text-red-600">{t('common.required', 'This field is required')}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t('supplier.description', 'Description')}
+              </label>
+              <textarea
+                {...register('description')}
+                rows={4}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                placeholder={t('supplier.descriptionPlaceholder', 'Describe your product...')}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {t('supplier.category', 'Category')}
+                </label>
+                <select
+                  {...register('productCategory')}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">{t('supplier.selectCategory', 'Select category')}</option>
+                  {Object.entries(ProductLine).map(([key, value]) => (
+                    <option key={value} value={value}>
+                      {PRODUCT_TYPE_NAMES[value as keyof typeof PRODUCT_TYPE_NAMES]}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {t('supplier.hsCode', 'HS Code')}
+                </label>
+                <input
+                  type="text"
+                  {...register('hsCode')}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                  placeholder="e.g., 8471.30"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Pricing */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">
+            {t('supplier.pricing', 'Pricing')}
+          </h2>
+
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="showPrice"
+                {...register('showPrice')}
+                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              />
+              <label htmlFor="showPrice" className="text-sm text-gray-700">
+                {t('supplier.showPricePublicly', 'Show price publicly')}
+              </label>
+            </div>
+
+            {showPrice && (
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('supplier.minPrice', 'Min Price')}
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    {...register('minPrice', { min: 0 })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('supplier.maxPrice', 'Max Price')}
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    {...register('maxPrice', { min: 0 })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('supplier.currency', 'Currency')}
+                  </label>
+                  <select
+                    {...register('priceCurrency')}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                    <option value="CNY">CNY</option>
+                    <option value="VND">VND</option>
+                    <option value="JPY">JPY</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('supplier.priceUnit', 'Price Unit')}
+                  </label>
+                  <input
+                    type="text"
+                    {...register('priceUnit')}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                    placeholder="per unit"
+                  />
+                </div>
+              </div>
+            )}
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t('supplier.moq', 'Minimum Order Quantity')}
+              </label>
+              <input
+                type="number"
+                min="1"
+                {...register('minOrderQuantity', { min: 1 })}
+                className="w-full md:w-1/3 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Supply Info */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">
+            {t('supplier.supplyInfo', 'Supply Information')}
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t('supplier.supplyRegion', 'Supply Region')}
+              </label>
+              <input
+                type="text"
+                {...register('supplyRegion')}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                placeholder={t('supplier.regionPlaceholder', 'e.g., China, Vietnam')}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t('supplier.leadTime', 'Lead Time (days)')}
+              </label>
+              <input
+                type="number"
+                min="0"
+                {...register('leadTimeDays', { min: 0 })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Status */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">
+            {t('supplier.publishStatus', 'Publish Status')}
+          </h2>
+
+          <div className="flex gap-4">
+            <label className="flex items-center gap-2">
+              <input
+                type="radio"
+                value={MarketplaceListingStatus.DRAFT}
+                {...register('status')}
+                className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+              />
+              <span className="text-sm text-gray-700">{t('supplier.saveAsDraft', 'Save as Draft')}</span>
+            </label>
+            <label className="flex items-center gap-2">
+              <input
+                type="radio"
+                value={MarketplaceListingStatus.ACTIVE}
+                {...register('status')}
+                className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+              />
+              <span className="text-sm text-gray-700">{t('supplier.publishNow', 'Publish Now')}</span>
+            </label>
+          </div>
+        </div>
+
+        {/* Submit */}
+        <div className="flex justify-end gap-4">
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+          >
+            {t('common.cancel', 'Cancel')}
+          </button>
+          <button
+            type="submit"
+            disabled={createMutation.isPending}
+            className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+          >
+            <Save className="w-5 h-5" />
+            {createMutation.isPending ? t('common.saving', 'Saving...') : t('supplier.publish', 'Publish')}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}

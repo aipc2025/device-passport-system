@@ -26,15 +26,15 @@ export class ServiceOrder {
   @Column({ name: 'order_number', unique: true })
   orderNumber: string;
 
-  @Column({ name: 'passport_id' })
-  passportId: string;
+  @Column({ name: 'passport_id', type: 'uuid', nullable: true })
+  passportId: string | null;
 
-  @ManyToOne(() => DevicePassport)
+  @ManyToOne(() => DevicePassport, { nullable: true })
   @JoinColumn({ name: 'passport_id' })
   passport: DevicePassport;
 
-  @Column({ name: 'passport_code' })
-  passportCode: string;
+  @Column({ name: 'passport_code', type: 'varchar', nullable: true })
+  passportCode: string | null;
 
   @Column({
     name: 'service_type',
@@ -63,14 +63,14 @@ export class ServiceOrder {
   @Column({ type: 'text' })
   description: string;
 
-  @Column({ name: 'customer_id' })
-  customerId: string;
+  @Column({ name: 'customer_id', type: 'uuid', nullable: true })
+  customerId: string | null;
 
-  @ManyToOne(() => Organization)
+  @ManyToOne(() => Organization, { nullable: true })
   @JoinColumn({ name: 'customer_id' })
   customer: Organization;
 
-  @Column({ name: 'customer_name' })
+  @Column({ name: 'customer_name', type: 'varchar', nullable: true })
   customerName: string;
 
   @Column({ name: 'contact_name' })
@@ -125,12 +125,35 @@ export class ServiceOrder {
   @Column({ name: 'resolution_notes', type: 'text', nullable: true })
   resolutionNotes: string;
 
-  @Column({ name: 'created_by' })
-  createdBy: string;
+  // Location from map selection
+  @Column({ name: 'location_lat', type: 'decimal', precision: 10, scale: 7, nullable: true })
+  locationLat: number | null;
 
-  @ManyToOne(() => User)
+  @Column({ name: 'location_lng', type: 'decimal', precision: 10, scale: 7, nullable: true })
+  locationLng: number | null;
+
+  // Preferred service date from public request
+  @Column({ name: 'preferred_date', type: 'date', nullable: true })
+  preferredDate: Date | null;
+
+  // Attachment file IDs
+  @Column({ name: 'attachment_file_ids', type: 'jsonb', nullable: true })
+  attachmentFileIds: string[] | null;
+
+  @Column({ name: 'created_by', type: 'uuid', nullable: true })
+  createdBy: string | null;
+
+  @ManyToOne(() => User, { nullable: true })
   @JoinColumn({ name: 'created_by' })
   creator: User;
+
+  // For public requests where there's no user
+  @Column({ name: 'created_by_source', type: 'varchar', nullable: true })
+  createdBySource: string | null;
+
+  // Urgent service flag
+  @Column({ name: 'is_urgent', default: false })
+  isUrgent: boolean;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

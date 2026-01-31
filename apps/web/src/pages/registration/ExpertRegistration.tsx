@@ -93,7 +93,9 @@ export default function ExpertRegistration() {
         locationLat: expertData.locationLat,
         locationLng: expertData.locationLng,
         resumeFileId: expertData.resumeFileId,
-        certificateFileIds: expertData.certificateFileIds,
+        certificateFileIds: expertData.certificateFileIds?.length ? expertData.certificateFileIds : undefined,
+        idDocumentFileId: expertData.idDocumentFileId,
+        photoFileId: expertData.photoFileId,
       };
 
       await registrationApi.registerExpert(submitData);
@@ -101,8 +103,23 @@ export default function ExpertRegistration() {
       reset();
       navigate('/registration/success', { state: { type: 'expert' } });
     } catch (err: unknown) {
-      const error = err as { response?: { data?: { message?: string } } };
-      setError(error.response?.data?.message || 'Registration failed. Please try again.');
+      const error = err as { response?: { data?: { message?: string | string[]; error?: string } } };
+      let errorMessage = 'Registration failed. Please try again.';
+
+      if (error.response?.data) {
+        const { message, error: errorType } = error.response.data;
+        if (Array.isArray(message)) {
+          // Validation errors come as array
+          errorMessage = message.join('\n');
+        } else if (message) {
+          errorMessage = message;
+        } else if (errorType) {
+          errorMessage = errorType;
+        }
+      }
+
+      setError(errorMessage);
+      console.error('Registration error:', err);
     } finally {
       setSubmitting(false);
     }

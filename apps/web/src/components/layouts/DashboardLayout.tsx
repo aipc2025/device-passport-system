@@ -6,23 +6,94 @@ import {
   LogOut,
   Building2,
   UserCheck,
+  Store,
+  FileText,
+  MessageSquare,
+  ChevronDown,
+  ChevronRight,
+  User,
+  Briefcase,
 } from 'lucide-react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../../store/auth.store';
 import { UserRole } from '@device-passport/shared';
 import LanguageSwitcher from '../common/LanguageSwitcher';
 import clsx from 'clsx';
 
+interface NavItem {
+  name: string;
+  href?: string;
+  icon: React.ComponentType<{ className?: string }>;
+  roles: UserRole[];
+  children?: { name: string; href: string }[];
+  hideForExpert?: boolean; // Hide this item for expert users
+  expertOnly?: boolean; // Only show this item for expert users
+}
+
 export default function DashboardLayout() {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, logout, hasRole } = useAuthStore();
+  const { user, logout, hasRole, isExpert } = useAuthStore();
+  const [expandedSections, setExpandedSections] = useState<string[]>(['marketplace', 'supplier', 'buyer', 'expert']);
 
-  const navigation = [
+  const toggleSection = (name: string) => {
+    setExpandedSections((prev) =>
+      prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name]
+    );
+  };
+
+  const navigation: NavItem[] = [
     { name: t('common.dashboard'), href: '/dashboard', icon: LayoutDashboard, roles: [UserRole.CUSTOMER] },
-    { name: t('nav.devicePassports'), href: '/passports', icon: Package, roles: [UserRole.CUSTOMER] },
+    { name: t('nav.devicePassports'), href: '/passports', icon: Package, roles: [UserRole.CUSTOMER], hideForExpert: true },
     { name: t('nav.serviceOrders'), href: '/service-orders', icon: ClipboardList, roles: [UserRole.CUSTOMER] },
+    {
+      name: t('nav.marketplace'),
+      icon: Store,
+      roles: [UserRole.CUSTOMER],
+      hideForExpert: true,
+      children: [
+        { name: t('nav.products'), href: '/marketplace/products' },
+        { name: t('nav.rfqs'), href: '/marketplace/rfqs' },
+      ],
+    },
+    {
+      name: t('role.supplier'),
+      icon: Building2,
+      roles: [UserRole.CUSTOMER],
+      hideForExpert: true,
+      children: [
+        { name: t('nav.myProducts'), href: '/supplier/products' },
+        { name: t('nav.publishProduct'), href: '/supplier/products/publish' },
+        { name: t('nav.supplierMatches'), href: '/supplier/matches' },
+      ],
+    },
+    {
+      name: t('role.buyer'),
+      icon: FileText,
+      roles: [UserRole.CUSTOMER],
+      hideForExpert: true,
+      children: [
+        { name: t('nav.myRfqs'), href: '/buyer/rfqs' },
+        { name: t('nav.createRfq'), href: '/buyer/rfqs/create' },
+        { name: t('nav.buyerMatches'), href: '/buyer/matches' },
+      ],
+    },
+    { name: t('nav.inquiries'), href: '/inquiries', icon: MessageSquare, roles: [UserRole.CUSTOMER], hideForExpert: true },
+    // Expert-specific menu items
+    {
+      name: t('nav.expert', 'Expert'),
+      icon: User,
+      roles: [UserRole.CUSTOMER],
+      expertOnly: true,
+      children: [
+        { name: t('nav.expertProfile', 'My Profile'), href: '/expert/profile' },
+        { name: t('nav.serviceRecords', 'Service Records'), href: '/expert/service-records' },
+        { name: t('nav.expertMatches', 'Matches'), href: '/expert/matches' },
+      ],
+    },
+    { name: t('nav.serviceHall', 'Service Hall'), href: '/expert/service-hall', icon: Briefcase, roles: [UserRole.CUSTOMER], expertOnly: true },
     { name: t('nav.suppliers'), href: '/suppliers', icon: Building2, roles: [UserRole.ADMIN] },
     { name: t('nav.registrations'), href: '/registrations', icon: UserCheck, roles: [UserRole.ADMIN] },
   ];
@@ -32,7 +103,16 @@ export default function DashboardLayout() {
     navigate('/login');
   };
 
-  const filteredNav = navigation.filter((item) => hasRole(item.roles));
+  const userIsExpert = isExpert();
+  const filteredNav = navigation.filter((item) => {
+    // Check role requirement
+    if (!hasRole(item.roles)) return false;
+    // Hide items marked as hideForExpert when user is expert
+    if (userIsExpert && item.hideForExpert) return false;
+    // Only show items marked as expertOnly when user is expert
+    if (item.expertOnly && !userIsExpert) return false;
+    return true;
+  });
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -48,13 +128,62 @@ export default function DashboardLayout() {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 px-2 py-4 space-y-1">
+          <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
             {filteredNav.map((item) => {
-              const isActive = location.pathname.startsWith(item.href);
+              if (item.children) {
+                const isExpanded = expandedSections.includes(item.name);
+                const isChildActive = item.children.some((child) =>
+                  location.pathname.startsWith(child.href)
+                );
+                return (
+                  <div key={item.name}>
+                    <button
+                      onClick={() => toggleSection(item.name)}
+                      className={clsx(
+                        'w-full flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors',
+                        isChildActive
+                          ? 'bg-gray-800 text-white'
+                          : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                      )}
+                    >
+                      <item.icon className="h-5 w-5 mr-3" />
+                      <span className="flex-1 text-left">{item.name}</span>
+                      {isExpanded ? (
+                        <ChevronDown className="h-4 w-4" />
+                      ) : (
+                        <ChevronRight className="h-4 w-4" />
+                      )}
+                    </button>
+                    {isExpanded && (
+                      <div className="ml-8 mt-1 space-y-1">
+                        {item.children.map((child) => {
+                          const isActive = location.pathname === child.href;
+                          return (
+                            <Link
+                              key={child.href}
+                              to={child.href}
+                              className={clsx(
+                                'block px-3 py-2 rounded-md text-sm transition-colors',
+                                isActive
+                                  ? 'bg-gray-700 text-white'
+                                  : 'text-gray-400 hover:bg-gray-700 hover:text-white'
+                              )}
+                            >
+                              {child.name}
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              }
+
+              const isActive = location.pathname.startsWith(item.href!);
               return (
                 <Link
                   key={item.name}
-                  to={item.href}
+                  to={item.href!}
                   className={clsx(
                     'flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors',
                     isActive

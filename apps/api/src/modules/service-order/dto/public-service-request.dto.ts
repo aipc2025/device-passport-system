@@ -4,14 +4,19 @@ import {
   IsOptional,
   IsEmail,
   IsDateString,
+  IsNumber,
+  IsArray,
+  IsUUID,
+  IsBoolean,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ServiceType } from '@device-passport/shared';
 
 export class PublicServiceRequestDto {
-  @ApiProperty({ example: 'DP-MED-2025-PLC-DE-000001-A7' })
+  @ApiPropertyOptional({ example: 'DP-MED-2025-PLC-DE-000001-A7', description: 'Optional - can be empty if no passport code' })
+  @IsOptional()
   @IsString()
-  passportCode: string;
+  passportCode?: string;
 
   @ApiProperty({ enum: ServiceType, example: ServiceType.REPAIR })
   @IsEnum(ServiceType)
@@ -50,4 +55,28 @@ export class PublicServiceRequestDto {
   @IsOptional()
   @IsDateString()
   preferredDate?: string;
+
+  // Location coordinates (from map selection)
+  @ApiPropertyOptional({ example: 40.7128 })
+  @IsOptional()
+  @IsNumber()
+  locationLat?: number;
+
+  @ApiPropertyOptional({ example: -74.006 })
+  @IsOptional()
+  @IsNumber()
+  locationLng?: number;
+
+  // Attachment file IDs
+  @ApiPropertyOptional({ type: [String], description: 'File IDs of uploaded attachments' })
+  @IsOptional()
+  @IsArray()
+  @IsUUID('4', { each: true })
+  attachmentFileIds?: string[];
+
+  // Urgent service flag
+  @ApiPropertyOptional({ example: false, description: 'Whether this is an urgent service request' })
+  @IsOptional()
+  @IsBoolean()
+  isUrgent?: boolean;
 }

@@ -17,6 +17,7 @@ export interface UploadOptions {
   relatedEntityType?: string;
   relatedEntityId?: string;
   uploadedBy?: string;
+  passportCode?: string; // For service attachment file naming
 }
 
 @Injectable()
@@ -60,6 +61,21 @@ export class UploadService {
     return categoryDir;
   }
 
+  /**
+   * Generate timestamp in format: YYMMDDHHMM.SSS
+   * Example: 2601312003.123 (26=year, 01=month, 31=day, 20=hour, 03=minute, .123=milliseconds)
+   */
+  private generateTimestamp(): string {
+    const now = new Date();
+    const year = now.getFullYear().toString().slice(-2); // Last 2 digits of year
+    const month = (now.getMonth() + 1).toString().padStart(2, '0');
+    const day = now.getDate().toString().padStart(2, '0');
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    const milliseconds = now.getMilliseconds().toString().padStart(3, '0');
+    return `${year}${month}${day}${hours}${minutes}.${milliseconds}`;
+  }
+
   async uploadFile(
     file: Express.Multer.File,
     options: UploadOptions = {},
@@ -86,7 +102,24 @@ export class UploadService {
 
     // Generate unique filename
     const fileExt = path.extname(file.originalname);
-    const storedName = `${Date.now()}-${uuidv4()}${fileExt}`;
+    let storedName: string;
+
+    // Special naming for service attachments: IS-{code}-timestamp
+    if (fileCategory === FileCategory.SERVICE_ATTACHMENT) {
+      const timestamp = this.generateTimestamp();
+      if (options.passportCode && options.passportCode.trim() !== '') {
+        // Replace DP prefix with IS and append timestamp
+        // Format: DP-MED-2025-PLC-DE-000001-A7 -> IS-MED-2025-PLC-DE-000001-A7-timestamp
+        const codeWithoutPrefix = options.passportCode.replace(/^DP-/i, '');
+        storedName = `IS-${codeWithoutPrefix}-${timestamp}${fileExt}`;
+      } else {
+        // No passport code: IS-None-timestamp
+        storedName = `IS-None-${timestamp}${fileExt}`;
+      }
+    } else {
+      storedName = `${Date.now()}-${uuidv4()}${fileExt}`;
+    }
+
     const storagePath = path.join(categoryDir, storedName);
 
     // Write file to disk

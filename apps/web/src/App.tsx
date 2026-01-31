@@ -28,6 +28,34 @@ import ServiceOrderDetail from './pages/admin/ServiceOrderDetail';
 import SupplierList from './pages/admin/SupplierList';
 import PendingRegistrations from './pages/admin/PendingRegistrations';
 
+// Marketplace pages
+import MarketplaceHome from './pages/marketplace';
+import ProductList from './pages/marketplace/ProductList';
+import ProductDetail from './pages/marketplace/ProductDetail';
+import RFQList from './pages/marketplace/RFQList';
+import RFQDetail from './pages/marketplace/RFQDetail';
+
+// Supplier pages
+import MyProducts from './pages/supplier/MyProducts';
+import PublishProduct from './pages/supplier/PublishProduct';
+import SupplierMatches from './pages/supplier/SupplierMatches';
+
+// Buyer pages
+import MyRFQs from './pages/buyer/MyRFQs';
+import CreateRFQ from './pages/buyer/CreateRFQ';
+import BuyerMatches from './pages/buyer/BuyerMatches';
+
+// Inquiry pages
+import InquiryList from './pages/inquiries/InquiryList';
+import InquiryDetail from './pages/inquiries/InquiryDetail';
+import CreateInquiry from './pages/inquiries/CreateInquiry';
+
+// Matching pages
+import MatchDetail from './pages/matching/MatchDetail';
+
+// Expert pages
+import { ExpertProfile, ServiceRecords, ExpertMatches, ServiceHall } from './pages/expert';
+
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
@@ -71,6 +99,37 @@ function App() {
           <Route path="/service-orders/:id" element={<ServiceOrderDetail />} />
           <Route path="/suppliers" element={<SupplierList />} />
           <Route path="/registrations" element={<PendingRegistrations />} />
+
+          {/* Marketplace routes */}
+          <Route path="/marketplace" element={<MarketplaceHome />} />
+          <Route path="/marketplace/products" element={<ProductList />} />
+          <Route path="/marketplace/products/:id" element={<ProductDetail />} />
+          <Route path="/marketplace/rfqs" element={<RFQList />} />
+          <Route path="/marketplace/rfqs/:id" element={<RFQDetail />} />
+
+          {/* Supplier routes */}
+          <Route path="/supplier/products" element={<MyProducts />} />
+          <Route path="/supplier/products/publish" element={<PublishProduct />} />
+          <Route path="/supplier/matches" element={<SupplierMatches />} />
+
+          {/* Buyer routes */}
+          <Route path="/buyer/rfqs" element={<MyRFQs />} />
+          <Route path="/buyer/rfqs/create" element={<CreateRFQ />} />
+          <Route path="/buyer/matches" element={<BuyerMatches />} />
+
+          {/* Inquiry routes */}
+          <Route path="/inquiries" element={<InquiryList />} />
+          <Route path="/inquiries/create" element={<CreateInquiry />} />
+          <Route path="/inquiries/:id" element={<InquiryDetail />} />
+
+          {/* Match detail */}
+          <Route path="/matching/:id" element={<MatchDetail />} />
+
+          {/* Expert routes */}
+          <Route path="/expert/profile" element={<ExpertProfile />} />
+          <Route path="/expert/service-records" element={<ServiceRecords />} />
+          <Route path="/expert/matches" element={<ExpertMatches />} />
+          <Route path="/expert/service-hall" element={<ServiceHall />} />
         </Route>
 
         {/* Fallback */}

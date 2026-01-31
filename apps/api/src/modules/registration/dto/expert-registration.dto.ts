@@ -8,6 +8,7 @@ import {
   IsArray,
   IsUUID,
   MinLength,
+  ArrayMinSize,
 } from 'class-validator';
 import { ExpertType } from '@device-passport/shared';
 
@@ -22,10 +23,12 @@ export class ExpertRegistrationDto {
   @MinLength(8)
   password: string;
 
-  // Expert type
-  @ApiProperty({ enum: ExpertType })
-  @IsEnum(ExpertType)
-  expertType: ExpertType;
+  // Expert types - supports multiple selection
+  @ApiProperty({ enum: ExpertType, isArray: true })
+  @IsArray()
+  @ArrayMinSize(1, { message: 'At least one expert type must be selected' })
+  @IsEnum(ExpertType, { each: true })
+  expertTypes: ExpertType[];
 
   // Personal Info (Section F)
   @ApiProperty()
@@ -112,4 +115,14 @@ export class ExpertRegistrationDto {
   @IsArray()
   @IsUUID('4', { each: true })
   certificateFileIds?: string[];
+
+  @ApiPropertyOptional({ description: 'ID/Passport document file ID' })
+  @IsOptional()
+  @IsUUID()
+  idDocumentFileId?: string;
+
+  @ApiPropertyOptional({ description: 'Profile photo file ID' })
+  @IsOptional()
+  @IsUUID()
+  photoFileId?: string;
 }

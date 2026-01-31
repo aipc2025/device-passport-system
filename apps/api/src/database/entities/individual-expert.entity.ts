@@ -23,11 +23,11 @@ export class IndividualExpert {
   user: User;
 
   @Column({
-    name: 'expert_type',
-    type: 'enum',
-    enum: ExpertType,
+    name: 'expert_types',
+    type: 'jsonb',
+    default: '[]',
   })
-  expertType: ExpertType;
+  expertTypes: ExpertType[];
 
   // Personal Info (Section F)
   @Column({ name: 'personal_name' })

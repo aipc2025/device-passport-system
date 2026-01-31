@@ -196,11 +196,11 @@ export class CompanyRegistrationDto {
   @IsString()
   organizationName: string;
 
-  @ApiProperty({ description: '3-letter organization code' })
+  @ApiProperty({ description: '2-6 character alphanumeric organization code' })
   @IsString()
-  @MinLength(3)
-  @MaxLength(3)
-  @Matches(/^[A-Z]{3}$/, { message: 'Organization code must be 3 uppercase letters' })
+  @MinLength(2)
+  @MaxLength(6)
+  @Matches(/^[A-Z0-9]{2,6}$/, { message: 'Organization code must be 2-6 uppercase letters or numbers' })
   organizationCode: string;
 
   // Roles

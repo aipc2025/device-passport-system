@@ -79,23 +79,25 @@ export class ServiceRecordService {
       await this.serviceOrderRepository.save(serviceOrder);
     }
 
-    // Create lifecycle event
-    await this.lifecycleService.create(
-      {
-        passportId: serviceOrder.passportId,
-        eventType: LifecycleEventType.SERVICE_PERFORMED,
-        description: `Service record added: ${createDto.recordType}`,
-        metadata: {
-          serviceOrderId: serviceOrder.id,
-          serviceRecordId: savedRecord.id,
-          recordType: createDto.recordType,
-          workPerformed: createDto.workPerformed,
+    // Create lifecycle event if there is a passport associated
+    if (serviceOrder.passportId) {
+      await this.lifecycleService.create(
+        {
+          passportId: serviceOrder.passportId,
+          eventType: LifecycleEventType.SERVICE_PERFORMED,
+          description: `Service record added: ${createDto.recordType}`,
+          metadata: {
+            serviceOrderId: serviceOrder.id,
+            serviceRecordId: savedRecord.id,
+            recordType: createDto.recordType,
+            workPerformed: createDto.workPerformed,
+          },
         },
-      },
-      userId,
-      user?.name || 'System',
-      user?.role || 'SYSTEM',
-    );
+        userId,
+        user?.name || 'System',
+        user?.role || 'SYSTEM',
+      );
+    }
 
     return savedRecord;
   }

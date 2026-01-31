@@ -218,13 +218,14 @@ export interface PublicServiceRequestDto {
 export interface ServiceOrderListItem {
   id: string;
   orderNumber: string;
-  passportCode: string;
+  passportCode?: string | null;
   serviceType: ServiceType;
   status: ServiceOrderStatus;
   priority: ServicePriority;
   title: string;
-  customerName: string;
+  customerName?: string | null;
   assignedEngineerName?: string;
   scheduledDate?: Date;
   createdAt: Date;
+  isUrgent?: boolean;
 }

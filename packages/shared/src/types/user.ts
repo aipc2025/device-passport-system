@@ -10,6 +10,8 @@ export interface User {
   role: UserRole;
   organizationId?: string;
   isActive: boolean;
+  isExpert?: boolean; // True if user is an individual expert
+  expertId?: string; // ID of the IndividualExpert record
   lastLoginAt?: Date;
   createdAt: Date;
   updatedAt: Date;

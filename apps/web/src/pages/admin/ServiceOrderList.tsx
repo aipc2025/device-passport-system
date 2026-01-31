@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, AlertTriangle } from 'lucide-react';
 import { serviceOrderApi } from '../../services/api';
 import { ServiceOrderStatus, ServicePriority, ServiceOrderListItem } from '@device-passport/shared';
 import { format } from 'date-fns';
@@ -143,17 +143,43 @@ export default function ServiceOrderList() {
                 </tr>
               ) : (
                 data?.data?.map((order: ServiceOrderListItem) => (
-                  <tr key={order.id} className="hover:bg-gray-50">
+                  <tr
+                    key={order.id}
+                    className={clsx(
+                      'hover:bg-gray-50',
+                      order.isUrgent && 'bg-red-50 hover:bg-red-100'
+                    )}
+                  >
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <Link
-                        to={`/service-orders/${order.id}`}
-                        className="text-primary-600 hover:text-primary-900 font-mono"
-                      >
-                        {order.orderNumber}
-                      </Link>
+                      <div className="flex items-center gap-2">
+                        {order.isUrgent && (
+                          <span className="flex items-center" title="Urgent Service Request">
+                            <AlertTriangle className="h-4 w-4 text-red-600 animate-pulse" />
+                          </span>
+                        )}
+                        <Link
+                          to={`/service-orders/${order.id}`}
+                          className={clsx(
+                            'font-mono',
+                            order.isUrgent
+                              ? 'text-red-600 hover:text-red-900 font-bold'
+                              : 'text-primary-600 hover:text-primary-900'
+                          )}
+                        >
+                          {order.orderNumber}
+                        </Link>
+                      </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="text-sm font-medium text-gray-900 max-w-xs truncate">
+                      <div className={clsx(
+                        'text-sm font-medium max-w-xs truncate',
+                        order.isUrgent ? 'text-red-900' : 'text-gray-900'
+                      )}>
+                        {order.isUrgent && (
+                          <span className="inline-block px-2 py-0.5 mr-2 text-xs font-bold text-white bg-red-600 rounded">
+                            URGENT
+                          </span>
+                        )}
                         {order.title}
                       </div>
                     </td>

@@ -112,6 +112,7 @@ export class ServiceOrderService {
         assignedEngineerName: o.assignedEngineerName,
         scheduledDate: o.scheduledDate,
         createdAt: o.createdAt,
+        isUrgent: o.isUrgent,
       })),
       meta: {
         total,
@@ -191,27 +192,49 @@ export class ServiceOrderService {
   }
 
   async createPublicRequest(dto: PublicServiceRequestDto): Promise<ServiceOrder> {
-    // Find passport
-    const passport = await this.passportRepository.findOne({
-      where: { passportCode: dto.passportCode.toUpperCase() },
-    });
+    let passportId: string | undefined;
+    let passportCode: string | undefined;
+    let customerId: string | undefined;
 
-    if (!passport) {
-      throw new NotFoundException('Device passport not found');
+    // Find passport if code is provided
+    if (dto.passportCode && dto.passportCode.trim() !== '') {
+      const passport = await this.passportRepository.findOne({
+        where: { passportCode: dto.passportCode.toUpperCase() },
+      });
+
+      if (!passport) {
+        throw new NotFoundException('Device passport not found');
+      }
+
+      passportId = passport.id;
+      passportCode = passport.passportCode;
+      customerId = passport.customerId;
     }
 
     const orderNumber = await this.generateOrderNumber();
 
     const order = this.serviceOrderRepository.create({
-      ...dto,
       orderNumber,
-      passportId: passport.id,
-      passportCode: passport.passportCode,
-      customerId: passport.customerId,
+      serviceType: dto.serviceType,
+      title: dto.title,
+      description: dto.description,
+      contactName: dto.contactName,
+      contactPhone: dto.contactPhone,
+      contactEmail: dto.contactEmail,
+      serviceAddress: dto.serviceAddress,
+      serviceCity: dto.serviceCity,
+      preferredDate: dto.preferredDate ? new Date(dto.preferredDate) : undefined,
+      locationLat: dto.locationLat,
+      locationLng: dto.locationLng,
+      passportId,
+      passportCode,
+      customerId,
       customerName: dto.contactName,
       customerNotes: dto.description,
       status: ServiceOrderStatus.PENDING,
-      createdBy: 'PUBLIC',
+      createdBySource: 'PUBLIC', // For public requests without a user
+      attachmentFileIds: dto.attachmentFileIds,
+      isUrgent: dto.isUrgent || false,
     });
 
     return this.serviceOrderRepository.save(order);

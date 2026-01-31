@@ -134,6 +134,8 @@ export default function PassportCreate() {
     if (data.buyerCountry === 'OTHER' && data.customBuyerCountry) {
       data.buyerCountry = data.customBuyerCountry;
     }
+    // Remove temporary field that backend doesn't accept
+    delete data.customBuyerCountry;
     // Convert custom origin code to uppercase
     if (data.customOriginCode) {
       data.customOriginCode = data.customOriginCode.toUpperCase();

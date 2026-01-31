@@ -13,3 +13,11 @@ export * from './organization-contact.entity';
 export * from './supplier-product.entity';
 export * from './individual-expert.entity';
 export * from './uploaded-file.entity';
+
+// Marketplace entities
+export * from './marketplace-product.entity';
+export * from './buyer-requirement.entity';
+export * from './match-result.entity';
+export * from './inquiry.entity';
+export * from './inquiry-message.entity';
+export * from './saved-item.entity';

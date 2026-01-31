@@ -10,6 +10,7 @@ interface AuthState {
   setAuth: (user: Omit<User, 'password'>, accessToken: string, refreshToken: string) => void;
   logout: () => void;
   hasRole: (roles: UserRole[]) => boolean;
+  isExpert: () => boolean;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -55,6 +56,11 @@ export const useAuthStore = create<AuthState>()(
         const minRequired = Math.min(...roles.map((r) => roleHierarchy[r]));
 
         return userLevel >= minRequired;
+      },
+
+      isExpert: () => {
+        const user = get().user;
+        return !!user?.isExpert;
       },
     }),
     {

@@ -39,7 +39,7 @@ export interface PendingRegistration {
   companyCode?: string;
   isSupplier?: boolean;
   isBuyer?: boolean;
-  expertType?: string;
+  expertTypes?: string[];
 }
 
 export interface RegistrationStatusResponse {
@@ -242,7 +242,7 @@ export class RegistrationService {
       // 2. Create Expert Profile
       const expert = queryRunner.manager.create(IndividualExpert, {
         userId: savedUser.id,
-        expertType: dto.expertType,
+        expertTypes: dto.expertTypes,
         personalName: dto.personalName,
         idNumber: dto.idNumber,
         phone: dto.phone,
@@ -276,6 +276,20 @@ export class RegistrationService {
             relatedEntityId: savedExpert.id,
           });
         }
+      }
+
+      if (dto.idDocumentFileId) {
+        await queryRunner.manager.update(UploadedFile, dto.idDocumentFileId, {
+          relatedEntityType: 'IndividualExpert',
+          relatedEntityId: savedExpert.id,
+        });
+      }
+
+      if (dto.photoFileId) {
+        await queryRunner.manager.update(UploadedFile, dto.photoFileId, {
+          relatedEntityType: 'IndividualExpert',
+          relatedEntityId: savedExpert.id,
+        });
       }
 
       await queryRunner.commitTransaction();
@@ -388,7 +402,7 @@ export class RegistrationService {
         email: expert.user?.email || 'Unknown',
         status: expert.registrationStatus,
         submittedAt: expert.createdAt,
-        expertType: expert.expertType,
+        expertTypes: expert.expertTypes,
       });
     }
 

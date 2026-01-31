@@ -226,8 +226,11 @@ export default function BusinessLicenseStep() {
                 <option value="USD">USD</option>
                 <option value="EUR">EUR</option>
                 <option value="CNY">CNY</option>
+                <option value="VND">VND</option>
                 <option value="GBP">GBP</option>
                 <option value="JPY">JPY</option>
+                <option value="KRW">KRW</option>
+                <option value="THB">THB</option>
               </select>
             </div>
           </div>

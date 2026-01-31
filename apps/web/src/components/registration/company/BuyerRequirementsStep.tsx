@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRegistrationStore } from '../../../store/registration.store';
-import { PurchaseFrequency } from '@device-passport/shared';
-import { PlusIcon, TrashIcon, CubeIcon } from '@heroicons/react/24/outline';
+import { PurchaseFrequency, FileCategory } from '@device-passport/shared';
+import { PlusIcon, TrashIcon, CubeIcon, PaperClipIcon } from '@heroicons/react/24/outline';
+import FileUploader from '../common/FileUploader';
 
 interface BuyerProductRequirement {
   productName: string;
@@ -11,10 +12,13 @@ interface BuyerProductRequirement {
   budgetMin?: number;
   budgetMax?: number;
   budgetCurrency: string;
+  purchaseFrequency?: PurchaseFrequency;
+  estimatedAnnualVolume?: string;
+  attachmentFileIds?: string[];
 }
 
-// Common currency options
-const CURRENCIES = ['USD', 'EUR', 'CNY', 'JPY', 'GBP', 'KRW', 'TWD', 'HKD', 'SGD', 'AUD'];
+// Common currency options (including VND for Vietnam)
+const CURRENCIES = ['USD', 'EUR', 'CNY', 'VND', 'JPY', 'GBP', 'KRW', 'TWD', 'HKD', 'SGD', 'AUD', 'THB', 'MYR'];
 
 export default function BuyerRequirementsStep() {
   const { t } = useTranslation();
@@ -174,6 +178,47 @@ export default function BuyerRequirementsStep() {
                   placeholder="0"
                 />
               </div>
+
+              <div>
+                <label className="label">{t('buyer.purchaseFrequency', 'Purchase Frequency')}</label>
+                <select
+                  value={newProduct.purchaseFrequency || ''}
+                  onChange={(e) => setNewProduct({ ...newProduct, purchaseFrequency: e.target.value as PurchaseFrequency || undefined })}
+                  className="select"
+                >
+                  <option value="">{t('common.select', 'Select...')}</option>
+                  <option value={PurchaseFrequency.ONE_TIME}>{t('frequency.oneTime', 'One-time purchase')}</option>
+                  <option value={PurchaseFrequency.MONTHLY}>{t('frequency.monthly', 'Monthly')}</option>
+                  <option value={PurchaseFrequency.QUARTERLY}>{t('frequency.quarterly', 'Quarterly')}</option>
+                  <option value={PurchaseFrequency.YEARLY}>{t('frequency.yearly', 'Yearly')}</option>
+                  <option value={PurchaseFrequency.AS_NEEDED}>{t('frequency.asNeeded', 'As needed')}</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="label">{t('buyer.estimatedAnnualVolume', 'Estimated Annual Volume')}</label>
+                <input
+                  type="text"
+                  value={newProduct.estimatedAnnualVolume || ''}
+                  onChange={(e) => setNewProduct({ ...newProduct, estimatedAnnualVolume: e.target.value })}
+                  className="input"
+                  placeholder={t('buyer.estimatedAnnualVolumePlaceholder', 'e.g., $100,000 - $500,000')}
+                />
+              </div>
+            </div>
+
+            {/* File Attachments */}
+            <div className="pt-3 border-t border-gray-100">
+              <FileUploader
+                label={t('buyer.attachments', 'Attachments (Drawings, Specs, etc.)')}
+                accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.dwg,.dxf"
+                multiple={true}
+                maxFiles={5}
+                fileCategory={FileCategory.OTHER}
+                value={newProduct.attachmentFileIds}
+                onChange={(fileIds) => setNewProduct({ ...newProduct, attachmentFileIds: fileIds as string[] | undefined })}
+                helperText={t('buyer.attachmentsHelp', 'PDF, Word, Excel, Images, DWG (max 10MB each)')}
+              />
             </div>
 
             <div className="flex justify-end space-x-3 pt-3 border-t">
@@ -229,7 +274,24 @@ export default function BuyerRequirementsStep() {
                           <span className="font-medium">{t('buyer.budget', 'Budget')}:</span> {formatBudget(product)}
                         </span>
                       )}
+                      {product.purchaseFrequency && (
+                        <span className="text-gray-500">
+                          <span className="font-medium">{t('buyer.frequency', 'Frequency')}:</span>{' '}
+                          {t(`frequency.${product.purchaseFrequency.toLowerCase()}`, product.purchaseFrequency)}
+                        </span>
+                      )}
+                      {product.estimatedAnnualVolume && (
+                        <span className="text-gray-500">
+                          <span className="font-medium">{t('buyer.volume', 'Volume')}:</span> {product.estimatedAnnualVolume}
+                        </span>
+                      )}
                     </div>
+                    {product.attachmentFileIds && product.attachmentFileIds.length > 0 && (
+                      <div className="mt-2 flex items-center text-sm text-blue-600">
+                        <PaperClipIcon className="h-4 w-4 mr-1" />
+                        {product.attachmentFileIds.length} {t('buyer.filesAttached', 'file(s) attached')}
+                      </div>
+                    )}
                   </div>
                   <button
                     type="button"
@@ -260,39 +322,6 @@ export default function BuyerRequirementsStep() {
             className="textarea"
             placeholder={t('buyer.generalDescriptionPlaceholder', 'Any additional information about your purchasing needs, preferred brands, quality standards, etc.')}
           />
-        </div>
-
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-          <div>
-            <label className="label">{t('buyer.purchaseFrequency', 'Purchase Frequency')}</label>
-            <select
-              value={companyData.purchaseFrequency || ''}
-              onChange={(e) =>
-                updateCompanyData({
-                  purchaseFrequency: e.target.value as PurchaseFrequency || undefined,
-                })
-              }
-              className="select"
-            >
-              <option value="">{t('common.select', 'Select...')}</option>
-              <option value={PurchaseFrequency.ONE_TIME}>{t('frequency.oneTime', 'One-time purchase')}</option>
-              <option value={PurchaseFrequency.MONTHLY}>{t('frequency.monthly', 'Monthly')}</option>
-              <option value={PurchaseFrequency.QUARTERLY}>{t('frequency.quarterly', 'Quarterly')}</option>
-              <option value={PurchaseFrequency.YEARLY}>{t('frequency.yearly', 'Yearly')}</option>
-              <option value={PurchaseFrequency.AS_NEEDED}>{t('frequency.asNeeded', 'As needed')}</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="label">{t('buyer.purchaseVolume', 'Estimated Annual Volume')}</label>
-            <input
-              type="text"
-              value={companyData.purchaseVolume || ''}
-              onChange={(e) => updateCompanyData({ purchaseVolume: e.target.value })}
-              className="input"
-              placeholder={t('buyer.purchaseVolumePlaceholder', 'e.g., $100,000 - $500,000 per year')}
-            />
-          </div>
         </div>
 
         <div>

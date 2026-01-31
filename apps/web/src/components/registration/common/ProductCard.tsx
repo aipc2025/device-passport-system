@@ -10,8 +10,8 @@ interface ProductCardProps {
   onDelete: () => void;
 }
 
-// Common currency options
-const CURRENCIES = ['USD', 'EUR', 'CNY', 'JPY', 'GBP', 'KRW', 'TWD', 'HKD', 'SGD', 'AUD'];
+// Common currency options (including VND for Vietnam)
+const CURRENCIES = ['USD', 'EUR', 'CNY', 'VND', 'JPY', 'GBP', 'KRW', 'TWD', 'HKD', 'SGD', 'AUD', 'THB', 'MYR'];
 
 export default function ProductCard({ product, onEdit, onDelete }: ProductCardProps) {
   const { t } = useTranslation();

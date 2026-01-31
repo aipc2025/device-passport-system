@@ -579,3 +579,49 @@ export const EXPERT_MATCH_STATUS_NAMES: Record<ExpertMatchStatus, string> = {
   [ExpertMatchStatus.APPLIED]: 'Applied',
   [ExpertMatchStatus.DISMISSED]: 'Dismissed',
 };
+
+// ============================================
+// Expert Rating System Enums
+// ============================================
+
+/**
+ * Expert service record status
+ */
+export enum ServiceRecordStatus {
+  PENDING = 'PENDING',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED',
+  DISPUTED = 'DISPUTED',
+}
+
+/**
+ * Service record status display names
+ */
+export const SERVICE_RECORD_STATUS_NAMES: Record<ServiceRecordStatus, string> = {
+  [ServiceRecordStatus.PENDING]: 'Pending',
+  [ServiceRecordStatus.IN_PROGRESS]: 'In Progress',
+  [ServiceRecordStatus.COMPLETED]: 'Completed',
+  [ServiceRecordStatus.CANCELLED]: 'Cancelled',
+  [ServiceRecordStatus.DISPUTED]: 'Disputed',
+};
+
+/**
+ * Expert review status
+ */
+export enum ReviewStatus {
+  PENDING = 'PENDING',
+  PUBLISHED = 'PUBLISHED',
+  HIDDEN = 'HIDDEN',
+  FLAGGED = 'FLAGGED',
+}
+
+/**
+ * Review status display names
+ */
+export const REVIEW_STATUS_NAMES: Record<ReviewStatus, string> = {
+  [ReviewStatus.PENDING]: 'Pending',
+  [ReviewStatus.PUBLISHED]: 'Published',
+  [ReviewStatus.HIDDEN]: 'Hidden',
+  [ReviewStatus.FLAGGED]: 'Flagged',
+};

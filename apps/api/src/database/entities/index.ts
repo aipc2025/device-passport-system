@@ -27,3 +27,7 @@ export * from './saved-item.entity';
 export * from './service-request.entity';
 export * from './expert-application.entity';
 export * from './expert-match-result.entity';
+
+// Expert Rating System entities
+export * from './expert-service-record.entity';
+export * from './expert-review.entity';

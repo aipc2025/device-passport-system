@@ -19,6 +19,7 @@ import { SavedModule } from './modules/saved/saved.module';
 import { ExpertModule } from './modules/expert/expert.module';
 import { ServiceRequestModule } from './modules/service-request/service-request.module';
 import { ExpertMatchingModule } from './modules/expert-matching/expert-matching.module';
+import { ExpertRatingModule } from './modules/expert-rating/expert-rating.module';
 import databaseConfig from './config/database.config';
 import jwtConfig from './config/jwt.config';
 
@@ -71,6 +72,7 @@ import jwtConfig from './config/jwt.config';
     ExpertModule,
     ServiceRequestModule,
     ExpertMatchingModule,
+    ExpertRatingModule,
   ],
 })
 export class AppModule {}

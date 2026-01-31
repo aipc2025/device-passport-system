@@ -592,3 +592,110 @@ export const expertApi = {
     return response.data.data || response.data;
   },
 };
+
+// ==========================================
+// Expert Rating APIs
+// ==========================================
+
+export interface CreateServiceRecordDto {
+  serviceRequestId: string;
+  expertId: string;
+  agreedPrice: number;
+  priceCurrency?: string;
+  estimatedDuration?: string;
+  scheduledStart?: Date;
+  scheduledEnd?: Date;
+  expertNotes?: string;
+}
+
+export interface CreateReviewDto {
+  serviceRecordId: string;
+  overallRating: number;
+  qualityRating?: number;
+  communicationRating?: number;
+  punctualityRating?: number;
+  professionalismRating?: number;
+  valueRating?: number;
+  title?: string;
+  comment?: string;
+  pros?: string[];
+  cons?: string[];
+}
+
+export const ratingApi = {
+  // Service Records
+  createServiceRecord: async (data: CreateServiceRecordDto) => {
+    const response = await api.post('/expert-rating/service-records', data);
+    return response.data.data || response.data;
+  },
+  getServiceRecord: async (id: string) => {
+    const response = await api.get(`/expert-rating/service-records/${id}`);
+    return response.data.data || response.data;
+  },
+  getExpertServiceRecords: async (expertId: string, status?: string, limit = 50) => {
+    const response = await api.get(`/expert-rating/service-records/expert/${expertId}`, {
+      params: { status, limit },
+    });
+    return response.data.data || response.data;
+  },
+  getMyServiceRecords: async (status?: string, limit = 50) => {
+    const response = await api.get('/expert-rating/service-records/customer/my', {
+      params: { status, limit },
+    });
+    return response.data.data || response.data;
+  },
+  updateServiceRecord: async (id: string, data: Record<string, unknown>) => {
+    const response = await api.patch(`/expert-rating/service-records/${id}`, data);
+    return response.data.data || response.data;
+  },
+  startService: async (id: string) => {
+    const response = await api.post(`/expert-rating/service-records/${id}/start`);
+    return response.data.data || response.data;
+  },
+  completeService: async (id: string, data?: { finalPrice?: number; completionNotes?: string }) => {
+    const response = await api.post(`/expert-rating/service-records/${id}/complete`, data);
+    return response.data.data || response.data;
+  },
+  confirmCompletion: async (id: string) => {
+    const response = await api.post(`/expert-rating/service-records/${id}/confirm`);
+    return response.data.data || response.data;
+  },
+  cancelService: async (id: string, reason?: string) => {
+    const response = await api.post(`/expert-rating/service-records/${id}/cancel`, { reason });
+    return response.data.data || response.data;
+  },
+
+  // Reviews
+  createReview: async (data: CreateReviewDto) => {
+    const response = await api.post('/expert-rating/reviews', data);
+    return response.data.data || response.data;
+  },
+  getReview: async (id: string) => {
+    const response = await api.get(`/expert-rating/reviews/${id}`);
+    return response.data.data || response.data;
+  },
+  getExpertReviews: async (expertId: string, limit = 50) => {
+    const response = await api.get(`/expert-rating/reviews/expert/${expertId}`, {
+      params: { limit },
+    });
+    return response.data.data || response.data;
+  },
+  respondToReview: async (reviewId: string, response: string) => {
+    const res = await api.post(`/expert-rating/reviews/${reviewId}/respond`, { response });
+    return res.data.data || res.data;
+  },
+  flagReview: async (reviewId: string, reason: string) => {
+    const response = await api.post(`/expert-rating/reviews/${reviewId}/flag`, { reason });
+    return response.data.data || response.data;
+  },
+  voteReview: async (reviewId: string, isHelpful: boolean) => {
+    const response = await api.post(`/expert-rating/reviews/${reviewId}/vote`, { isHelpful });
+    return response.data.data || response.data;
+  },
+
+  // Rating Summary
+  getExpertRatingSummary: async (expertId: string) => {
+    const response = await api.get(`/expert-rating/summary/${expertId}`);
+    return response.data.data || response.data;
+  },
+};

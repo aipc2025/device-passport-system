@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useRegistrationStore } from '../../../store/registration.store';
 import ProductCard, { ProductForm } from '../common/ProductCard';
-import { PlusIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, CubeIcon } from '@heroicons/react/24/outline';
 import type { ProductData } from '../../../store/registration.store';
 
 export default function SupplierProductsStep() {
+  const { t } = useTranslation();
   const { companyData, addProduct, updateProduct, removeProduct } = useRegistrationStore();
   const [isEditing, setIsEditing] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -35,18 +37,22 @@ export default function SupplierProductsStep() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <h2 className="text-lg font-medium text-gray-900">Supplier Products</h2>
-        <p className="mt-1 text-sm text-gray-500">
-          Add the products your company supplies. You can add more products after registration.
+        <h2 className="text-xl font-semibold text-gray-900">
+          {t('supplier.title', 'Supplier Products')}
+        </h2>
+        <p className="mt-2 text-sm text-gray-500">
+          {t('supplier.subtitle', 'Add the products your company supplies. You can add more products after registration.')}
         </p>
       </div>
 
       {isEditing ? (
-        <div className="bg-gray-50 rounded-lg p-4">
-          <h3 className="text-sm font-medium text-gray-900 mb-4">
-            {editingIndex !== null ? 'Edit Product' : 'Add New Product'}
+        <div className="bg-gray-50 rounded-xl p-6">
+          <h3 className="text-base font-medium text-gray-900 mb-4">
+            {editingIndex !== null
+              ? t('supplier.editProduct', 'Edit Product')
+              : t('supplier.addNewProduct', 'Add New Product')}
           </h3>
           <ProductForm
             product={editingIndex !== null ? companyData.products[editingIndex] : undefined}
@@ -60,18 +66,19 @@ export default function SupplierProductsStep() {
             <button
               type="button"
               onClick={handleAddProduct}
-              className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+              className="btn-primary"
             >
               <PlusIcon className="h-4 w-4 mr-2" />
-              Add Product
+              {t('supplier.addProduct', 'Add Product')}
             </button>
           </div>
 
           {companyData.products.length === 0 ? (
-            <div className="text-center py-12 bg-gray-50 rounded-lg">
-              <p className="text-gray-500">No products added yet</p>
+            <div className="text-center py-12 bg-gray-50 rounded-xl border border-dashed border-gray-300">
+              <CubeIcon className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+              <p className="text-gray-500 font-medium">{t('supplier.noProducts', 'No products added yet')}</p>
               <p className="text-sm text-gray-400 mt-1">
-                Click "Add Product" to add your first product
+                {t('supplier.noProductsHint', 'Click "Add Product" to add your first product')}
               </p>
             </div>
           ) : (
@@ -89,11 +96,12 @@ export default function SupplierProductsStep() {
         </>
       )}
 
-      <div className="bg-amber-50 rounded-lg p-4">
-        <h4 className="text-sm font-medium text-amber-900">Tip</h4>
-        <p className="mt-1 text-sm text-amber-700">
-          Adding detailed product information helps buyers find your products more easily.
-          Include HS codes for international trade compliance.
+      <div className="bg-amber-50 rounded-xl p-5">
+        <h4 className="text-sm font-semibold text-amber-900">
+          {t('supplier.tipTitle', 'Tip')}
+        </h4>
+        <p className="mt-2 text-sm text-amber-700">
+          {t('supplier.tipText', 'Adding detailed product information helps buyers find your products more easily. Include HS codes for international trade compliance.')}
         </p>
       </div>
     </div>

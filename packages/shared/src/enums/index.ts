@@ -223,7 +223,23 @@ export enum Gender {
 export enum PackagingType {
   WOODEN_BOX = 'WOODEN_BOX',
   CARDBOARD_BOX = 'CARDBOARD_BOX',
+  PLASTIC_WRAP = 'PLASTIC_WRAP',
+  FOAM_PACKAGING = 'FOAM_PACKAGING',
+  PALLET = 'PALLET',
+  OTHER = 'OTHER',
 }
+
+/**
+ * Packaging type display names
+ */
+export const PACKAGING_TYPE_NAMES: Record<PackagingType, string> = {
+  [PackagingType.WOODEN_BOX]: 'Wooden Box',
+  [PackagingType.CARDBOARD_BOX]: 'Cardboard Box',
+  [PackagingType.PLASTIC_WRAP]: 'Plastic Wrap',
+  [PackagingType.FOAM_PACKAGING]: 'Foam Packaging',
+  [PackagingType.PALLET]: 'Pallet',
+  [PackagingType.OTHER]: 'Other',
+};
 
 /**
  * Company legal type

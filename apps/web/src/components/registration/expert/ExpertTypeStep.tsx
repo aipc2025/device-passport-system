@@ -1,88 +1,118 @@
+import { useTranslation } from 'react-i18next';
 import { useRegistrationStore } from '../../../store/registration.store';
 import { ExpertType } from '@device-passport/shared';
-import { WrenchScrewdriverIcon, BriefcaseIcon } from '@heroicons/react/24/outline';
+import { WrenchScrewdriverIcon, BriefcaseIcon, CheckIcon } from '@heroicons/react/24/outline';
 
 export default function ExpertTypeStep() {
+  const { t } = useTranslation();
   const { expertData, updateExpertData } = useRegistrationStore();
 
   const expertTypes = [
     {
       type: ExpertType.TECHNICAL,
-      name: 'Technical Expert',
-      description:
-        'Engineers, technicians, and specialists who provide hands-on technical services, installation, maintenance, and repairs.',
+      name: t('expertType.technical.name', 'Technical Expert'),
+      description: t(
+        'expertType.technical.description',
+        'Engineers, technicians, and specialists who provide hands-on technical services, installation, maintenance, and repairs.'
+      ),
       icon: WrenchScrewdriverIcon,
-      examples: ['Field Engineer', 'Service Technician', 'Installation Specialist'],
+      examples: [
+        t('expertType.technical.example1', 'Field Engineer'),
+        t('expertType.technical.example2', 'Service Technician'),
+        t('expertType.technical.example3', 'Installation Specialist'),
+      ],
     },
     {
       type: ExpertType.BUSINESS,
-      name: 'Business Expert',
-      description:
-        'Consultants and advisors who provide business strategy, sourcing, and commercial services.',
+      name: t('expertType.business.name', 'Business Expert'),
+      description: t(
+        'expertType.business.description',
+        'Consultants and advisors who provide business strategy, sourcing, and commercial services.'
+      ),
       icon: BriefcaseIcon,
-      examples: ['Procurement Consultant', 'Market Analyst', 'Trade Advisor'],
+      examples: [
+        t('expertType.business.example1', 'Procurement Consultant'),
+        t('expertType.business.example2', 'Market Analyst'),
+        t('expertType.business.example3', 'Trade Advisor'),
+      ],
     },
   ];
 
+  const toggleExpertType = (type: ExpertType) => {
+    const currentTypes = expertData.expertTypes || [];
+    const isSelected = currentTypes.includes(type);
+
+    if (isSelected) {
+      updateExpertData({ expertTypes: currentTypes.filter((t) => t !== type) });
+    } else {
+      updateExpertData({ expertTypes: [...currentTypes, type] });
+    }
+  };
+
+  const isSelected = (type: ExpertType) => {
+    return (expertData.expertTypes || []).includes(type);
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <h2 className="text-lg font-medium text-gray-900">Choose Your Expert Type</h2>
-        <p className="mt-1 text-sm text-gray-500">
-          Select the category that best describes your expertise and services.
+        <h2 className="text-xl font-semibold text-gray-900">
+          {t('expertType.title', 'Choose Your Expert Type')}
+        </h2>
+        <p className="mt-2 text-sm text-gray-500">
+          {t('expertType.subtitle', 'Select one or more categories that best describe your expertise and services. You can select both if applicable.')}
         </p>
       </div>
 
       <div className="grid grid-cols-1 gap-4">
         {expertTypes.map((expert) => (
-          <label
+          <button
             key={expert.type}
-            className={`relative flex cursor-pointer rounded-lg border p-5 shadow-sm focus:outline-none ${
-              expertData.expertType === expert.type
-                ? 'border-blue-600 ring-2 ring-blue-600'
-                : 'border-gray-300 hover:border-gray-400'
+            type="button"
+            onClick={() => toggleExpertType(expert.type)}
+            className={`relative flex text-left cursor-pointer rounded-xl border-2 p-5 transition-all ${
+              isSelected(expert.type)
+                ? 'border-primary-600 bg-primary-50 shadow-md'
+                : 'border-gray-200 hover:border-gray-300 bg-white hover:bg-gray-50'
             }`}
           >
-            <input
-              type="radio"
-              name="expertType"
-              value={expert.type}
-              checked={expertData.expertType === expert.type}
-              onChange={() => updateExpertData({ expertType: expert.type })}
-              className="sr-only"
-            />
-
             <div className="flex flex-1">
               <div className="flex items-start space-x-4">
                 <div
-                  className={`flex-shrink-0 h-12 w-12 rounded-full flex items-center justify-center ${
-                    expertData.expertType === expert.type ? 'bg-blue-100' : 'bg-gray-100'
+                  className={`flex-shrink-0 h-12 w-12 rounded-full flex items-center justify-center transition-colors ${
+                    isSelected(expert.type) ? 'bg-primary-100' : 'bg-gray-100'
                   }`}
                 >
                   <expert.icon
                     className={`h-6 w-6 ${
-                      expertData.expertType === expert.type ? 'text-blue-600' : 'text-gray-400'
+                      isSelected(expert.type) ? 'text-primary-600' : 'text-gray-400'
                     }`}
                   />
                 </div>
 
                 <div className="flex-1">
                   <h3
-                    className={`text-base font-medium ${
-                      expertData.expertType === expert.type ? 'text-blue-900' : 'text-gray-900'
+                    className={`text-base font-semibold ${
+                      isSelected(expert.type) ? 'text-primary-900' : 'text-gray-900'
                     }`}
                   >
                     {expert.name}
                   </h3>
-                  <p className="mt-1 text-sm text-gray-500">{expert.description}</p>
+                  <p className="mt-1 text-sm text-gray-600">{expert.description}</p>
 
                   <div className="mt-3">
-                    <p className="text-xs text-gray-500">Examples:</p>
-                    <div className="mt-1 flex flex-wrap gap-2">
+                    <p className="text-xs text-gray-500 font-medium">
+                      {t('expertType.examples', 'Examples')}:
+                    </p>
+                    <div className="mt-1.5 flex flex-wrap gap-2">
                       {expert.examples.map((example) => (
                         <span
                           key={example}
-                          className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600"
+                          className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
+                            isSelected(expert.type)
+                              ? 'bg-primary-100 text-primary-700'
+                              : 'bg-gray-100 text-gray-600'
+                          }`}
                         >
                           {example}
                         </span>
@@ -93,15 +123,37 @@ export default function ExpertTypeStep() {
               </div>
             </div>
 
+            {/* Selection indicator */}
             <div
-              className={`absolute -inset-px rounded-lg border-2 pointer-events-none ${
-                expertData.expertType === expert.type ? 'border-blue-600' : 'border-transparent'
+              className={`absolute top-4 right-4 h-6 w-6 rounded-full flex items-center justify-center transition-colors ${
+                isSelected(expert.type)
+                  ? 'bg-primary-600'
+                  : 'border-2 border-gray-300'
               }`}
-              aria-hidden="true"
-            />
-          </label>
+            >
+              {isSelected(expert.type) && (
+                <CheckIcon className="h-4 w-4 text-white" />
+              )}
+            </div>
+          </button>
         ))}
       </div>
+
+      {(expertData.expertTypes?.length || 0) === 0 && (
+        <div className="bg-amber-50 rounded-xl p-4">
+          <p className="text-sm text-amber-700">
+            {t('expertType.selectHint', 'Please select at least one expert type to continue.')}
+          </p>
+        </div>
+      )}
+
+      {(expertData.expertTypes?.length || 0) === 2 && (
+        <div className="bg-green-50 rounded-xl p-4">
+          <p className="text-sm text-green-700">
+            {t('expertType.bothSelected', 'Great! You\'ve selected both expert types. This allows you to offer a wider range of services.')}
+          </p>
+        </div>
+      )}
     </div>
   );
 }

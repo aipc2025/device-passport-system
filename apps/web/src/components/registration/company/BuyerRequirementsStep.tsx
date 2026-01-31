@@ -1,38 +1,270 @@
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useRegistrationStore } from '../../../store/registration.store';
 import { PurchaseFrequency } from '@device-passport/shared';
+import { PlusIcon, TrashIcon, CubeIcon } from '@heroicons/react/24/outline';
+
+interface BuyerProductRequirement {
+  productName: string;
+  specifications?: string;
+  quantity?: string;
+  budgetMin?: number;
+  budgetMax?: number;
+  budgetCurrency: string;
+}
+
+// Common currency options
+const CURRENCIES = ['USD', 'EUR', 'CNY', 'JPY', 'GBP', 'KRW', 'TWD', 'HKD', 'SGD', 'AUD'];
 
 export default function BuyerRequirementsStep() {
+  const { t } = useTranslation();
   const { companyData, updateCompanyData } = useRegistrationStore();
 
+  // Parse existing product requirements from buyerProductDescription
+  const parseProductRequirements = (): BuyerProductRequirement[] => {
+    if (!companyData.buyerProductRequirements) {
+      return [];
+    }
+    try {
+      return JSON.parse(companyData.buyerProductRequirements as string);
+    } catch {
+      return [];
+    }
+  };
+
+  const [productRequirements, setProductRequirements] = useState<BuyerProductRequirement[]>(
+    parseProductRequirements()
+  );
+  const [isAddingProduct, setIsAddingProduct] = useState(false);
+  const [newProduct, setNewProduct] = useState<BuyerProductRequirement>({
+    productName: '',
+    budgetCurrency: 'USD',
+  });
+
+  const saveProductRequirements = (requirements: BuyerProductRequirement[]) => {
+    setProductRequirements(requirements);
+    updateCompanyData({
+      buyerProductRequirements: JSON.stringify(requirements),
+    });
+  };
+
+  const handleAddProduct = () => {
+    if (!newProduct.productName.trim()) return;
+
+    const updatedRequirements = [...productRequirements, newProduct];
+    saveProductRequirements(updatedRequirements);
+    setNewProduct({ productName: '', budgetCurrency: 'USD' });
+    setIsAddingProduct(false);
+  };
+
+  const handleRemoveProduct = (index: number) => {
+    const updatedRequirements = productRequirements.filter((_, i) => i !== index);
+    saveProductRequirements(updatedRequirements);
+  };
+
+  const formatBudget = (product: BuyerProductRequirement) => {
+    if (!product.budgetMin && !product.budgetMax) return null;
+    const currency = product.budgetCurrency || 'USD';
+    if (product.budgetMin && product.budgetMax) {
+      return `${currency} ${product.budgetMin.toLocaleString()} - ${product.budgetMax.toLocaleString()}`;
+    }
+    if (product.budgetMin) {
+      return `${currency} ${product.budgetMin.toLocaleString()}+`;
+    }
+    return `${t('buyer.upTo', 'Up to')} ${currency} ${product.budgetMax?.toLocaleString()}`;
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <h2 className="text-lg font-medium text-gray-900">Buyer Requirements</h2>
-        <p className="mt-1 text-sm text-gray-500">
-          Tell us about your purchasing needs so we can match you with suitable suppliers.
+        <h2 className="text-xl font-semibold text-gray-900">{t('buyer.title', 'Buyer Requirements')}</h2>
+        <p className="mt-2 text-sm text-gray-500">
+          {t('buyer.subtitle', 'Tell us about your purchasing needs so we can match you with suitable suppliers.')}
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Product/Equipment Needs
-          </label>
-          <textarea
-            rows={4}
-            value={companyData.buyerProductDescription || ''}
-            onChange={(e) => updateCompanyData({ buyerProductDescription: e.target.value })}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-            placeholder="Describe the types of products or equipment you're looking to purchase..."
-          />
-          <p className="mt-1 text-xs text-gray-500">
-            Include product categories, specifications, or specific requirements
-          </p>
+      {/* Product Requirements List */}
+      <div className="bg-gray-50 rounded-xl p-6 space-y-4">
+        <div className="flex justify-between items-center">
+          <h3 className="text-base font-medium text-gray-900">
+            {t('buyer.productRequirements', 'Product/Equipment Requirements')}
+          </h3>
+          {!isAddingProduct && (
+            <button
+              type="button"
+              onClick={() => setIsAddingProduct(true)}
+              className="btn-secondary text-sm px-3 py-1.5"
+            >
+              <PlusIcon className="h-4 w-4 mr-1" />
+              {t('buyer.addProduct', 'Add Product')}
+            </button>
+          )}
         </div>
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        {/* Add New Product Form */}
+        {isAddingProduct && (
+          <div className="bg-white rounded-lg p-4 border border-gray-200 space-y-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div className="sm:col-span-2">
+                <label className="label">{t('buyer.productName', 'Product/Equipment Name')} *</label>
+                <input
+                  type="text"
+                  value={newProduct.productName}
+                  onChange={(e) => setNewProduct({ ...newProduct, productName: e.target.value })}
+                  className="input"
+                  placeholder={t('buyer.productNamePlaceholder', 'e.g., PLC Controller, Servo Motor')}
+                />
+              </div>
+
+              <div className="sm:col-span-2">
+                <label className="label">{t('buyer.specifications', 'Specifications/Requirements')}</label>
+                <textarea
+                  rows={2}
+                  value={newProduct.specifications || ''}
+                  onChange={(e) => setNewProduct({ ...newProduct, specifications: e.target.value })}
+                  className="textarea"
+                  placeholder={t('buyer.specificationsPlaceholder', 'Describe specifications, brand preferences, or other requirements...')}
+                />
+              </div>
+
+              <div>
+                <label className="label">{t('buyer.quantity', 'Estimated Quantity')}</label>
+                <input
+                  type="text"
+                  value={newProduct.quantity || ''}
+                  onChange={(e) => setNewProduct({ ...newProduct, quantity: e.target.value })}
+                  className="input"
+                  placeholder={t('buyer.quantityPlaceholder', 'e.g., 10 units, 100-200 pcs')}
+                />
+              </div>
+
+              <div>
+                <label className="label">{t('buyer.budgetCurrency', 'Budget Currency')}</label>
+                <select
+                  value={newProduct.budgetCurrency}
+                  onChange={(e) => setNewProduct({ ...newProduct, budgetCurrency: e.target.value })}
+                  className="select"
+                >
+                  {CURRENCIES.map((curr) => (
+                    <option key={curr} value={curr}>{curr}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="label">{t('buyer.budgetMin', 'Min Budget')}</label>
+                <input
+                  type="number"
+                  min="0"
+                  value={newProduct.budgetMin || ''}
+                  onChange={(e) => setNewProduct({ ...newProduct, budgetMin: parseFloat(e.target.value) || undefined })}
+                  className="input"
+                  placeholder="0"
+                />
+              </div>
+
+              <div>
+                <label className="label">{t('buyer.budgetMax', 'Max Budget')}</label>
+                <input
+                  type="number"
+                  min="0"
+                  value={newProduct.budgetMax || ''}
+                  onChange={(e) => setNewProduct({ ...newProduct, budgetMax: parseFloat(e.target.value) || undefined })}
+                  className="input"
+                  placeholder="0"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end space-x-3 pt-3 border-t">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsAddingProduct(false);
+                  setNewProduct({ productName: '', budgetCurrency: 'USD' });
+                }}
+                className="btn-secondary"
+              >
+                {t('common.cancel', 'Cancel')}
+              </button>
+              <button
+                type="button"
+                onClick={handleAddProduct}
+                disabled={!newProduct.productName.trim()}
+                className="btn-primary"
+              >
+                {t('common.add', 'Add')}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Product Requirements List */}
+        {productRequirements.length === 0 && !isAddingProduct ? (
+          <div className="text-center py-8 bg-white rounded-lg border border-dashed border-gray-300">
+            <CubeIcon className="h-10 w-10 text-gray-300 mx-auto mb-3" />
+            <p className="text-gray-500">{t('buyer.noProducts', 'No product requirements added yet')}</p>
+            <p className="text-sm text-gray-400 mt-1">
+              {t('buyer.noProductsHint', 'Click "Add Product" to specify what you\'re looking to purchase')}
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {productRequirements.map((product, index) => (
+              <div key={index} className="bg-white rounded-lg border border-gray-200 p-4">
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <h4 className="font-medium text-gray-900">{product.productName}</h4>
+                    {product.specifications && (
+                      <p className="text-sm text-gray-600 mt-1 whitespace-pre-wrap">{product.specifications}</p>
+                    )}
+                    <div className="flex flex-wrap gap-3 mt-2 text-sm">
+                      {product.quantity && (
+                        <span className="text-gray-500">
+                          <span className="font-medium">{t('buyer.qty', 'Qty')}:</span> {product.quantity}
+                        </span>
+                      )}
+                      {formatBudget(product) && (
+                        <span className="text-gray-500">
+                          <span className="font-medium">{t('buyer.budget', 'Budget')}:</span> {formatBudget(product)}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveProduct(index)}
+                    className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors ml-2"
+                  >
+                    <TrashIcon className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* General Description */}
+      <div className="bg-gray-50 rounded-xl p-6 space-y-4">
+        <h3 className="text-base font-medium text-gray-900">
+          {t('buyer.additionalInfo', 'Additional Information')}
+        </h3>
+
+        <div>
+          <label className="label">{t('buyer.generalDescription', 'General Requirements')}</label>
+          <textarea
+            rows={3}
+            value={companyData.buyerProductDescription || ''}
+            onChange={(e) => updateCompanyData({ buyerProductDescription: e.target.value })}
+            className="textarea"
+            placeholder={t('buyer.generalDescriptionPlaceholder', 'Any additional information about your purchasing needs, preferred brands, quality standards, etc.')}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Purchase Frequency</label>
+            <label className="label">{t('buyer.purchaseFrequency', 'Purchase Frequency')}</label>
             <select
               value={companyData.purchaseFrequency || ''}
               onChange={(e) =>
@@ -40,48 +272,45 @@ export default function BuyerRequirementsStep() {
                   purchaseFrequency: e.target.value as PurchaseFrequency || undefined,
                 })
               }
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+              className="select"
             >
-              <option value="">Select...</option>
-              <option value={PurchaseFrequency.ONE_TIME}>One-time purchase</option>
-              <option value={PurchaseFrequency.MONTHLY}>Monthly</option>
-              <option value={PurchaseFrequency.QUARTERLY}>Quarterly</option>
-              <option value={PurchaseFrequency.YEARLY}>Yearly</option>
-              <option value={PurchaseFrequency.AS_NEEDED}>As needed</option>
+              <option value="">{t('common.select', 'Select...')}</option>
+              <option value={PurchaseFrequency.ONE_TIME}>{t('frequency.oneTime', 'One-time purchase')}</option>
+              <option value={PurchaseFrequency.MONTHLY}>{t('frequency.monthly', 'Monthly')}</option>
+              <option value={PurchaseFrequency.QUARTERLY}>{t('frequency.quarterly', 'Quarterly')}</option>
+              <option value={PurchaseFrequency.YEARLY}>{t('frequency.yearly', 'Yearly')}</option>
+              <option value={PurchaseFrequency.AS_NEEDED}>{t('frequency.asNeeded', 'As needed')}</option>
             </select>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Estimated Purchase Volume
-            </label>
+            <label className="label">{t('buyer.purchaseVolume', 'Estimated Annual Volume')}</label>
             <input
               type="text"
               value={companyData.purchaseVolume || ''}
               onChange={(e) => updateCompanyData({ purchaseVolume: e.target.value })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-              placeholder="e.g., $10,000 - $50,000 per order"
+              className="input"
+              placeholder={t('buyer.purchaseVolumePlaceholder', 'e.g., $100,000 - $500,000 per year')}
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">Preferred Payment Terms</label>
+          <label className="label">{t('buyer.paymentTerms', 'Preferred Payment Terms')}</label>
           <textarea
             rows={2}
             value={companyData.preferredPaymentTerms || ''}
             onChange={(e) => updateCompanyData({ preferredPaymentTerms: e.target.value })}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-            placeholder="e.g., Net 30, LC at sight, 30% advance + 70% before shipment"
+            className="textarea"
+            placeholder={t('buyer.paymentTermsPlaceholder', 'e.g., Net 30, LC at sight, 30% advance + 70% before shipment')}
           />
         </div>
       </div>
 
-      <div className="bg-blue-50 rounded-lg p-4">
-        <h4 className="text-sm font-medium text-blue-900">How We Use This Information</h4>
+      <div className="bg-blue-50 rounded-xl p-4">
+        <h4 className="text-sm font-medium text-blue-900">{t('buyer.infoTitle', 'How We Use This Information')}</h4>
         <p className="mt-1 text-sm text-blue-700">
-          Your purchasing requirements help us recommend suitable suppliers and products.
-          This information is shared with potential suppliers to facilitate better matches.
+          {t('buyer.infoText', 'Your purchasing requirements help us recommend suitable suppliers and products. This information is shared with potential suppliers to facilitate better matches.')}
         </p>
       </div>
     </div>

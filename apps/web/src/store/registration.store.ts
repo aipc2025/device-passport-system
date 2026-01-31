@@ -9,6 +9,8 @@ import {
   PurchaseFrequency,
 } from '@device-passport/shared';
 
+export { Gender } from '@device-passport/shared';
+
 // Types for form data
 export interface AddressData {
   street?: string;
@@ -43,7 +45,9 @@ export interface ProductData {
   costPrice?: number;
   sellingPrice?: number;
   priceCurrency?: string;
+  customCurrency?: string; // For "Other" currency option
   packagingType?: PackagingType;
+  customPackaging?: string; // For "Other" packaging option
   length?: number;
   width?: number;
   height?: number;
@@ -93,9 +97,20 @@ export interface CompanyFormData {
 
   // Buyer Requirements (Section E)
   buyerProductDescription?: string;
+  buyerProductRequirements?: string; // JSON string of product requirements
   purchaseFrequency?: PurchaseFrequency;
   purchaseVolume?: string;
   preferredPaymentTerms?: string;
+}
+
+export interface WorkHistoryEntry {
+  id?: string;
+  companyName: string;
+  position: string;
+  startDate: string;
+  endDate?: string;
+  isCurrent: boolean;
+  description?: string;
 }
 
 export interface ExpertFormData {
@@ -104,11 +119,14 @@ export interface ExpertFormData {
   password: string;
   confirmPassword: string;
 
-  // Expert type
-  expertType: ExpertType;
+  // Expert type - now supports multiple selection
+  expertTypes: ExpertType[];
 
   // Personal Info (Section F)
   personalName: string;
+  gender?: Gender;
+  nationality?: string;
+  passportNumber?: string;
   idNumber?: string;
   phone?: string;
   dateOfBirth?: string;
@@ -123,6 +141,7 @@ export interface ExpertFormData {
   servicesOffered?: string;
   yearsOfExperience?: number;
   certifications?: string[];
+  workHistory: WorkHistoryEntry[];
 
   // Location
   currentLocation?: string;
@@ -132,6 +151,8 @@ export interface ExpertFormData {
   // File uploads
   resumeFileId?: string;
   certificateFileIds?: string[];
+  idDocumentFileId?: string; // ID/passport document
+  photoFileId?: string; // Personal photo
 }
 
 // Company registration steps
@@ -170,8 +191,9 @@ const initialExpertData: ExpertFormData = {
   email: '',
   password: '',
   confirmPassword: '',
-  expertType: ExpertType.TECHNICAL,
+  expertTypes: [],
   personalName: '',
+  workHistory: [],
 };
 
 interface RegistrationState {

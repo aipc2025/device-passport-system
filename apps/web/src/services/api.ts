@@ -187,7 +187,7 @@ export const uploadApi = {
 export const registrationApi = {
   checkCodeAvailability: async (code: string) => {
     const response = await api.get(`/registration/check-code/${code}`);
-    return response.data;
+    return response.data.data;
   },
   registerCompany: async (data: Record<string, unknown>) => {
     const response = await api.post('/registration/company', data);

@@ -102,10 +102,10 @@ export default function Login() {
         <div className="mt-6 card p-4 bg-gray-50">
           <h3 className="text-sm font-medium text-gray-900 mb-2">Demo Accounts:</h3>
           <div className="text-xs text-gray-600 space-y-1 font-mono">
-            <p>admin@medtech.com / password123 (Admin)</p>
-            <p>operator@medtech.com / password123 (Operator)</p>
-            <p>engineer@medtech.com / password123 (Engineer)</p>
-            <p>customer@abc-mfg.com / password123 (Customer)</p>
+            <p>admin@luna.top / password123 (Admin)</p>
+            <p>operator@luna.top / password123 (Operator)</p>
+            <p>engineer@luna.top / password123 (Engineer)</p>
+            <p>customer@luna.top / password123 (Customer)</p>
           </div>
         </div>
       </div>

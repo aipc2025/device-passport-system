@@ -15,9 +15,13 @@ import { adminExpertApi } from '../../services/api';
 import {
   RegistrationStatus,
   REGISTRATION_STATUS_NAMES,
-  EXPERT_TYPE_NAMES,
   ExpertType,
 } from '@device-passport/shared';
+
+const EXPERT_TYPE_NAMES: Record<ExpertType, string> = {
+  [ExpertType.TECHNICAL]: 'Technical',
+  [ExpertType.BUSINESS]: 'Business',
+};
 import toast from 'react-hot-toast';
 import clsx from 'clsx';
 

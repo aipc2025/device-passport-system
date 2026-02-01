@@ -314,6 +314,17 @@ export class ExpertController {
   // Admin Verification Endpoints
   // ==========================================
 
+  @Patch('admin/:id')
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Admin update expert profile (Admin only)' })
+  @ApiParam({ name: 'id', description: 'Expert ID' })
+  async adminUpdateProfile(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() data: Record<string, unknown>,
+  ) {
+    return this.expertService.adminUpdateProfile(id, data as any);
+  }
+
   @Get('admin/all')
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Get all experts with passport info (Admin only)' })

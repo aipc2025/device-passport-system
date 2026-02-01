@@ -74,6 +74,25 @@ export class ExpertService {
     return this.expertRepository.save(expert);
   }
 
+  async adminUpdateProfile(
+    expertId: string,
+    data: Partial<IndividualExpert>,
+  ): Promise<IndividualExpert> {
+    const expert = await this.expertRepository.findOne({
+      where: { id: expertId },
+    });
+
+    if (!expert) {
+      throw new NotFoundException('Expert profile not found');
+    }
+
+    // Don't allow updating certain fields
+    const { id, userId, createdAt, updatedAt, ...updateData } = data as any;
+
+    Object.assign(expert, updateData);
+    return this.expertRepository.save(expert);
+  }
+
   async getServiceRecords(expertId: string, userId: string): Promise<any[]> {
     // First verify the expert profile belongs to the user
     await this.getProfile(expertId, userId);
@@ -359,11 +378,16 @@ export class ExpertService {
       await queryRunner.manager.save(sequenceCounter);
 
       // Generate passport code
+      // Ensure dateOfBirth is a Date object
+      const dateOfBirth = expert.dateOfBirth instanceof Date
+        ? expert.dateOfBirth
+        : new Date(expert.dateOfBirth);
+
       const passportCode = generateExpertPassportCode(
         expertTypeCode,
         primaryIndustry,
         primarySkill,
-        expert.dateOfBirth,
+        dateOfBirth,
         nationality,
         sequenceCounter.currentSequence,
       );

@@ -7,6 +7,8 @@ import {
   ExpertType,
   PackagingType,
   PurchaseFrequency,
+  IndustryCode,
+  SkillCode,
 } from '@device-passport/shared';
 
 export { Gender } from '@device-passport/shared';
@@ -106,11 +108,15 @@ export interface CompanyFormData {
 export interface WorkHistoryEntry {
   id?: string;
   companyName: string;
+  companyContactEmail?: string;
+  companyContactPhone?: string;
+  companyAddress?: string;
   position: string;
   startDate: string;
   endDate?: string;
   isCurrent: boolean;
   description?: string;
+  isPublic?: boolean;
 }
 
 export interface ExpertFormData {
@@ -122,10 +128,14 @@ export interface ExpertFormData {
   // Expert type - now supports multiple selection
   expertTypes: ExpertType[];
 
+  // Industries and Skills for passport code
+  industries: IndustryCode[];
+  skills: SkillCode[];
+
   // Personal Info (Section F)
   personalName: string;
   gender?: Gender;
-  nationality?: string;
+  nationality?: string; // ISO 3166-1 Alpha-2 code (e.g., CN, US, DE)
   passportNumber?: string;
   idNumber?: string;
   phone?: string;
@@ -153,6 +163,10 @@ export interface ExpertFormData {
   certificateFileIds?: string[];
   idDocumentFileId?: string; // ID/passport document
   photoFileId?: string; // Personal photo
+
+  // Profile visibility
+  isProfilePublic?: boolean;
+  bio?: string;
 }
 
 // Company registration steps
@@ -168,6 +182,7 @@ export type CompanyStep =
 // Expert registration steps
 export type ExpertStep =
   | 'expert-type'
+  | 'industry-skill'
   | 'personal-info'
   | 'professional-info'
   | 'documents'
@@ -192,8 +207,11 @@ const initialExpertData: ExpertFormData = {
   password: '',
   confirmPassword: '',
   expertTypes: [],
+  industries: [],
+  skills: [],
   personalName: '',
   workHistory: [],
+  isProfilePublic: true,
 };
 
 interface RegistrationState {
@@ -272,7 +290,7 @@ export const useRegistrationStore = create<RegistrationState>((set, get) => ({
   companySteps: ['role-selection', 'business-license', 'contacts', 'invoice-info', 'review'],
   expertData: initialExpertData,
   expertStep: 'expert-type',
-  expertSteps: ['expert-type', 'personal-info', 'professional-info', 'documents', 'review'],
+  expertSteps: ['expert-type', 'industry-skill', 'personal-info', 'professional-info', 'documents', 'review'],
   isSubmitting: false,
   error: null,
 
@@ -370,7 +388,7 @@ export const useRegistrationStore = create<RegistrationState>((set, get) => ({
       companySteps: ['role-selection', 'business-license', 'contacts', 'invoice-info', 'review'],
       expertData: initialExpertData,
       expertStep: 'expert-type',
-      expertSteps: ['expert-type', 'personal-info', 'professional-info', 'documents', 'review'],
+      expertSteps: ['expert-type', 'industry-skill', 'personal-info', 'professional-info', 'documents', 'review'],
       isSubmitting: false,
       error: null,
     }),

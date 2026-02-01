@@ -625,3 +625,349 @@ export const REVIEW_STATUS_NAMES: Record<ReviewStatus, string> = {
   [ReviewStatus.HIDDEN]: 'Hidden',
   [ReviewStatus.FLAGGED]: 'Flagged',
 };
+
+// ============================================
+// Expert Passport Code System Enums
+// ============================================
+
+/**
+ * Expert type code for passport generation
+ * T = Technical, B = Business, A = All (both)
+ */
+export enum ExpertTypeCode {
+  T = 'T', // Technical
+  B = 'B', // Business
+  A = 'A', // All (Technical + Business)
+}
+
+/**
+ * Expert type code display names
+ */
+export const EXPERT_TYPE_CODE_NAMES: Record<ExpertTypeCode, { en: string; zh: string }> = {
+  [ExpertTypeCode.T]: { en: 'Technical', zh: '技术类' },
+  [ExpertTypeCode.B]: { en: 'Business', zh: '商务类' },
+  [ExpertTypeCode.A]: { en: 'All (Technical + Business)', zh: '综合类（技术+商务）' },
+};
+
+/**
+ * Industry code for expert passport
+ * 20 industry codes representing major industrial sectors
+ */
+export enum IndustryCode {
+  A = 'A', // Automotive
+  B = 'B', // Building & Construction
+  C = 'C', // Chemical
+  D = 'D', // Pharmaceutical (Drug)
+  E = 'E', // Electronics
+  F = 'F', // Food & Beverage
+  G = 'G', // General Manufacturing
+  H = 'H', // Home Appliances
+  L = 'L', // Logistics
+  M = 'M', // Metallurgy
+  N = 'N', // New Energy
+  O = 'O', // Oil & Gas
+  P = 'P', // Packaging
+  R = 'R', // Rubber & Plastics
+  S = 'S', // Shipbuilding
+  T = 'T', // Textile
+  U = 'U', // Utilities
+  W = 'W', // Woodworking
+  X = 'X', // Mining (Extraction)
+  Z = 'Z', // Other
+}
+
+/**
+ * Industry code display names (English)
+ */
+export const INDUSTRY_CODE_NAMES_EN: Record<IndustryCode, string> = {
+  [IndustryCode.A]: 'Automotive',
+  [IndustryCode.B]: 'Building & Construction',
+  [IndustryCode.C]: 'Chemical',
+  [IndustryCode.D]: 'Pharmaceutical',
+  [IndustryCode.E]: 'Electronics',
+  [IndustryCode.F]: 'Food & Beverage',
+  [IndustryCode.G]: 'General Manufacturing',
+  [IndustryCode.H]: 'Home Appliances',
+  [IndustryCode.L]: 'Logistics',
+  [IndustryCode.M]: 'Metallurgy',
+  [IndustryCode.N]: 'New Energy',
+  [IndustryCode.O]: 'Oil & Gas',
+  [IndustryCode.P]: 'Packaging',
+  [IndustryCode.R]: 'Rubber & Plastics',
+  [IndustryCode.S]: 'Shipbuilding',
+  [IndustryCode.T]: 'Textile',
+  [IndustryCode.U]: 'Utilities',
+  [IndustryCode.W]: 'Woodworking',
+  [IndustryCode.X]: 'Mining',
+  [IndustryCode.Z]: 'Other',
+};
+
+/**
+ * Industry code display names (Chinese)
+ */
+export const INDUSTRY_CODE_NAMES_ZH: Record<IndustryCode, string> = {
+  [IndustryCode.A]: '汽车制造',
+  [IndustryCode.B]: '建筑工程',
+  [IndustryCode.C]: '化工',
+  [IndustryCode.D]: '制药',
+  [IndustryCode.E]: '电子',
+  [IndustryCode.F]: '食品饮料',
+  [IndustryCode.G]: '通用制造',
+  [IndustryCode.H]: '家电',
+  [IndustryCode.L]: '物流',
+  [IndustryCode.M]: '冶金',
+  [IndustryCode.N]: '新能源',
+  [IndustryCode.O]: '石油天然气',
+  [IndustryCode.P]: '包装',
+  [IndustryCode.R]: '橡塑',
+  [IndustryCode.S]: '船舶制造',
+  [IndustryCode.T]: '纺织',
+  [IndustryCode.U]: '公用事业',
+  [IndustryCode.W]: '木工',
+  [IndustryCode.X]: '矿业',
+  [IndustryCode.Z]: '其他',
+};
+
+/**
+ * Industry code display names (bilingual)
+ */
+export const INDUSTRY_CODE_NAMES: Record<IndustryCode, { en: string; zh: string }> = {
+  [IndustryCode.A]: { en: 'Automotive', zh: '汽车制造' },
+  [IndustryCode.B]: { en: 'Building & Construction', zh: '建筑工程' },
+  [IndustryCode.C]: { en: 'Chemical', zh: '化工' },
+  [IndustryCode.D]: { en: 'Pharmaceutical', zh: '制药' },
+  [IndustryCode.E]: { en: 'Electronics', zh: '电子' },
+  [IndustryCode.F]: { en: 'Food & Beverage', zh: '食品饮料' },
+  [IndustryCode.G]: { en: 'General Manufacturing', zh: '通用制造' },
+  [IndustryCode.H]: { en: 'Home Appliances', zh: '家电' },
+  [IndustryCode.L]: { en: 'Logistics', zh: '物流' },
+  [IndustryCode.M]: { en: 'Metallurgy', zh: '冶金' },
+  [IndustryCode.N]: { en: 'New Energy', zh: '新能源' },
+  [IndustryCode.O]: { en: 'Oil & Gas', zh: '石油天然气' },
+  [IndustryCode.P]: { en: 'Packaging', zh: '包装' },
+  [IndustryCode.R]: { en: 'Rubber & Plastics', zh: '橡塑' },
+  [IndustryCode.S]: { en: 'Shipbuilding', zh: '船舶制造' },
+  [IndustryCode.T]: { en: 'Textile', zh: '纺织' },
+  [IndustryCode.U]: { en: 'Utilities', zh: '公用事业' },
+  [IndustryCode.W]: { en: 'Woodworking', zh: '木工' },
+  [IndustryCode.X]: { en: 'Mining', zh: '矿业' },
+  [IndustryCode.Z]: { en: 'Other', zh: '其他' },
+};
+
+/**
+ * Skill code for expert passport
+ * 20 skill codes grouped into 5 categories
+ */
+export enum SkillCode {
+  // Automation (6 skills)
+  PL = 'PL', // PLC Programming
+  HM = 'HM', // HMI Design
+  RB = 'RB', // Robotics
+  MC = 'MC', // Motion Control
+  VS = 'VS', // Vision Systems
+  IO = 'IO', // IoT/Industrial IoT
+
+  // Electromechanical (6 skills)
+  ED = 'ED', // Electrical Design
+  EI = 'EI', // Electrical Installation
+  MD = 'MD', // Mechanical Design
+  MI = 'MI', // Mechanical Installation
+  HD = 'HD', // Hydraulics
+  WD = 'WD', // Welding
+
+  // Instrumentation (3 skills)
+  IS = 'IS', // Instrumentation
+  NT = 'NT', // Networks
+  SC = 'SC', // Safety Systems
+
+  // Software (2 skills)
+  SW = 'SW', // Software Development
+  AI = 'AI', // AI/Machine Learning
+
+  // Service (3 skills)
+  MN = 'MN', // Maintenance
+  CM = 'CM', // Commissioning
+  PM = 'PM', // Project Management
+}
+
+/**
+ * Skill code categories
+ */
+export enum SkillCategory {
+  AUTOMATION = 'AUTOMATION',
+  ELECTROMECHANICAL = 'ELECTROMECHANICAL',
+  INSTRUMENTATION = 'INSTRUMENTATION',
+  SOFTWARE = 'SOFTWARE',
+  SERVICE = 'SERVICE',
+}
+
+/**
+ * Skill category display names
+ */
+export const SKILL_CATEGORY_NAMES: Record<SkillCategory, { en: string; zh: string }> = {
+  [SkillCategory.AUTOMATION]: { en: 'Automation', zh: '自动化' },
+  [SkillCategory.ELECTROMECHANICAL]: { en: 'Electromechanical', zh: '机电' },
+  [SkillCategory.INSTRUMENTATION]: { en: 'Instrumentation', zh: '仪器仪表' },
+  [SkillCategory.SOFTWARE]: { en: 'Software', zh: '软件' },
+  [SkillCategory.SERVICE]: { en: 'Service', zh: '服务' },
+};
+
+/**
+ * Mapping of skill codes to their categories
+ */
+export const SKILL_CODE_CATEGORIES: Record<SkillCode, SkillCategory> = {
+  // Automation
+  [SkillCode.PL]: SkillCategory.AUTOMATION,
+  [SkillCode.HM]: SkillCategory.AUTOMATION,
+  [SkillCode.RB]: SkillCategory.AUTOMATION,
+  [SkillCode.MC]: SkillCategory.AUTOMATION,
+  [SkillCode.VS]: SkillCategory.AUTOMATION,
+  [SkillCode.IO]: SkillCategory.AUTOMATION,
+
+  // Electromechanical
+  [SkillCode.ED]: SkillCategory.ELECTROMECHANICAL,
+  [SkillCode.EI]: SkillCategory.ELECTROMECHANICAL,
+  [SkillCode.MD]: SkillCategory.ELECTROMECHANICAL,
+  [SkillCode.MI]: SkillCategory.ELECTROMECHANICAL,
+  [SkillCode.HD]: SkillCategory.ELECTROMECHANICAL,
+  [SkillCode.WD]: SkillCategory.ELECTROMECHANICAL,
+
+  // Instrumentation
+  [SkillCode.IS]: SkillCategory.INSTRUMENTATION,
+  [SkillCode.NT]: SkillCategory.INSTRUMENTATION,
+  [SkillCode.SC]: SkillCategory.INSTRUMENTATION,
+
+  // Software
+  [SkillCode.SW]: SkillCategory.SOFTWARE,
+  [SkillCode.AI]: SkillCategory.SOFTWARE,
+
+  // Service
+  [SkillCode.MN]: SkillCategory.SERVICE,
+  [SkillCode.CM]: SkillCategory.SERVICE,
+  [SkillCode.PM]: SkillCategory.SERVICE,
+};
+
+/**
+ * Skill code display names (English)
+ */
+export const SKILL_CODE_NAMES_EN: Record<SkillCode, string> = {
+  // Automation
+  [SkillCode.PL]: 'PLC Programming',
+  [SkillCode.HM]: 'HMI Design',
+  [SkillCode.RB]: 'Robotics',
+  [SkillCode.MC]: 'Motion Control',
+  [SkillCode.VS]: 'Vision Systems',
+  [SkillCode.IO]: 'IoT',
+
+  // Electromechanical
+  [SkillCode.ED]: 'Electrical Design',
+  [SkillCode.EI]: 'Electrical Installation',
+  [SkillCode.MD]: 'Mechanical Design',
+  [SkillCode.MI]: 'Mechanical Installation',
+  [SkillCode.HD]: 'Hydraulics',
+  [SkillCode.WD]: 'Welding',
+
+  // Instrumentation
+  [SkillCode.IS]: 'Instrumentation',
+  [SkillCode.NT]: 'Networks',
+  [SkillCode.SC]: 'Safety Systems',
+
+  // Software
+  [SkillCode.SW]: 'Software Development',
+  [SkillCode.AI]: 'AI/Machine Learning',
+
+  // Service
+  [SkillCode.MN]: 'Maintenance',
+  [SkillCode.CM]: 'Commissioning',
+  [SkillCode.PM]: 'Project Management',
+};
+
+/**
+ * Skill code display names (Chinese)
+ */
+export const SKILL_CODE_NAMES_ZH: Record<SkillCode, string> = {
+  // Automation
+  [SkillCode.PL]: 'PLC编程',
+  [SkillCode.HM]: 'HMI设计',
+  [SkillCode.RB]: '机器人',
+  [SkillCode.MC]: '运动控制',
+  [SkillCode.VS]: '视觉系统',
+  [SkillCode.IO]: '物联网',
+
+  // Electromechanical
+  [SkillCode.ED]: '电气设计',
+  [SkillCode.EI]: '电气安装',
+  [SkillCode.MD]: '机械设计',
+  [SkillCode.MI]: '机械安装',
+  [SkillCode.HD]: '液压系统',
+  [SkillCode.WD]: '焊接',
+
+  // Instrumentation
+  [SkillCode.IS]: '仪器仪表',
+  [SkillCode.NT]: '网络通讯',
+  [SkillCode.SC]: '安全系统',
+
+  // Software
+  [SkillCode.SW]: '软件开发',
+  [SkillCode.AI]: 'AI/机器学习',
+
+  // Service
+  [SkillCode.MN]: '维护保养',
+  [SkillCode.CM]: '调试',
+  [SkillCode.PM]: '项目管理',
+};
+
+/**
+ * Skill code display names (bilingual)
+ */
+export const SKILL_CODE_NAMES: Record<SkillCode, { en: string; zh: string }> = {
+  // Automation
+  [SkillCode.PL]: { en: 'PLC Programming', zh: 'PLC编程' },
+  [SkillCode.HM]: { en: 'HMI Design', zh: 'HMI设计' },
+  [SkillCode.RB]: { en: 'Robotics', zh: '机器人' },
+  [SkillCode.MC]: { en: 'Motion Control', zh: '运动控制' },
+  [SkillCode.VS]: { en: 'Vision Systems', zh: '视觉系统' },
+  [SkillCode.IO]: { en: 'IoT', zh: '物联网' },
+
+  // Electromechanical
+  [SkillCode.ED]: { en: 'Electrical Design', zh: '电气设计' },
+  [SkillCode.EI]: { en: 'Electrical Installation', zh: '电气安装' },
+  [SkillCode.MD]: { en: 'Mechanical Design', zh: '机械设计' },
+  [SkillCode.MI]: { en: 'Mechanical Installation', zh: '机械安装' },
+  [SkillCode.HD]: { en: 'Hydraulics', zh: '液压系统' },
+  [SkillCode.WD]: { en: 'Welding', zh: '焊接' },
+
+  // Instrumentation
+  [SkillCode.IS]: { en: 'Instrumentation', zh: '仪器仪表' },
+  [SkillCode.NT]: { en: 'Networks', zh: '网络通讯' },
+  [SkillCode.SC]: { en: 'Safety Systems', zh: '安全系统' },
+
+  // Software
+  [SkillCode.SW]: { en: 'Software Development', zh: '软件开发' },
+  [SkillCode.AI]: { en: 'AI/Machine Learning', zh: 'AI/机器学习' },
+
+  // Service
+  [SkillCode.MN]: { en: 'Maintenance', zh: '维护保养' },
+  [SkillCode.CM]: { en: 'Commissioning', zh: '调试' },
+  [SkillCode.PM]: { en: 'Project Management', zh: '项目管理' },
+};
+
+/**
+ * Work history verification status for expert credentials
+ */
+export enum WorkHistoryVerificationStatus {
+  UNVERIFIED = 'UNVERIFIED',
+  PENDING_VERIFICATION = 'PENDING_VERIFICATION',
+  VERIFIED = 'VERIFIED',
+  REJECTED = 'REJECTED',
+}
+
+/**
+ * Work history verification status display names
+ */
+export const WORK_HISTORY_VERIFICATION_STATUS_NAMES: Record<WorkHistoryVerificationStatus, { en: string; zh: string }> = {
+  [WorkHistoryVerificationStatus.UNVERIFIED]: { en: 'Unverified', zh: '未验证' },
+  [WorkHistoryVerificationStatus.PENDING_VERIFICATION]: { en: 'Pending Verification', zh: '验证中' },
+  [WorkHistoryVerificationStatus.VERIFIED]: { en: 'Verified', zh: '已验证' },
+  [WorkHistoryVerificationStatus.REJECTED]: { en: 'Rejected', zh: '已拒绝' },
+};

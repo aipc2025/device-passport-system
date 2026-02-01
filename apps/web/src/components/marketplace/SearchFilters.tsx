@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Search, Filter, X, ChevronDown, ChevronUp } from 'lucide-react';
 import { ProductLine, PRODUCT_TYPE_NAMES } from '@device-passport/shared';
-import { useMarketplaceStore, MarketplaceFilters } from '../../store/marketplace.store';
+import { useMarketplaceStore } from '../../store/marketplace.store';
 
 interface SearchFiltersProps {
   onSearch: () => void;
@@ -83,7 +83,7 @@ export default function SearchFilters({
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">{t('marketplace.allCategories', 'All Categories')}</option>
-                  {Object.entries(ProductLine).map(([key, value]) => (
+                  {Object.entries(ProductLine).map(([, value]) => (
                     <option key={value} value={value}>
                       {PRODUCT_TYPE_NAMES[value as keyof typeof PRODUCT_TYPE_NAMES]}
                     </option>

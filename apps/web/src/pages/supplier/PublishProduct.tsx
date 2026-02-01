@@ -44,7 +44,7 @@ export default function PublishProduct() {
   const showPrice = watch('showPrice');
 
   const createMutation = useMutation({
-    mutationFn: (data: ProductFormData) => marketplaceProductApi.create(data),
+    mutationFn: (data: ProductFormData) => marketplaceProductApi.create(data as unknown as Record<string, unknown>),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-marketplace-products'] });
       toast.success(t('supplier.productCreated', 'Product published successfully'));
@@ -123,7 +123,7 @@ export default function PublishProduct() {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">{t('supplier.selectCategory', 'Select category')}</option>
-                  {Object.entries(ProductLine).map(([key, value]) => (
+                  {Object.entries(ProductLine).map(([, value]) => (
                     <option key={value} value={value}>
                       {PRODUCT_TYPE_NAMES[value as keyof typeof PRODUCT_TYPE_NAMES]}
                     </option>

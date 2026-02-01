@@ -6,9 +6,17 @@ import {
   UpdateDateColumn,
   OneToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
-import { ExpertType, RegistrationStatus } from '@device-passport/shared';
+import {
+  ExpertType,
+  RegistrationStatus,
+  IndustryCode,
+  SkillCode,
+  ExpertTypeCode,
+} from '@device-passport/shared';
 import { User } from './user.entity';
+import { ExpertWorkHistory } from './expert-work-history.entity';
 
 @Entity('individual_experts')
 export class IndividualExpert {
@@ -28,6 +36,35 @@ export class IndividualExpert {
     default: '[]',
   })
   expertTypes: ExpertType[];
+
+  // Expert Passport Code fields (new format)
+  @Column({
+    name: 'expert_type_code',
+    type: 'varchar',
+    length: 1,
+    nullable: true,
+  })
+  expertTypeCode: ExpertTypeCode;
+
+  // Industries (first one is primary for passport code)
+  @Column({
+    name: 'industries',
+    type: 'jsonb',
+    default: '[]',
+  })
+  industries: IndustryCode[];
+
+  // Skills (first one is primary for passport code)
+  @Column({
+    name: 'skills',
+    type: 'jsonb',
+    default: '[]',
+  })
+  skills: SkillCode[];
+
+  // Nationality (ISO 3166-1 Alpha-2)
+  @Column({ name: 'nationality', length: 2, nullable: true })
+  nationality: string;
 
   // Personal Info (Section F)
   @Column({ name: 'personal_name' })
@@ -125,6 +162,18 @@ export class IndividualExpert {
 
   @Column({ name: 'reviewed_at', nullable: true })
   reviewedAt: Date;
+
+  // Profile visibility
+  @Column({ name: 'is_profile_public', default: true })
+  isProfilePublic: boolean;
+
+  // Bio/Introduction for public profile
+  @Column({ name: 'bio', type: 'text', nullable: true })
+  bio: string;
+
+  // Work history relation
+  @OneToMany(() => ExpertWorkHistory, (workHistory) => workHistory.expert)
+  workHistories: ExpertWorkHistory[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

@@ -85,7 +85,7 @@ export default function BuyerMatches() {
                         getStatusColor(match.status)
                       )}
                     >
-                      {MATCH_STATUS_NAMES[match.status]}
+                      {MATCH_STATUS_NAMES[match.status as MatchStatus]}
                     </span>
                     {match.matchSource && (
                       <span

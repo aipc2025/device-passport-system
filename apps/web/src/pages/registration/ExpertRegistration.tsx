@@ -3,6 +3,7 @@ import { useRegistrationStore, ExpertStep } from '../../store/registration.store
 import { registrationApi } from '../../services/api';
 import StepIndicator from '../../components/registration/StepIndicator';
 import ExpertTypeStep from '../../components/registration/expert/ExpertTypeStep';
+import IndustrySkillStep from '../../components/registration/expert/IndustrySkillStep';
 import PersonalInfoStep from '../../components/registration/expert/PersonalInfoStep';
 import ProfessionalInfoStep from '../../components/registration/expert/ProfessionalInfoStep';
 import DocumentsStep from '../../components/registration/expert/DocumentsStep';
@@ -11,6 +12,7 @@ import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 
 const STEP_NAMES: Record<ExpertStep, string> = {
   'expert-type': 'Type',
+  'industry-skill': 'Industry',
   'personal-info': 'Personal',
   'professional-info': 'Professional',
   documents: 'Documents',
@@ -39,6 +41,22 @@ export default function ExpertRegistration() {
 
   const validateCurrentStep = (): boolean => {
     switch (expertStep) {
+      case 'expert-type':
+        if (!expertData.expertTypes?.length) {
+          setError('Please select at least one expert type');
+          return false;
+        }
+        break;
+      case 'industry-skill':
+        if (!expertData.industries?.length) {
+          setError('Please select at least one industry');
+          return false;
+        }
+        if (!expertData.skills?.length) {
+          setError('Please select at least one skill');
+          return false;
+        }
+        break;
       case 'personal-info':
         if (!expertData.email || !expertData.password || !expertData.personalName) {
           setError('Please fill in all required fields');
@@ -50,6 +68,14 @@ export default function ExpertRegistration() {
         }
         if (expertData.password.length < 8) {
           setError('Password must be at least 8 characters');
+          return false;
+        }
+        if (!expertData.nationality) {
+          setError('Please select your nationality');
+          return false;
+        }
+        if (!expertData.dateOfBirth) {
+          setError('Please enter your date of birth');
           return false;
         }
         break;
@@ -78,7 +104,10 @@ export default function ExpertRegistration() {
         email: expertData.email,
         password: expertData.password,
         expertTypes: expertData.expertTypes,
+        industries: expertData.industries,
+        skills: expertData.skills,
         personalName: expertData.personalName,
+        nationality: expertData.nationality,
         idNumber: expertData.idNumber,
         phone: expertData.phone,
         dateOfBirth: expertData.dateOfBirth,
@@ -89,6 +118,7 @@ export default function ExpertRegistration() {
         servicesOffered: expertData.servicesOffered,
         yearsOfExperience: expertData.yearsOfExperience,
         certifications: expertData.certifications,
+        workHistory: expertData.workHistory,
         currentLocation: expertData.currentLocation,
         locationLat: expertData.locationLat,
         locationLng: expertData.locationLng,
@@ -96,6 +126,8 @@ export default function ExpertRegistration() {
         certificateFileIds: expertData.certificateFileIds?.length ? expertData.certificateFileIds : undefined,
         idDocumentFileId: expertData.idDocumentFileId,
         photoFileId: expertData.photoFileId,
+        isProfilePublic: expertData.isProfilePublic,
+        bio: expertData.bio,
       };
 
       await registrationApi.registerExpert(submitData);
@@ -129,6 +161,8 @@ export default function ExpertRegistration() {
     switch (expertStep) {
       case 'expert-type':
         return <ExpertTypeStep />;
+      case 'industry-skill':
+        return <IndustrySkillStep />;
       case 'personal-info':
         return <PersonalInfoStep />;
       case 'professional-info':

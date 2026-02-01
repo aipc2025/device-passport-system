@@ -106,6 +106,7 @@ export default function Login() {
             <p>operator@luna.top / password123 (Operator)</p>
             <p>engineer@luna.top / password123 (Engineer)</p>
             <p>customer@luna.top / password123 (Customer)</p>
+            <p>expert@luna.top / password123 (Expert)</p>
           </div>
         </div>
       </div>

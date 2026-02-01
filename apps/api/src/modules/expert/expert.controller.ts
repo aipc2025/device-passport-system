@@ -3,6 +3,7 @@ import {
   Get,
   Patch,
   Post,
+  Delete,
   Param,
   Body,
   Query,
@@ -22,7 +23,13 @@ import { ExpertService } from './expert.service';
 import { ExpertCodeService } from './expert-code.service';
 import { JwtAuthGuard, RolesGuard } from '../../common/guards';
 import { CurrentUser, Roles } from '../../common/decorators';
-import { TokenPayload, UserRole } from '@device-passport/shared';
+import {
+  TokenPayload,
+  UserRole,
+  validateExpertPassportCode,
+  INDUSTRY_CODE_NAMES,
+  SKILL_CODE_NAMES,
+} from '@device-passport/shared';
 
 @ApiTags('Experts')
 @Controller('experts')
@@ -33,6 +40,17 @@ export class ExpertController {
     private readonly expertService: ExpertService,
     private readonly expertCodeService: ExpertCodeService,
   ) {}
+
+  @Get(':id/dashboard')
+  @Roles(UserRole.CUSTOMER, UserRole.ENGINEER, UserRole.ADMIN)
+  @ApiOperation({ summary: 'Get expert dashboard statistics' })
+  @ApiParam({ name: 'id', description: 'Expert ID' })
+  async getDashboardStats(
+    @CurrentUser() user: TokenPayload,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
+    return this.expertService.getDashboardStats(id, user.sub);
+  }
 
   @Get(':id')
   @Roles(UserRole.CUSTOMER, UserRole.ENGINEER, UserRole.ADMIN)
@@ -206,5 +224,204 @@ export class ExpertController {
     @Body() data: { skillTags: string[] },
   ) {
     return this.expertService.updateSkills(id, user.sub, data.skillTags);
+  }
+
+  // ==========================================
+  // Work History Endpoints
+  // ==========================================
+
+  @Get(':id/work-histories')
+  @Roles(UserRole.CUSTOMER, UserRole.ENGINEER, UserRole.ADMIN)
+  @ApiOperation({ summary: 'Get expert work histories' })
+  @ApiParam({ name: 'id', description: 'Expert ID' })
+  async getWorkHistories(
+    @CurrentUser() user: TokenPayload,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
+    return this.expertService.getWorkHistories(id, user.sub);
+  }
+
+  @Post(':id/work-histories')
+  @Roles(UserRole.CUSTOMER, UserRole.ENGINEER, UserRole.ADMIN)
+  @ApiOperation({ summary: 'Add work history entry' })
+  @ApiParam({ name: 'id', description: 'Expert ID' })
+  async addWorkHistory(
+    @CurrentUser() user: TokenPayload,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() data: {
+      companyName: string;
+      companyContactEmail?: string;
+      companyContactPhone?: string;
+      companyAddress?: string;
+      position: string;
+      description?: string;
+      startDate: string;
+      endDate?: string;
+      isCurrent?: boolean;
+      isPublic?: boolean;
+    },
+  ) {
+    return this.expertService.addWorkHistory(id, user.sub, {
+      ...data,
+      startDate: new Date(data.startDate),
+      endDate: data.endDate ? new Date(data.endDate) : undefined,
+    });
+  }
+
+  @Patch('work-histories/:workHistoryId')
+  @Roles(UserRole.CUSTOMER, UserRole.ENGINEER, UserRole.ADMIN)
+  @ApiOperation({ summary: 'Update work history entry' })
+  @ApiParam({ name: 'workHistoryId', description: 'Work History ID' })
+  async updateWorkHistory(
+    @CurrentUser() user: TokenPayload,
+    @Param('workHistoryId', ParseUUIDPipe) workHistoryId: string,
+    @Body() data: Record<string, unknown>,
+  ) {
+    // Handle date conversion
+    if (data.startDate) {
+      data.startDate = new Date(data.startDate as string);
+    }
+    if (data.endDate) {
+      data.endDate = new Date(data.endDate as string);
+    }
+    return this.expertService.updateWorkHistory(workHistoryId, user.sub, data);
+  }
+
+  @Delete('work-histories/:workHistoryId')
+  @Roles(UserRole.CUSTOMER, UserRole.ENGINEER, UserRole.ADMIN)
+  @ApiOperation({ summary: 'Delete work history entry' })
+  @ApiParam({ name: 'workHistoryId', description: 'Work History ID' })
+  async deleteWorkHistory(
+    @CurrentUser() user: TokenPayload,
+    @Param('workHistoryId', ParseUUIDPipe) workHistoryId: string,
+  ) {
+    await this.expertService.deleteWorkHistory(workHistoryId, user.sub);
+    return { success: true };
+  }
+
+  @Post('work-histories/:workHistoryId/request-verification')
+  @Roles(UserRole.CUSTOMER, UserRole.ENGINEER, UserRole.ADMIN)
+  @ApiOperation({ summary: 'Request verification for work history' })
+  @ApiParam({ name: 'workHistoryId', description: 'Work History ID' })
+  async requestVerification(
+    @CurrentUser() user: TokenPayload,
+    @Param('workHistoryId', ParseUUIDPipe) workHistoryId: string,
+  ) {
+    return this.expertService.requestVerification(workHistoryId, user.sub);
+  }
+
+  // ==========================================
+  // Admin Verification Endpoints
+  // ==========================================
+
+  @Get('admin/pending-verifications')
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Get pending work history verifications (Admin only)' })
+  async getPendingVerifications() {
+    return this.expertService.getPendingVerifications();
+  }
+
+  @Post('admin/work-histories/:workHistoryId/verify')
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Process work history verification (Admin only)' })
+  @ApiParam({ name: 'workHistoryId', description: 'Work History ID' })
+  async processVerification(
+    @CurrentUser() user: TokenPayload,
+    @Param('workHistoryId', ParseUUIDPipe) workHistoryId: string,
+    @Body() data: {
+      approved: boolean;
+      notes?: string;
+      rejectionReason?: string;
+      proofDocumentId?: string;
+    },
+  ) {
+    return this.expertService.processVerification(
+      workHistoryId,
+      user.sub,
+      data.approved,
+      data.notes,
+      data.rejectionReason,
+      data.proofDocumentId,
+    );
+  }
+
+  // ==========================================
+  // New Passport Code Generation (with new format)
+  // ==========================================
+
+  @Post(':id/generate-passport')
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Generate expert passport code with new format (Admin only)' })
+  @ApiParam({ name: 'id', description: 'Expert ID' })
+  async generateNewPassportCode(@Param('id', ParseUUIDPipe) id: string) {
+    const code = await this.expertService.generatePassportCode(id);
+    return { expertCode: code };
+  }
+}
+
+// ==========================================
+// Public Expert Passport Controller (no auth required)
+// ==========================================
+
+@ApiTags('Expert Passport (Public)')
+@Controller('expert-passport')
+export class ExpertPassportPublicController {
+  constructor(private readonly expertService: ExpertService) {}
+
+  @Get('scan/:code')
+  @ApiOperation({ summary: 'Scan expert passport code (public)' })
+  @ApiParam({ name: 'code', description: 'Expert passport code' })
+  async scanExpertPassport(@Param('code') code: string) {
+    // Validate the code format
+    const validation = validateExpertPassportCode(code);
+    if (!validation.valid) {
+      throw new NotFoundException(`Invalid expert passport code: ${validation.error}`);
+    }
+
+    // Get public profile
+    const profile = await this.expertService.getPublicProfile(code);
+    if (!profile) {
+      throw new NotFoundException('Expert not found');
+    }
+
+    // Add code parsing info
+    const parts = validation.parts!;
+    return {
+      ...profile,
+      passportInfo: {
+        code: code.toUpperCase(),
+        expertType: parts.expertType,
+        expertTypeName: parts.expertType === 'T' ? 'Technical' : parts.expertType === 'B' ? 'Business' : 'Technical & Business',
+        industry: parts.industry,
+        industryName: INDUSTRY_CODE_NAMES[parts.industry],
+        skill: parts.skill,
+        skillName: SKILL_CODE_NAMES[parts.skill],
+        nationality: parts.nationality,
+        isValid: true,
+      },
+    };
+  }
+
+  @Get('validate/:code')
+  @ApiOperation({ summary: 'Validate expert passport code format (public)' })
+  @ApiParam({ name: 'code', description: 'Expert passport code' })
+  async validateCode(@Param('code') code: string) {
+    const validation = validateExpertPassportCode(code);
+    if (!validation.valid) {
+      return {
+        valid: false,
+        error: validation.error,
+      };
+    }
+
+    const parts = validation.parts!;
+    return {
+      valid: true,
+      parts: {
+        ...parts,
+        industryName: INDUSTRY_CODE_NAMES[parts.industry],
+        skillName: SKILL_CODE_NAMES[parts.skill],
+      },
+    };
   }
 }

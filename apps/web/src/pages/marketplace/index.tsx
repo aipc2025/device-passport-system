@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { Package, FileText, ArrowRight, TrendingUp, Users } from 'lucide-react';
+import { Package, FileText, ArrowRight, Users } from 'lucide-react';
 import { marketplaceProductApi, marketplaceRfqApi } from '../../services/api';
 import { ProductCard, RFQCard } from '../../components/marketplace';
 

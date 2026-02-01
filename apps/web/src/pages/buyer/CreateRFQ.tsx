@@ -144,7 +144,7 @@ export default function CreateRFQ() {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500"
                 >
                   <option value="">{t('buyer.anyCategory', 'Any category')}</option>
-                  {Object.entries(ProductLine).map(([key, value]) => (
+                  {Object.entries(ProductLine).map(([, value]) => (
                     <option key={value} value={value}>
                       {PRODUCT_TYPE_NAMES[value as keyof typeof PRODUCT_TYPE_NAMES]}
                     </option>
@@ -205,7 +205,7 @@ export default function CreateRFQ() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500"
               >
                 <option value="">{t('buyer.selectFrequency', 'Select frequency')}</option>
-                {Object.entries(PurchaseFrequency).map(([key, value]) => (
+                {Object.entries(PurchaseFrequency).map(([, value]) => (
                   <option key={value} value={value}>
                     {PURCHASE_FREQUENCY_NAMES[value as keyof typeof PURCHASE_FREQUENCY_NAMES]}
                   </option>

@@ -510,6 +510,11 @@ export const savedApi = {
 // ==========================================
 
 export const expertApi = {
+  // Dashboard
+  getDashboardStats: async (expertId: string) => {
+    const response = await api.get(`/experts/${expertId}/dashboard`);
+    return response.data.data || response.data;
+  },
   // Profile management
   getProfile: async (expertId: string) => {
     const response = await api.get(`/experts/${expertId}`);

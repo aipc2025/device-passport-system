@@ -137,7 +137,7 @@ export default function MyRFQs() {
                         getStatusColor(rfq.status)
                       )}
                     >
-                      {RFQ_STATUS_NAMES[rfq.status]}
+                      {RFQ_STATUS_NAMES[rfq.status as RFQStatus]}
                     </span>
                   </td>
                   <td className="px-6 py-4">

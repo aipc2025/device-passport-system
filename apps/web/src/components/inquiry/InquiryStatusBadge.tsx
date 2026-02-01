@@ -9,7 +9,7 @@ interface InquiryStatusBadgeProps {
 }
 
 export default function InquiryStatusBadge({ status, size = 'md' }: InquiryStatusBadgeProps) {
-  const { t } = useTranslation();
+  useTranslation(); // Initialize i18n context
 
   const config: Record<
     InquiryStatus,

@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -15,7 +14,7 @@ import {
 } from 'lucide-react';
 import { marketplaceProductApi } from '../../services/api';
 import { SaveButton } from '../../components/marketplace';
-import { PRODUCT_TYPE_NAMES, SavedItemType, MarketplaceListingStatus } from '@device-passport/shared';
+import { PRODUCT_TYPE_NAMES, SavedItemType } from '@device-passport/shared';
 import { useAuthStore } from '../../store/auth.store';
 
 export default function ProductDetail() {
@@ -23,7 +22,6 @@ export default function ProductDetail() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuthStore();
-  const [showContactModal, setShowContactModal] = useState(false);
 
   const { data: product, isLoading, error } = useQuery({
     queryKey: ['marketplace-product', id],

@@ -4,22 +4,51 @@ import { useRegistrationStore, Gender } from '../../../store/registration.store'
 import MapPicker from '../../common/MapPicker';
 import { MapPinIcon } from '@heroicons/react/24/outline';
 
-// Common nationalities list
-const NATIONALITIES = [
-  'Chinese', 'American', 'German', 'Japanese', 'Korean', 'British', 'French',
-  'Italian', 'Canadian', 'Australian', 'Indian', 'Brazilian', 'Russian',
-  'Spanish', 'Dutch', 'Swiss', 'Swedish', 'Norwegian', 'Danish', 'Finnish',
-  'Austrian', 'Belgian', 'Polish', 'Turkish', 'Mexican', 'Argentine',
-  'Chilean', 'Colombian', 'Indonesian', 'Malaysian', 'Singaporean',
-  'Thai', 'Vietnamese', 'Filipino', 'Egyptian', 'South African', 'Nigerian',
-  'Other',
+// Countries with ISO 3166-1 Alpha-2 codes for passport code generation
+const COUNTRIES = [
+  { code: 'CN', name: { en: 'China', zh: '中国' } },
+  { code: 'US', name: { en: 'United States', zh: '美国' } },
+  { code: 'DE', name: { en: 'Germany', zh: '德国' } },
+  { code: 'JP', name: { en: 'Japan', zh: '日本' } },
+  { code: 'KR', name: { en: 'South Korea', zh: '韩国' } },
+  { code: 'TW', name: { en: 'Taiwan', zh: '中国台湾' } },
+  { code: 'HK', name: { en: 'Hong Kong', zh: '中国香港' } },
+  { code: 'SG', name: { en: 'Singapore', zh: '新加坡' } },
+  { code: 'MY', name: { en: 'Malaysia', zh: '马来西亚' } },
+  { code: 'TH', name: { en: 'Thailand', zh: '泰国' } },
+  { code: 'VN', name: { en: 'Vietnam', zh: '越南' } },
+  { code: 'IN', name: { en: 'India', zh: '印度' } },
+  { code: 'GB', name: { en: 'United Kingdom', zh: '英国' } },
+  { code: 'FR', name: { en: 'France', zh: '法国' } },
+  { code: 'IT', name: { en: 'Italy', zh: '意大利' } },
+  { code: 'CH', name: { en: 'Switzerland', zh: '瑞士' } },
+  { code: 'AT', name: { en: 'Austria', zh: '奥地利' } },
+  { code: 'SE', name: { en: 'Sweden', zh: '瑞典' } },
+  { code: 'DK', name: { en: 'Denmark', zh: '丹麦' } },
+  { code: 'NL', name: { en: 'Netherlands', zh: '荷兰' } },
+  { code: 'BE', name: { en: 'Belgium', zh: '比利时' } },
+  { code: 'AU', name: { en: 'Australia', zh: '澳大利亚' } },
+  { code: 'CA', name: { en: 'Canada', zh: '加拿大' } },
+  { code: 'BR', name: { en: 'Brazil', zh: '巴西' } },
+  { code: 'MX', name: { en: 'Mexico', zh: '墨西哥' } },
+  { code: 'RU', name: { en: 'Russia', zh: '俄罗斯' } },
+  { code: 'SA', name: { en: 'Saudi Arabia', zh: '沙特阿拉伯' } },
+  { code: 'AE', name: { en: 'United Arab Emirates', zh: '阿联酋' } },
+  { code: 'ID', name: { en: 'Indonesia', zh: '印度尼西亚' } },
+  { code: 'PH', name: { en: 'Philippines', zh: '菲律宾' } },
+  { code: 'PL', name: { en: 'Poland', zh: '波兰' } },
+  { code: 'TR', name: { en: 'Turkey', zh: '土耳其' } },
+  { code: 'ZA', name: { en: 'South Africa', zh: '南非' } },
+  { code: 'EG', name: { en: 'Egypt', zh: '埃及' } },
+  { code: 'NG', name: { en: 'Nigeria', zh: '尼日利亚' } },
+  { code: 'XX', name: { en: 'Other', zh: '其他' } },
 ];
 
 export default function PersonalInfoStep() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { expertData, updateExpertData } = useRegistrationStore();
   const [showLocationMap, setShowLocationMap] = useState(false);
-  const [customNationality, setCustomNationality] = useState('');
+  const lang = i18n.language.startsWith('zh') ? 'zh' : 'en';
 
   const handleLocationSelect = (location: { lat: number; lng: number; address: string }) => {
     updateExpertData({
@@ -28,15 +57,6 @@ export default function PersonalInfoStep() {
       locationLng: location.lng,
     });
     setShowLocationMap(false);
-  };
-
-  const handleNationalityChange = (value: string) => {
-    if (value === 'Other') {
-      updateExpertData({ nationality: customNationality || 'Other' });
-    } else {
-      updateExpertData({ nationality: value });
-      setCustomNationality('');
-    }
   };
 
   return (
@@ -134,13 +154,17 @@ export default function PersonalInfoStep() {
           </div>
 
           <div>
-            <label className="label">{t('expertPersonal.dateOfBirth', 'Date of Birth')}</label>
+            <label className="label">{t('expertPersonal.dateOfBirth', 'Date of Birth')} *</label>
             <input
               type="date"
+              required
               value={expertData.dateOfBirth || ''}
               onChange={(e) => updateExpertData({ dateOfBirth: e.target.value })}
               className="input"
             />
+            <p className="mt-1 text-xs text-gray-500">
+              {t('expertPersonal.dobNote', 'Birth year/month will be encoded in your passport')}
+            </p>
           </div>
 
           <div>
@@ -155,30 +179,23 @@ export default function PersonalInfoStep() {
           </div>
 
           <div>
-            <label className="label">{t('expertPersonal.nationality', 'Nationality')}</label>
+            <label className="label">{t('expertPersonal.nationality', 'Nationality')} *</label>
             <select
-              value={NATIONALITIES.includes(expertData.nationality || '') ? expertData.nationality : (expertData.nationality ? 'Other' : '')}
-              onChange={(e) => handleNationalityChange(e.target.value)}
+              required
+              value={expertData.nationality || ''}
+              onChange={(e) => updateExpertData({ nationality: e.target.value })}
               className="select"
             >
               <option value="">{t('common.select', 'Select...')}</option>
-              {NATIONALITIES.map((nat) => (
-                <option key={nat} value={nat}>{nat}</option>
+              {COUNTRIES.map((country) => (
+                <option key={country.code} value={country.code}>
+                  {country.name[lang]} ({country.code})
+                </option>
               ))}
             </select>
-            {(!NATIONALITIES.includes(expertData.nationality || '') && expertData.nationality) ||
-             (NATIONALITIES.includes(expertData.nationality || '') && expertData.nationality === 'Other') ? (
-              <input
-                type="text"
-                value={expertData.nationality === 'Other' ? customNationality : (expertData.nationality || '')}
-                onChange={(e) => {
-                  setCustomNationality(e.target.value);
-                  updateExpertData({ nationality: e.target.value });
-                }}
-                className="input mt-2"
-                placeholder={t('expertPersonal.enterNationality', 'Enter nationality')}
-              />
-            ) : null}
+            <p className="mt-1 text-xs text-gray-500">
+              {t('expertPersonal.nationalityNote', 'This will be used in your expert passport code')}
+            </p>
           </div>
 
           <div>

@@ -31,3 +31,7 @@ export * from './expert-match-result.entity';
 // Expert Rating System entities
 export * from './expert-service-record.entity';
 export * from './expert-review.entity';
+
+// Expert Passport entities
+export * from './expert-work-history.entity';
+export * from './expert-passport-sequence.entity';

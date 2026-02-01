@@ -8,6 +8,8 @@ import {
   OriginCode,
   DeviceStatus,
   generatePassportCode,
+  ExpertType,
+  RegistrationStatus,
 } from '@device-passport/shared';
 
 dotenv.config({ path: '.env.local' });
@@ -168,6 +170,56 @@ async function seed() {
     });
   }
 
+  console.log('Seeding expert user...');
+  const expertRepo = AppDataSource.getRepository('IndividualExpert');
+
+  // Expert user
+  let expertUser = await userRepo.findOne({ where: { email: 'expert@luna.top' } });
+  if (!expertUser) {
+    expertUser = await userRepo.save({
+      email: 'expert@luna.top',
+      password: hashedPassword,
+      name: 'Zhang Expert',
+      role: UserRole.CUSTOMER,
+      isActive: true,
+    });
+  } else {
+    expertUser.password = hashedPassword;
+    expertUser.isActive = true;
+    await userRepo.save(expertUser);
+  }
+
+  // Create or update expert profile
+  let expertProfile = await expertRepo.findOne({ where: { userId: expertUser.id } });
+  if (!expertProfile) {
+    expertProfile = await expertRepo.save({
+      userId: expertUser.id,
+      personalName: 'Zhang Wei',
+      expertTypes: [ExpertType.TECHNICAL],
+      phone: '+86-138-0000-1234',
+      professionalField: 'PLC/HMI Programming, Industrial Automation',
+      servicesOffered: 'PLC programming, HMI development, system integration, troubleshooting',
+      yearsOfExperience: 8,
+      certifications: ['Siemens Certified Engineer', 'Rockwell Automation Specialist'],
+      expertCode: 'EP-TECH-2601-000001-A7',
+      expertCodeGeneratedAt: new Date(),
+      isAvailable: true,
+      skillTags: ['PLC', 'HMI', 'Siemens', 'Rockwell', 'Industrial Automation', 'SCADA'],
+      serviceRadius: 100,
+      currentLocation: 'Shanghai, China',
+      locationLat: 31.2304,
+      locationLng: 121.4737,
+      registrationStatus: RegistrationStatus.APPROVED,
+      avgRating: 4.8,
+      totalReviews: 15,
+      completedServices: 23,
+    });
+  }
+
+  // Update user with expertId
+  expertUser.expertId = expertProfile.id;
+  await userRepo.save(expertUser);
+
   console.log('Seeding sequence counters...');
   // Create sequence counter (using YYMM format)
   const now = new Date();
@@ -255,6 +307,7 @@ async function seed() {
   console.log('  Engineer: engineer@luna.top / password123');
   console.log('  QC Inspector: qc@luna.top / password123');
   console.log('  Customer: customer@luna.top / password123');
+  console.log('  Expert: expert@luna.top / password123');
 
   await AppDataSource.destroy();
 }

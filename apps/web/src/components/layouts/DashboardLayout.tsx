@@ -82,6 +82,7 @@ export default function DashboardLayout() {
     },
     { name: t('nav.inquiries'), href: '/inquiries', icon: MessageSquare, roles: [UserRole.CUSTOMER], hideForExpert: true },
     // Expert-specific menu items
+    { name: t('nav.expertDashboard', 'Dashboard'), href: '/expert/dashboard', icon: LayoutDashboard, roles: [UserRole.CUSTOMER], expertOnly: true },
     {
       name: t('nav.expert', 'Expert'),
       icon: User,

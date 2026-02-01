@@ -151,7 +151,7 @@ export default function MyProducts() {
                         getStatusColor(product.status)
                       )}
                     >
-                      {MARKETPLACE_LISTING_STATUS_NAMES[product.status]}
+                      {MARKETPLACE_LISTING_STATUS_NAMES[product.status as MarketplaceListingStatus]}
                     </span>
                   </td>
                   <td className="px-6 py-4">

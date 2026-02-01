@@ -10,3 +10,4 @@ export * from './types/registration';
 
 // Utils
 export * from './utils/passport-code';
+export * from './utils/expert-passport-code';

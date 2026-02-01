@@ -579,6 +579,7 @@
   },
   "nav": {
     "devicePassports": "设备护照",
+    "expertPassports": "专家护照",
     "serviceOrders": "服务订单",
     "suppliers": "供应商",
     "registrations": "注册审批",
@@ -595,6 +596,7 @@
     "saved": "收藏夹",
     "expert": "专家",
     "expertProfile": "我的资料",
+    "expertPassport": "我的护照",
     "serviceRecords": "服务记录",
     "expertMatches": "匹配推荐",
     "serviceHall": "服务大厅"

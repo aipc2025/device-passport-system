@@ -23,6 +23,7 @@ import Dashboard from './pages/admin/Dashboard';
 import PassportList from './pages/admin/PassportList';
 import PassportCreate from './pages/admin/PassportCreate';
 import PassportDetail from './pages/admin/PassportDetail';
+import ExpertPassportList from './pages/admin/ExpertPassportList';
 import ServiceOrderList from './pages/admin/ServiceOrderList';
 import ServiceOrderDetail from './pages/admin/ServiceOrderDetail';
 import SupplierList from './pages/admin/SupplierList';
@@ -95,6 +96,7 @@ function App() {
           <Route path="/passports" element={<PassportList />} />
           <Route path="/passports/create" element={<PassportCreate />} />
           <Route path="/passports/:id" element={<PassportDetail />} />
+          <Route path="/expert-passports" element={<ExpertPassportList />} />
           <Route path="/service-orders" element={<ServiceOrderList />} />
           <Route path="/service-orders/:id" element={<ServiceOrderDetail />} />
           <Route path="/suppliers" element={<SupplierList />} />

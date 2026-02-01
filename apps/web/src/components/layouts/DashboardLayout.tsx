@@ -45,8 +45,9 @@ export default function DashboardLayout() {
   };
 
   const navigation: NavItem[] = [
-    { name: t('common.dashboard'), href: '/dashboard', icon: LayoutDashboard, roles: [UserRole.CUSTOMER] },
+    { name: t('common.dashboard'), href: '/dashboard', icon: LayoutDashboard, roles: [UserRole.CUSTOMER], hideForExpert: true },
     { name: t('nav.devicePassports'), href: '/passports', icon: Package, roles: [UserRole.CUSTOMER], hideForExpert: true },
+    { name: t('nav.expertPassports'), href: '/expert-passports', icon: UserCheck, roles: [UserRole.ADMIN] },
     { name: t('nav.serviceOrders'), href: '/service-orders', icon: ClipboardList, roles: [UserRole.CUSTOMER] },
     {
       name: t('nav.marketplace'),

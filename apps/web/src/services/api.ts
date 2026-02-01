@@ -704,3 +704,22 @@ export const ratingApi = {
     return response.data.data || response.data;
   },
 };
+
+// Admin Expert API
+export const adminExpertApi = {
+  getAllExperts: async (params?: {
+    status?: string;
+    hasPassport?: boolean;
+    search?: string;
+    limit?: number;
+    offset?: number;
+  }) => {
+    const response = await api.get('/experts/admin/all', { params });
+    return response.data.data || response.data;
+  },
+
+  generatePassportCode: async (expertId: string) => {
+    const response = await api.post(`/experts/${expertId}/generate-passport`);
+    return response.data.data || response.data;
+  },
+};

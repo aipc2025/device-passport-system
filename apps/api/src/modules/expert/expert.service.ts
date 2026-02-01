@@ -544,4 +544,74 @@ export class ExpertService {
       order: { verificationRequestedAt: 'ASC' },
     });
   }
+
+  // ==========================================
+  // Admin: Get All Experts with Passport Info
+  // ==========================================
+
+  async getAllExperts(options?: {
+    status?: string;
+    hasPassport?: boolean;
+    search?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<{ experts: any[]; total: number }> {
+    const query = this.expertRepository.createQueryBuilder('expert')
+      .leftJoinAndSelect('expert.user', 'user')
+      .orderBy('expert.createdAt', 'DESC');
+
+    // Filter by registration status
+    if (options?.status) {
+      query.andWhere('expert.registrationStatus = :status', { status: options.status });
+    }
+
+    // Filter by passport existence
+    if (options?.hasPassport !== undefined) {
+      if (options.hasPassport) {
+        query.andWhere('expert.expertCode IS NOT NULL');
+      } else {
+        query.andWhere('expert.expertCode IS NULL');
+      }
+    }
+
+    // Search by name, email, or passport code
+    if (options?.search) {
+      query.andWhere(
+        '(expert.personalName ILIKE :search OR user.email ILIKE :search OR expert.expertCode ILIKE :search)',
+        { search: `%${options.search}%` },
+      );
+    }
+
+    const total = await query.getCount();
+
+    if (options?.limit) {
+      query.limit(options.limit);
+    }
+    if (options?.offset) {
+      query.offset(options.offset);
+    }
+
+    const experts = await query.getMany();
+
+    return {
+      experts: experts.map((expert) => ({
+        id: expert.id,
+        personalName: expert.personalName,
+        email: expert.user?.email,
+        expertCode: expert.expertCode,
+        expertCodeGeneratedAt: expert.expertCodeGeneratedAt,
+        expertTypes: expert.expertTypes,
+        industries: expert.industries,
+        skills: expert.skills,
+        nationality: expert.nationality,
+        registrationStatus: expert.registrationStatus,
+        isAvailable: expert.isAvailable,
+        avgRating: expert.avgRating,
+        totalReviews: expert.totalReviews,
+        completedServices: expert.completedServices,
+        createdAt: expert.createdAt,
+      })),
+      total,
+    };
+  }
 }

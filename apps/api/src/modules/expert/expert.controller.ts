@@ -314,6 +314,30 @@ export class ExpertController {
   // Admin Verification Endpoints
   // ==========================================
 
+  @Get('admin/all')
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Get all experts with passport info (Admin only)' })
+  @ApiQuery({ name: 'status', required: false, description: 'Filter by registration status' })
+  @ApiQuery({ name: 'hasPassport', required: false, type: Boolean, description: 'Filter by passport existence' })
+  @ApiQuery({ name: 'search', required: false, description: 'Search by name, email, or passport code' })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiQuery({ name: 'offset', required: false, type: Number })
+  async getAllExperts(
+    @Query('status') status?: string,
+    @Query('hasPassport') hasPassport?: string,
+    @Query('search') search?: string,
+    @Query('limit') limit?: number,
+    @Query('offset') offset?: number,
+  ) {
+    return this.expertService.getAllExperts({
+      status,
+      hasPassport: hasPassport === 'true' ? true : hasPassport === 'false' ? false : undefined,
+      search,
+      limit: limit ? Number(limit) : undefined,
+      offset: offset ? Number(offset) : undefined,
+    });
+  }
+
   @Get('admin/pending-verifications')
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Get pending work history verifications (Admin only)' })

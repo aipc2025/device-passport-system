@@ -882,6 +882,7 @@
   },
   "nav": {
     "devicePassports": "Device Passports",
+    "expertPassports": "Expert Passports",
     "serviceOrders": "Service Orders",
     "suppliers": "Suppliers",
     "registrations": "Registrations",
@@ -898,6 +899,7 @@
     "saved": "Saved Items",
     "expert": "Expert",
     "expertProfile": "My Profile",
+    "expertPassport": "My Passport",
     "serviceRecords": "Service Records",
     "expertMatches": "Matches",
     "serviceHall": "Service Hall"

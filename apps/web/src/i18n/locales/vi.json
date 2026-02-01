@@ -579,6 +579,7 @@
   },
   "nav": {
     "devicePassports": "Hộ Chiếu Thiết Bị",
+    "expertPassports": "Hộ Chiếu Chuyên Gia",
     "serviceOrders": "Đơn Dịch Vụ",
     "suppliers": "Nhà Cung Cấp",
     "registrations": "Đăng Ký",
@@ -592,7 +593,13 @@
     "createRfq": "Tạo Yêu Cầu",
     "buyerMatches": "Gợi Ý Kết Nối",
     "inquiries": "Hỏi Đáp",
-    "saved": "Đã Lưu"
+    "saved": "Đã Lưu",
+    "expert": "Chuyên Gia",
+    "expertProfile": "Hồ Sơ",
+    "expertPassport": "Hộ Chiếu",
+    "serviceRecords": "Lịch Sử Dịch Vụ",
+    "expertMatches": "Gợi Ý Kết Nối",
+    "serviceHall": "Sảnh Dịch Vụ"
   },
   "saved": {
     "title": "Mục Đã Lưu",

@@ -9,11 +9,17 @@ import {
   JoinColumn,
   Unique,
 } from 'typeorm';
-import { ServiceRecordStatus, ServiceType } from '@device-passport/shared';
+import {
+  ServiceRecordStatus,
+  ServiceType,
+  DeviceStatus,
+  MaintenanceType,
+} from '@device-passport/shared';
 import { ServiceRequest } from './service-request.entity';
 import { IndividualExpert } from './individual-expert.entity';
 import { Organization } from './organization.entity';
 import { User } from './user.entity';
+import { DevicePassport } from './device-passport.entity';
 
 @Entity('expert_service_records')
 @Unique(['serviceRequestId', 'expertId'])
@@ -70,6 +76,34 @@ export class ExpertServiceRecord {
 
   @Column({ name: 'service_description', type: 'text', nullable: true })
   serviceDescription: string;
+
+  // ============================================
+  // Device Association Fields
+  // ============================================
+
+  // Related device passport (inherited from service request)
+  @ManyToOne(() => DevicePassport, { nullable: true })
+  @JoinColumn({ name: 'passport_id' })
+  passport: DevicePassport;
+
+  @Column({ name: 'passport_id', nullable: true })
+  passportId: string;
+
+  // Redundant passport code for easier querying
+  @Column({ name: 'passport_code', type: 'varchar', length: 50, nullable: true })
+  passportCode: string;
+
+  // Device status before service started
+  @Column({ name: 'device_status_before', type: 'varchar', length: 30, nullable: true })
+  deviceStatusBefore: DeviceStatus;
+
+  // Device status after service completed
+  @Column({ name: 'device_status_after', type: 'varchar', length: 30, nullable: true })
+  deviceStatusAfter: DeviceStatus;
+
+  // Maintenance type classification
+  @Column({ name: 'maintenance_type', type: 'varchar', length: 30, nullable: true })
+  maintenanceType: MaintenanceType;
 
   // Status
   @Column({

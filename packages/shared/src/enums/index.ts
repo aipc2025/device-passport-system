@@ -274,8 +274,46 @@ export enum FileCategory {
   RESUME = 'RESUME',
   CERTIFICATE = 'CERTIFICATE',
   SERVICE_ATTACHMENT = 'SERVICE_ATTACHMENT',
+  DEVICE_TAKEOVER = 'DEVICE_TAKEOVER',
+  DEVICE_PHOTO = 'DEVICE_PHOTO',
+  NAMEPLATE_PHOTO = 'NAMEPLATE_PHOTO',
   OTHER = 'OTHER',
 }
+
+/**
+ * Supported currency codes
+ */
+export enum CurrencyCode {
+  CNY = 'CNY',  // Chinese Yuan (default)
+  USD = 'USD',  // US Dollar
+  EUR = 'EUR',  // Euro
+  VND = 'VND',  // Vietnamese Dong
+  MYR = 'MYR',  // Malaysian Ringgit
+  THB = 'THB',  // Thai Baht
+  IDR = 'IDR',  // Indonesian Rupiah
+  AED = 'AED',  // UAE Dirham
+  SAR = 'SAR',  // Saudi Riyal
+}
+
+/**
+ * Currency display names
+ */
+export const CURRENCY_NAMES: Record<CurrencyCode, { en: string; zh: string; symbol: string }> = {
+  [CurrencyCode.CNY]: { en: 'Chinese Yuan', zh: '人民币', symbol: '¥' },
+  [CurrencyCode.USD]: { en: 'US Dollar', zh: '美元', symbol: '$' },
+  [CurrencyCode.EUR]: { en: 'Euro', zh: '欧元', symbol: '€' },
+  [CurrencyCode.VND]: { en: 'Vietnamese Dong', zh: '越南盾', symbol: '₫' },
+  [CurrencyCode.MYR]: { en: 'Malaysian Ringgit', zh: '马来西亚林吉特', symbol: 'RM' },
+  [CurrencyCode.THB]: { en: 'Thai Baht', zh: '泰铢', symbol: '฿' },
+  [CurrencyCode.IDR]: { en: 'Indonesian Rupiah', zh: '印尼盾', symbol: 'Rp' },
+  [CurrencyCode.AED]: { en: 'UAE Dirham', zh: '阿联酋迪拉姆', symbol: 'د.إ' },
+  [CurrencyCode.SAR]: { en: 'Saudi Riyal', zh: '沙特里亚尔', symbol: '﷼' },
+};
+
+/**
+ * Default currency
+ */
+export const DEFAULT_CURRENCY = CurrencyCode.CNY;
 
 /**
  * Purchase frequency for buyers
@@ -525,11 +563,11 @@ export enum ServiceUrgency {
 /**
  * Service urgency display names
  */
-export const SERVICE_URGENCY_NAMES: Record<ServiceUrgency, string> = {
-  [ServiceUrgency.LOW]: 'Low',
-  [ServiceUrgency.NORMAL]: 'Normal',
-  [ServiceUrgency.HIGH]: 'High',
-  [ServiceUrgency.URGENT]: 'Urgent',
+export const SERVICE_URGENCY_NAMES: Record<ServiceUrgency, { en: string; zh: string }> = {
+  [ServiceUrgency.LOW]: { en: 'Low', zh: '低' },
+  [ServiceUrgency.NORMAL]: { en: 'Normal', zh: '普通' },
+  [ServiceUrgency.HIGH]: { en: 'High', zh: '高' },
+  [ServiceUrgency.URGENT]: { en: 'Urgent', zh: '紧急' },
 };
 
 /**
@@ -971,3 +1009,479 @@ export const WORK_HISTORY_VERIFICATION_STATUS_NAMES: Record<WorkHistoryVerificat
   [WorkHistoryVerificationStatus.VERIFIED]: { en: 'Verified', zh: '已验证' },
   [WorkHistoryVerificationStatus.REJECTED]: { en: 'Rejected', zh: '已拒绝' },
 };
+
+// ============================================
+// Expert Work Status & Membership Enums
+// ============================================
+
+/**
+ * Expert work status for service matching
+ */
+export enum ExpertWorkStatus {
+  RUSHING = 'RUSHING',       // 抢单中 - 急需订单，优先分配
+  IDLE = 'IDLE',             // 空闲 - 一般等待分配
+  BOOKED = 'BOOKED',         // 预定中 - 已分配订单，但当前空闲
+  IN_SERVICE = 'IN_SERVICE', // 服务中 - 已出发或正在服务
+  OFF_DUTY = 'OFF_DUTY',     // 休息中 - 暂不接单
+}
+
+/**
+ * Expert work status display names
+ */
+export const EXPERT_WORK_STATUS_NAMES: Record<ExpertWorkStatus, { en: string; zh: string }> = {
+  [ExpertWorkStatus.RUSHING]: { en: 'Rushing', zh: '抢单中' },
+  [ExpertWorkStatus.IDLE]: { en: 'Idle', zh: '空闲' },
+  [ExpertWorkStatus.BOOKED]: { en: 'Booked', zh: '预定中' },
+  [ExpertWorkStatus.IN_SERVICE]: { en: 'In Service', zh: '服务中' },
+  [ExpertWorkStatus.OFF_DUTY]: { en: 'Off Duty', zh: '休息中' },
+};
+
+/**
+ * Expert membership level
+ */
+export enum ExpertMembershipLevel {
+  STANDARD = 'STANDARD',
+  SILVER = 'SILVER',
+  GOLD = 'GOLD',
+  DIAMOND = 'DIAMOND',
+}
+
+/**
+ * Expert membership level display names
+ */
+export const EXPERT_MEMBERSHIP_LEVEL_NAMES: Record<ExpertMembershipLevel, { en: string; zh: string }> = {
+  [ExpertMembershipLevel.STANDARD]: { en: 'Standard', zh: '标准版' },
+  [ExpertMembershipLevel.SILVER]: { en: 'Silver', zh: '银牌会员' },
+  [ExpertMembershipLevel.GOLD]: { en: 'Gold', zh: '金牌会员' },
+  [ExpertMembershipLevel.DIAMOND]: { en: 'Diamond', zh: '钻石会员' },
+};
+
+// ============================================
+// Service Request Category Enums
+// ============================================
+
+/**
+ * Service request primary category (Level 1)
+ */
+export enum ServicePrimaryCategory {
+  DEVICE = 'DEVICE',       // 设备服务
+  LABOR = 'LABOR',         // 劳务服务
+  CONSULTING = 'CONSULTING', // 咨询培训
+}
+
+/**
+ * Primary category display names
+ */
+export const SERVICE_PRIMARY_CATEGORY_NAMES: Record<ServicePrimaryCategory, { en: string; zh: string; icon: string }> = {
+  [ServicePrimaryCategory.DEVICE]: { en: 'Device Service', zh: '设备服务', icon: '🔧' },
+  [ServicePrimaryCategory.LABOR]: { en: 'Labor Service', zh: '劳务服务', icon: '👷' },
+  [ServicePrimaryCategory.CONSULTING]: { en: 'Consulting & Training', zh: '咨询培训', icon: '💼' },
+};
+
+/**
+ * Service request sub-category (Level 2)
+ */
+export enum ServiceRequestCategory {
+  // Device-related services (Primary: DEVICE)
+  DEVICE_REPAIR = 'DEVICE_REPAIR',           // 故障维修
+  DEVICE_MAINTENANCE = 'DEVICE_MAINTENANCE', // 定期保养
+  DEVICE_INSTALLATION = 'DEVICE_INSTALLATION', // 设备安装
+  DEVICE_INSPECTION = 'DEVICE_INSPECTION',   // 检测检验
+  DEVICE_TAKEOVER = 'DEVICE_TAKEOVER',       // 设备接管/绑定旧设备
+
+  // Labor services (Primary: LABOR)
+  LABOR_ELECTRICAL = 'LABOR_ELECTRICAL',     // 电气工程
+  LABOR_MECHANICAL = 'LABOR_MECHANICAL',     // 机械工程
+  LABOR_PLUMBING = 'LABOR_PLUMBING',         // 管道工程
+  LABOR_GENERAL = 'LABOR_GENERAL',           // 综合劳务
+
+  // Consulting services (Primary: CONSULTING)
+  CONSULTING_TECHNICAL = 'CONSULTING_TECHNICAL', // 技术咨询
+  CONSULTING_TRAINING = 'CONSULTING_TRAINING',   // 操作培训
+  CONSULTING_CERTIFICATION = 'CONSULTING_CERTIFICATION', // 认证辅导
+}
+
+/**
+ * Mapping from sub-category to primary category
+ */
+export const CATEGORY_TO_PRIMARY: Record<ServiceRequestCategory, ServicePrimaryCategory> = {
+  [ServiceRequestCategory.DEVICE_REPAIR]: ServicePrimaryCategory.DEVICE,
+  [ServiceRequestCategory.DEVICE_MAINTENANCE]: ServicePrimaryCategory.DEVICE,
+  [ServiceRequestCategory.DEVICE_INSTALLATION]: ServicePrimaryCategory.DEVICE,
+  [ServiceRequestCategory.DEVICE_INSPECTION]: ServicePrimaryCategory.DEVICE,
+  [ServiceRequestCategory.DEVICE_TAKEOVER]: ServicePrimaryCategory.DEVICE,
+  [ServiceRequestCategory.LABOR_ELECTRICAL]: ServicePrimaryCategory.LABOR,
+  [ServiceRequestCategory.LABOR_MECHANICAL]: ServicePrimaryCategory.LABOR,
+  [ServiceRequestCategory.LABOR_PLUMBING]: ServicePrimaryCategory.LABOR,
+  [ServiceRequestCategory.LABOR_GENERAL]: ServicePrimaryCategory.LABOR,
+  [ServiceRequestCategory.CONSULTING_TECHNICAL]: ServicePrimaryCategory.CONSULTING,
+  [ServiceRequestCategory.CONSULTING_TRAINING]: ServicePrimaryCategory.CONSULTING,
+  [ServiceRequestCategory.CONSULTING_CERTIFICATION]: ServicePrimaryCategory.CONSULTING,
+};
+
+/**
+ * Get sub-categories for a primary category
+ */
+export const PRIMARY_TO_CATEGORIES: Record<ServicePrimaryCategory, ServiceRequestCategory[]> = {
+  [ServicePrimaryCategory.DEVICE]: [
+    ServiceRequestCategory.DEVICE_REPAIR,
+    ServiceRequestCategory.DEVICE_MAINTENANCE,
+    ServiceRequestCategory.DEVICE_INSTALLATION,
+    ServiceRequestCategory.DEVICE_INSPECTION,
+    ServiceRequestCategory.DEVICE_TAKEOVER,
+  ],
+  [ServicePrimaryCategory.LABOR]: [
+    ServiceRequestCategory.LABOR_ELECTRICAL,
+    ServiceRequestCategory.LABOR_MECHANICAL,
+    ServiceRequestCategory.LABOR_PLUMBING,
+    ServiceRequestCategory.LABOR_GENERAL,
+  ],
+  [ServicePrimaryCategory.CONSULTING]: [
+    ServiceRequestCategory.CONSULTING_TECHNICAL,
+    ServiceRequestCategory.CONSULTING_TRAINING,
+    ServiceRequestCategory.CONSULTING_CERTIFICATION,
+  ],
+};
+
+/**
+ * Service request category display names
+ */
+export const SERVICE_REQUEST_CATEGORY_NAMES: Record<ServiceRequestCategory, { en: string; zh: string }> = {
+  [ServiceRequestCategory.DEVICE_REPAIR]: { en: 'Fault Repair', zh: '故障维修' },
+  [ServiceRequestCategory.DEVICE_MAINTENANCE]: { en: 'Regular Maintenance', zh: '定期保养' },
+  [ServiceRequestCategory.DEVICE_INSTALLATION]: { en: 'Device Installation', zh: '设备安装' },
+  [ServiceRequestCategory.DEVICE_INSPECTION]: { en: 'Inspection & Testing', zh: '检测检验' },
+  [ServiceRequestCategory.DEVICE_TAKEOVER]: { en: 'Device Registration', zh: '设备绑定' },
+  [ServiceRequestCategory.LABOR_ELECTRICAL]: { en: 'Electrical Engineering', zh: '电气工程' },
+  [ServiceRequestCategory.LABOR_MECHANICAL]: { en: 'Mechanical Engineering', zh: '机械工程' },
+  [ServiceRequestCategory.LABOR_PLUMBING]: { en: 'Plumbing Engineering', zh: '管道工程' },
+  [ServiceRequestCategory.LABOR_GENERAL]: { en: 'General Labor', zh: '综合劳务' },
+  [ServiceRequestCategory.CONSULTING_TECHNICAL]: { en: 'Technical Consulting', zh: '技术咨询' },
+  [ServiceRequestCategory.CONSULTING_TRAINING]: { en: 'Operation Training', zh: '操作培训' },
+  [ServiceRequestCategory.CONSULTING_CERTIFICATION]: { en: 'Certification Support', zh: '认证辅导' },
+};
+
+/**
+ * Categories that require device passport (recommended)
+ */
+export const DEVICE_REQUIRED_CATEGORIES = [
+  ServiceRequestCategory.DEVICE_REPAIR,
+  ServiceRequestCategory.DEVICE_MAINTENANCE,
+  ServiceRequestCategory.DEVICE_INSPECTION,
+];
+
+/**
+ * Categories that can generate new passport
+ */
+export const PASSPORT_GENERATABLE_CATEGORIES = [
+  ServiceRequestCategory.DEVICE_TAKEOVER,
+  ServiceRequestCategory.DEVICE_INSTALLATION,
+];
+
+/**
+ * Common issue types for device services (predefined options)
+ */
+export enum CommonIssueType {
+  // Repair issues
+  CANNOT_START = 'CANNOT_START',           // 设备无法启动
+  UNEXPECTED_STOP = 'UNEXPECTED_STOP',     // 运行中异常停机
+  PRECISION_DROP = 'PRECISION_DROP',       // 精度下降/误差增大
+  ABNORMAL_SOUND = 'ABNORMAL_SOUND',       // 异响/振动异常
+  ALARM_CODE = 'ALARM_CODE',               // 报警/故障代码
+  OVERHEATING = 'OVERHEATING',             // 过热
+  LEAKAGE = 'LEAKAGE',                     // 泄漏
+
+  // Maintenance types
+  FIRST_MAINTENANCE = 'FIRST_MAINTENANCE', // 首次保养
+  REGULAR_MAINTENANCE = 'REGULAR_MAINTENANCE', // 定期例行保养
+  DEEP_MAINTENANCE = 'DEEP_MAINTENANCE',   // 深度保养/大修
+
+  // Installation types
+  NEW_INSTALL = 'NEW_INSTALL',             // 新设备开箱安装
+  RELOCATION = 'RELOCATION',               // 设备移机安装
+  UPGRADE_INSTALL = 'UPGRADE_INSTALL',     // 升级改造安装
+
+  OTHER = 'OTHER',                         // 其他
+}
+
+/**
+ * Common issue display names
+ */
+export const COMMON_ISSUE_NAMES: Record<CommonIssueType, { en: string; zh: string }> = {
+  [CommonIssueType.CANNOT_START]: { en: 'Cannot Start', zh: '设备无法启动' },
+  [CommonIssueType.UNEXPECTED_STOP]: { en: 'Unexpected Stop', zh: '运行中异常停机' },
+  [CommonIssueType.PRECISION_DROP]: { en: 'Precision Drop', zh: '精度下降/误差增大' },
+  [CommonIssueType.ABNORMAL_SOUND]: { en: 'Abnormal Sound/Vibration', zh: '异响/振动异常' },
+  [CommonIssueType.ALARM_CODE]: { en: 'Alarm/Error Code', zh: '报警/故障代码' },
+  [CommonIssueType.OVERHEATING]: { en: 'Overheating', zh: '过热' },
+  [CommonIssueType.LEAKAGE]: { en: 'Leakage', zh: '泄漏' },
+  [CommonIssueType.FIRST_MAINTENANCE]: { en: 'First Maintenance', zh: '首次保养' },
+  [CommonIssueType.REGULAR_MAINTENANCE]: { en: 'Regular Maintenance', zh: '定期例行保养' },
+  [CommonIssueType.DEEP_MAINTENANCE]: { en: 'Deep Maintenance', zh: '深度保养/大修' },
+  [CommonIssueType.NEW_INSTALL]: { en: 'New Installation', zh: '新设备开箱安装' },
+  [CommonIssueType.RELOCATION]: { en: 'Relocation', zh: '设备移机安装' },
+  [CommonIssueType.UPGRADE_INSTALL]: { en: 'Upgrade Installation', zh: '升级改造安装' },
+  [CommonIssueType.OTHER]: { en: 'Other', zh: '其他' },
+};
+
+/**
+ * Issues applicable to each category
+ */
+export const CATEGORY_ISSUES: Record<ServiceRequestCategory, CommonIssueType[]> = {
+  [ServiceRequestCategory.DEVICE_REPAIR]: [
+    CommonIssueType.CANNOT_START,
+    CommonIssueType.UNEXPECTED_STOP,
+    CommonIssueType.PRECISION_DROP,
+    CommonIssueType.ABNORMAL_SOUND,
+    CommonIssueType.ALARM_CODE,
+    CommonIssueType.OVERHEATING,
+    CommonIssueType.LEAKAGE,
+    CommonIssueType.OTHER,
+  ],
+  [ServiceRequestCategory.DEVICE_MAINTENANCE]: [
+    CommonIssueType.FIRST_MAINTENANCE,
+    CommonIssueType.REGULAR_MAINTENANCE,
+    CommonIssueType.DEEP_MAINTENANCE,
+    CommonIssueType.OTHER,
+  ],
+  [ServiceRequestCategory.DEVICE_INSTALLATION]: [
+    CommonIssueType.NEW_INSTALL,
+    CommonIssueType.RELOCATION,
+    CommonIssueType.UPGRADE_INSTALL,
+    CommonIssueType.OTHER,
+  ],
+  [ServiceRequestCategory.DEVICE_INSPECTION]: [CommonIssueType.OTHER],
+  [ServiceRequestCategory.DEVICE_TAKEOVER]: [CommonIssueType.OTHER],
+  [ServiceRequestCategory.LABOR_ELECTRICAL]: [CommonIssueType.OTHER],
+  [ServiceRequestCategory.LABOR_MECHANICAL]: [CommonIssueType.OTHER],
+  [ServiceRequestCategory.LABOR_PLUMBING]: [CommonIssueType.OTHER],
+  [ServiceRequestCategory.LABOR_GENERAL]: [CommonIssueType.OTHER],
+  [ServiceRequestCategory.CONSULTING_TECHNICAL]: [CommonIssueType.OTHER],
+  [ServiceRequestCategory.CONSULTING_TRAINING]: [CommonIssueType.OTHER],
+  [ServiceRequestCategory.CONSULTING_CERTIFICATION]: [CommonIssueType.OTHER],
+};
+
+/**
+ * Preferred time options
+ */
+export enum PreferredTimeOption {
+  ASAP = 'ASAP',           // 尽快
+  THIS_WEEK = 'THIS_WEEK', // 本周内
+  NEXT_WEEK = 'NEXT_WEEK', // 下周
+  FLEXIBLE = 'FLEXIBLE',   // 灵活
+  SPECIFIC = 'SPECIFIC',   // 指定日期
+}
+
+/**
+ * Preferred time option display names
+ */
+export const PREFERRED_TIME_NAMES: Record<PreferredTimeOption, { en: string; zh: string }> = {
+  [PreferredTimeOption.ASAP]: { en: 'ASAP', zh: '尽快' },
+  [PreferredTimeOption.THIS_WEEK]: { en: 'This Week', zh: '本周内' },
+  [PreferredTimeOption.NEXT_WEEK]: { en: 'Next Week', zh: '下周' },
+  [PreferredTimeOption.FLEXIBLE]: { en: 'Flexible', zh: '灵活' },
+  [PreferredTimeOption.SPECIFIC]: { en: 'Specific Date', zh: '指定日期' },
+};
+
+/**
+ * Budget range options (in CNY)
+ */
+export enum BudgetRangeOption {
+  NO_LIMIT = 'NO_LIMIT',   // 不限
+  UNDER_500 = 'UNDER_500', // <500
+  RANGE_500_2000 = 'RANGE_500_2000', // 500-2000
+  RANGE_2000_5000 = 'RANGE_2000_5000', // 2000-5000
+  OVER_5000 = 'OVER_5000', // >5000
+  CUSTOM = 'CUSTOM',       // 自定义
+}
+
+/**
+ * Budget range option display names
+ */
+export const BUDGET_RANGE_NAMES: Record<BudgetRangeOption, { en: string; zh: string }> = {
+  [BudgetRangeOption.NO_LIMIT]: { en: 'No Limit', zh: '不限' },
+  [BudgetRangeOption.UNDER_500]: { en: 'Under 500', zh: '500以下' },
+  [BudgetRangeOption.RANGE_500_2000]: { en: '500 - 2,000', zh: '500-2000' },
+  [BudgetRangeOption.RANGE_2000_5000]: { en: '2,000 - 5,000', zh: '2000-5000' },
+  [BudgetRangeOption.OVER_5000]: { en: 'Over 5,000', zh: '5000以上' },
+  [BudgetRangeOption.CUSTOM]: { en: 'Custom', zh: '自定义' },
+};
+
+// ============================================
+// Device Takeover Enums
+// ============================================
+
+/**
+ * Reason for device takeover
+ */
+export enum TakeoverReason {
+  NEW_PURCHASE = 'NEW_PURCHASE',           // 新购设备
+  TRANSFER = 'TRANSFER',                   // 设备转让
+  NO_SUPPORT = 'NO_SUPPORT',               // 原厂商不再支持
+  SYSTEM_MIGRATION = 'SYSTEM_MIGRATION',   // 系统迁移
+  OTHER = 'OTHER',
+}
+
+/**
+ * Takeover reason display names
+ */
+export const TAKEOVER_REASON_NAMES: Record<TakeoverReason, { en: string; zh: string }> = {
+  [TakeoverReason.NEW_PURCHASE]: { en: 'New Purchase', zh: '新购设备' },
+  [TakeoverReason.TRANSFER]: { en: 'Device Transfer', zh: '设备转让' },
+  [TakeoverReason.NO_SUPPORT]: { en: 'No Vendor Support', zh: '原厂商不再支持' },
+  [TakeoverReason.SYSTEM_MIGRATION]: { en: 'System Migration', zh: '系统迁移' },
+  [TakeoverReason.OTHER]: { en: 'Other', zh: '其他' },
+};
+
+/**
+ * Takeover request status
+ */
+export enum TakeoverStatus {
+  PENDING = 'PENDING',         // 待处理
+  INSPECTING = 'INSPECTING',   // 验机中
+  REVIEWING = 'REVIEWING',     // 审核中
+  APPROVED = 'APPROVED',       // 已批准
+  REJECTED = 'REJECTED',       // 已拒绝
+}
+
+/**
+ * Takeover status display names
+ */
+export const TAKEOVER_STATUS_NAMES: Record<TakeoverStatus, { en: string; zh: string }> = {
+  [TakeoverStatus.PENDING]: { en: 'Pending', zh: '待处理' },
+  [TakeoverStatus.INSPECTING]: { en: 'Inspecting', zh: '验机中' },
+  [TakeoverStatus.REVIEWING]: { en: 'Reviewing', zh: '审核中' },
+  [TakeoverStatus.APPROVED]: { en: 'Approved', zh: '已批准' },
+  [TakeoverStatus.REJECTED]: { en: 'Rejected', zh: '已拒绝' },
+};
+
+// ============================================
+// Maintenance Type Enums
+// ============================================
+
+/**
+ * Maintenance type for service records
+ */
+export enum MaintenanceType {
+  PREVENTIVE = 'PREVENTIVE',   // 预防性维护 (定期保养)
+  CORRECTIVE = 'CORRECTIVE',   // 纠正性维护 (故障维修)
+  EMERGENCY = 'EMERGENCY',     // 紧急维护 (突发故障)
+  UPGRADE = 'UPGRADE',         // 升级改造
+  INSPECTION = 'INSPECTION',   // 检测检验
+}
+
+/**
+ * Maintenance type display names
+ */
+export const MAINTENANCE_TYPE_NAMES: Record<MaintenanceType, { en: string; zh: string }> = {
+  [MaintenanceType.PREVENTIVE]: { en: 'Preventive', zh: '预防性维护' },
+  [MaintenanceType.CORRECTIVE]: { en: 'Corrective', zh: '纠正性维护' },
+  [MaintenanceType.EMERGENCY]: { en: 'Emergency', zh: '紧急维护' },
+  [MaintenanceType.UPGRADE]: { en: 'Upgrade', zh: '升级改造' },
+  [MaintenanceType.INSPECTION]: { en: 'Inspection', zh: '检测检验' },
+};
+
+// ============================================
+// Points & Credit System Enums
+// ============================================
+
+/**
+ * Point transaction type
+ */
+export enum PointType {
+  REWARD = 'REWARD',     // 奖励积分 (可用于兑换)
+  CREDIT = 'CREDIT',     // 信用分 (影响排名和权益)
+  PENALTY = 'PENALTY',   // 惩罚扣分
+}
+
+/**
+ * Point type display names
+ */
+export const POINT_TYPE_NAMES: Record<PointType, { en: string; zh: string }> = {
+  [PointType.REWARD]: { en: 'Reward', zh: '奖励积分' },
+  [PointType.CREDIT]: { en: 'Credit', zh: '信用分' },
+  [PointType.PENALTY]: { en: 'Penalty', zh: '惩罚扣分' },
+};
+
+/**
+ * User credit level based on credit score
+ */
+export enum CreditLevel {
+  BRONZE = 'BRONZE',     // 青铜: 0-199
+  SILVER = 'SILVER',     // 白银: 200-499
+  GOLD = 'GOLD',         // 黄金: 500-999
+  PLATINUM = 'PLATINUM', // 铂金: 1000-1999
+  DIAMOND = 'DIAMOND',   // 钻石: 2000+
+}
+
+/**
+ * Credit level display names
+ */
+export const CREDIT_LEVEL_NAMES: Record<CreditLevel, { en: string; zh: string }> = {
+  [CreditLevel.BRONZE]: { en: 'Bronze', zh: '青铜' },
+  [CreditLevel.SILVER]: { en: 'Silver', zh: '白银' },
+  [CreditLevel.GOLD]: { en: 'Gold', zh: '黄金' },
+  [CreditLevel.PLATINUM]: { en: 'Platinum', zh: '铂金' },
+  [CreditLevel.DIAMOND]: { en: 'Diamond', zh: '钻石' },
+};
+
+/**
+ * Credit level thresholds
+ */
+export const CREDIT_LEVEL_THRESHOLDS: Record<CreditLevel, { min: number; max: number }> = {
+  [CreditLevel.BRONZE]: { min: 0, max: 199 },
+  [CreditLevel.SILVER]: { min: 200, max: 499 },
+  [CreditLevel.GOLD]: { min: 500, max: 999 },
+  [CreditLevel.PLATINUM]: { min: 1000, max: 1999 },
+  [CreditLevel.DIAMOND]: { min: 2000, max: Infinity },
+};
+
+/**
+ * Get credit level from score
+ */
+export function getCreditLevelFromScore(score: number): CreditLevel {
+  if (score >= 2000) return CreditLevel.DIAMOND;
+  if (score >= 1000) return CreditLevel.PLATINUM;
+  if (score >= 500) return CreditLevel.GOLD;
+  if (score >= 200) return CreditLevel.SILVER;
+  return CreditLevel.BRONZE;
+}
+
+/**
+ * Point action codes for rules configuration
+ */
+export enum PointActionCode {
+  // Reward actions
+  PUBLISH_SERVICE = 'PUBLISH_SERVICE',           // 发布服务请求 +10
+  FIRST_PUBLISH = 'FIRST_PUBLISH',               // 首次发布服务 +50
+  SERVICE_MATCHED = 'SERVICE_MATCHED',           // 服务请求被成功匹配 +20
+  SERVICE_COMPLETED = 'SERVICE_COMPLETED',       // 专家完成服务 +30
+  FIVE_STAR_REVIEW = 'FIVE_STAR_REVIEW',         // 获得5星好评 +50
+  ON_TIME_COMPLETION = 'ON_TIME_COMPLETION',     // 按时完成服务 +10
+  CUSTOMER_CONFIRMED = 'CUSTOMER_CONFIRMED',     // 客户确认完成 +15
+  CUSTOMER_REVIEWED = 'CUSTOMER_REVIEWED',       // 客户给出评价 +10
+  INVITE_REGISTER = 'INVITE_REGISTER',           // 邀请新用户注册 +100
+  INVITEE_FIRST_ORDER = 'INVITEE_FIRST_ORDER',   // 被邀请人首次交易 +200
+  DEVICE_TAKEOVER = 'DEVICE_TAKEOVER',           // 成功接管设备 +50
+  DEVICE_INSPECTION = 'DEVICE_INSPECTION',       // 专家完成验机 +30
+  DAILY_LOGIN_STREAK_7 = 'DAILY_LOGIN_STREAK_7', // 连续7天登录 +20
+  DAILY_LOGIN_STREAK_30 = 'DAILY_LOGIN_STREAK_30', // 连续30天活跃 +100
+  IDENTITY_VERIFIED = 'IDENTITY_VERIFIED',       // 完成实名认证 +100
+  CERTIFICATE_UPLOADED = 'CERTIFICATE_UPLOADED', // 上传证书 +30
+
+  // Penalty actions
+  CANCEL_ORDER_EXPERT = 'CANCEL_ORDER_EXPERT',   // 专家无故取消订单 -50
+  CANCEL_ORDER_CUSTOMER = 'CANCEL_ORDER_CUSTOMER', // 客户无故取消已接单服务 -30
+  SERVICE_TIMEOUT = 'SERVICE_TIMEOUT',           // 服务超时未完成 -20
+  SERVICE_SEVERE_TIMEOUT = 'SERVICE_SEVERE_TIMEOUT', // 严重超时 -50
+  VALID_COMPLAINT = 'VALID_COMPLAINT',           // 收到有效投诉 -30
+  COMPLAINT_ESCALATED = 'COMPLAINT_ESCALATED',   // 投诉升级处理 -80
+  MALICIOUS_COMPLAINT = 'MALICIOUS_COMPLAINT',   // 恶意投诉他人 -100
+  ONE_STAR_REVIEW = 'ONE_STAR_REVIEW',           // 收到1星差评 -20
+  FAKE_REVIEW = 'FAKE_REVIEW',                   // 虚假评价 -100
+  HARASSMENT = 'HARASSMENT',                     // 辱骂/骚扰他人 -100
+  ORDER_FRAUD = 'ORDER_FRAUD',                   // 恶意刷单 -200
+  FRAUD = 'FRAUD',                               // 欺诈行为 -500
+  FAKE_PROFILE = 'FAKE_PROFILE',                 // 虚假资料 -100
+  NO_SHOW = 'NO_SHOW',                           // 预约后失约 -40
+}

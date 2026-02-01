@@ -10,6 +10,7 @@ import {
   SupplierProduct,
   IndividualExpert,
   UploadedFile,
+  ExpertWorkHistory,
 } from '../../database/entities';
 import { UploadModule } from '../upload/upload.module';
 import { ExpertModule } from '../expert/expert.module';
@@ -24,6 +25,7 @@ import { ExpertModule } from '../expert/expert.module';
       SupplierProduct,
       IndividualExpert,
       UploadedFile,
+      ExpertWorkHistory,
     ]),
     UploadModule,
     ExpertModule,

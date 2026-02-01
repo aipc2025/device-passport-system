@@ -12,6 +12,7 @@ import {
   ServiceRecordStatus,
   ReviewStatus,
   ServiceRequestStatus,
+  ExpertWorkStatus,
 } from '@device-passport/shared';
 
 interface CreateServiceRecordDto {
@@ -143,7 +144,18 @@ export class ExpertRatingService {
       status: ServiceRecordStatus.PENDING,
     });
 
-    return this.serviceRecordRepository.save(record);
+    const savedRecord = await this.serviceRecordRepository.save(record);
+
+    // Update expert status to BOOKED
+    await this.setExpertBookedStatus(dto.expertId);
+
+    // Update service request status to IN_PROGRESS (expert assigned)
+    await this.serviceRequestRepository.update(dto.serviceRequestId, {
+      status: ServiceRequestStatus.IN_PROGRESS,
+      assignedExpertId: dto.expertId,
+    });
+
+    return savedRecord;
   }
 
   /**
@@ -275,6 +287,8 @@ export class ExpertRatingService {
     // Handle specific status changes
     if (newStatus === ServiceRecordStatus.IN_PROGRESS && !record.actualStart) {
       record.actualStart = new Date();
+      // Update expert work status to IN_SERVICE
+      await this.setExpertInServiceStatus(record.expertId);
     }
 
     if (newStatus === ServiceRecordStatus.COMPLETED) {
@@ -293,10 +307,68 @@ export class ExpertRatingService {
         status: ServiceRequestStatus.COMPLETED,
         completedAt: new Date(),
       });
+
+      // Restore expert status after service completion
+      await this.restoreExpertStatusAfterService(record.expertId);
     }
 
     if (newStatus === ServiceRecordStatus.CANCELLED) {
       record.cancelledAt = new Date();
+      // Restore expert status after cancellation
+      await this.restoreExpertStatusAfterService(record.expertId);
+    }
+  }
+
+  /**
+   * Set expert work status to IN_SERVICE
+   */
+  private async setExpertInServiceStatus(expertId: string): Promise<void> {
+    const expert = await this.expertRepository.findOne({ where: { id: expertId } });
+    if (!expert) return;
+
+    expert.workStatus = ExpertWorkStatus.IN_SERVICE;
+    await this.expertRepository.save(expert);
+  }
+
+  /**
+   * Restore expert status after completing or cancelling a service
+   */
+  private async restoreExpertStatusAfterService(expertId: string): Promise<void> {
+    const expert = await this.expertRepository.findOne({ where: { id: expertId } });
+    if (!expert) return;
+
+    expert.activeServiceCount = Math.max(0, expert.activeServiceCount - 1);
+
+    // Check if expert has other active services
+    const activeServices = await this.serviceRecordRepository.count({
+      where: {
+        expertId: expert.id,
+        status: In([ServiceRecordStatus.PENDING, ServiceRecordStatus.IN_PROGRESS]),
+      },
+    });
+
+    if (activeServices > 0) {
+      expert.workStatus = ExpertWorkStatus.BOOKED;
+    } else {
+      expert.workStatus = ExpertWorkStatus.IDLE;
+    }
+
+    await this.expertRepository.save(expert);
+  }
+
+  /**
+   * Set expert status to BOOKED when assigned to a service
+   */
+  private async setExpertBookedStatus(expertId: string): Promise<void> {
+    const expert = await this.expertRepository.findOne({ where: { id: expertId } });
+    if (!expert) return;
+
+    if (expert.workStatus === ExpertWorkStatus.RUSHING ||
+        expert.workStatus === ExpertWorkStatus.IDLE) {
+      expert.workStatus = ExpertWorkStatus.BOOKED;
+      expert.rushingStartedAt = null;
+      expert.activeServiceCount += 1;
+      await this.expertRepository.save(expert);
     }
   }
 

@@ -35,3 +35,15 @@ export * from './expert-review.entity';
 // Expert Passport entities
 export * from './expert-work-history.entity';
 export * from './expert-passport-sequence.entity';
+
+// Device Takeover entities
+export * from './device-takeover-request.entity';
+
+// Points System entities
+export * from './point-account.entity';
+export * from './point-transaction.entity';
+export * from './point-rule.entity';
+
+// Invitation/Referral System entities
+export * from './invitation-code.entity';
+export * from './invitation-record.entity';

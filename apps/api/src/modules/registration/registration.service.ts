@@ -15,6 +15,7 @@ import {
   SupplierProduct,
   IndividualExpert,
   UploadedFile,
+  ExpertWorkHistory,
 } from '../../database/entities';
 import {
   CompanyRegistrationDto,
@@ -67,6 +68,8 @@ export class RegistrationService {
     private readonly productRepository: Repository<SupplierProduct>,
     @InjectRepository(IndividualExpert)
     private readonly expertRepository: Repository<IndividualExpert>,
+    @InjectRepository(ExpertWorkHistory)
+    private readonly workHistoryRepository: Repository<ExpertWorkHistory>,
     @InjectRepository(UploadedFile)
     private readonly uploadedFileRepository: Repository<UploadedFile>,
     private readonly uploadService: UploadService,
@@ -259,11 +262,36 @@ export class RegistrationService {
         currentLocation: dto.currentLocation,
         locationLat: dto.locationLat,
         locationLng: dto.locationLng,
+        // New fields
+        industries: dto.industries || [],
+        skills: dto.skills || [],
+        nationality: dto.nationality,
+        isProfilePublic: dto.isProfilePublic ?? true,
         registrationStatus: RegistrationStatus.PENDING,
       });
       const savedExpert = await queryRunner.manager.save(expert);
 
-      // 3. Link uploaded files
+      // 3. Create Work History entries
+      if (dto.workHistory && dto.workHistory.length > 0) {
+        const workHistories = dto.workHistory.map((wh) =>
+          queryRunner.manager.create(ExpertWorkHistory, {
+            expertId: savedExpert.id,
+            companyName: wh.companyName,
+            companyContactEmail: wh.companyContactEmail,
+            companyContactPhone: wh.companyContactPhone,
+            companyAddress: wh.companyAddress,
+            position: wh.position,
+            description: wh.description,
+            startDate: new Date(wh.startDate),
+            endDate: wh.endDate ? new Date(wh.endDate) : undefined,
+            isCurrent: wh.isCurrent ?? false,
+            isPublic: wh.isPublic ?? true,
+          }),
+        );
+        await queryRunner.manager.save(workHistories);
+      }
+
+      // 4. Link uploaded files
       if (dto.resumeFileId) {
         await queryRunner.manager.update(UploadedFile, dto.resumeFileId, {
           relatedEntityType: 'IndividualExpert',
@@ -536,7 +564,7 @@ export class RegistrationService {
   }> {
     const expert = await this.expertRepository.findOne({
       where: { id: expertId },
-      relations: ['user'],
+      relations: ['user', 'workHistories'],
     });
 
     if (!expert) {

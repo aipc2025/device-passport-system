@@ -63,6 +63,52 @@ export class ServiceRequestController {
     return this.serviceRequestService.getServiceTypes();
   }
 
+  @Post('public')
+  @Public()
+  @ApiOperation({ summary: 'Create a public service request (no authentication required)' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['title', 'description', 'serviceType', 'contactName', 'contactPhone', 'contactEmail'],
+      properties: {
+        title: { type: 'string' },
+        description: { type: 'string' },
+        serviceType: { type: 'string', enum: Object.values(ServiceType) },
+        category: { type: 'string', description: 'ServiceRequestCategory' },
+        urgency: { type: 'string', enum: Object.values(ServiceUrgency) },
+        passportCode: { type: 'string', description: 'Device passport code (optional)' },
+        laborDetails: {
+          type: 'object',
+          properties: {
+            estimatedDays: { type: 'number' },
+            workSchedule: { type: 'string' },
+            requiredCertifications: { type: 'array', items: { type: 'string' } },
+            experienceYears: { type: 'number' },
+            requiredWorkers: { type: 'number' },
+            workScope: { type: 'string' },
+            safetyRequirements: { type: 'string' },
+            materialsProvided: { type: 'boolean' },
+            materialsDescription: { type: 'string' },
+          },
+        },
+        serviceLocation: { type: 'string' },
+        locationLat: { type: 'number' },
+        locationLng: { type: 'number' },
+        contactName: { type: 'string' },
+        contactPhone: { type: 'string' },
+        contactEmail: { type: 'string' },
+        budgetMin: { type: 'number' },
+        budgetMax: { type: 'number' },
+        budgetCurrency: { type: 'string', default: 'USD' },
+        preferredDate: { type: 'string', format: 'date-time' },
+        requiredSkills: { type: 'array', items: { type: 'string' } },
+      },
+    },
+  })
+  async createPublic(@Body() data: Record<string, unknown>) {
+    return this.serviceRequestService.createPublic(data as any);
+  }
+
   @Get('public/:id')
   @Public()
   @ApiOperation({ summary: 'Get public service request detail' })

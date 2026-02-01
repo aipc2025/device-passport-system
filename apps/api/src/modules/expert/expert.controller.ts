@@ -29,6 +29,8 @@ import {
   validateExpertPassportCode,
   INDUSTRY_CODE_NAMES,
   SKILL_CODE_NAMES,
+  ExpertWorkStatus,
+  EXPERT_WORK_STATUS_NAMES,
 } from '@device-passport/shared';
 
 @ApiTags('Experts')
@@ -391,6 +393,68 @@ export class ExpertController {
   async generateNewPassportCode(@Param('id', ParseUUIDPipe) id: string) {
     const code = await this.expertService.generatePassportCode(id);
     return { expertCode: code };
+  }
+
+  // ==========================================
+  // Work Status Management Endpoints
+  // ==========================================
+
+  @Patch(':id/work-status')
+  @Roles(UserRole.CUSTOMER, UserRole.ENGINEER, UserRole.ADMIN)
+  @ApiOperation({ summary: 'Update expert work status' })
+  @ApiParam({ name: 'id', description: 'Expert ID' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        status: {
+          type: 'string',
+          enum: Object.values(ExpertWorkStatus),
+          description: 'New work status (RUSHING, IDLE, OFF_DUTY only)',
+        },
+      },
+      required: ['status'],
+    },
+  })
+  async updateWorkStatus(
+    @CurrentUser() user: TokenPayload,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() data: { status: ExpertWorkStatus },
+  ) {
+    return this.expertService.updateWorkStatus(id, user.sub, data.status);
+  }
+
+  @Get(':id/work-summary')
+  @Roles(UserRole.CUSTOMER, UserRole.ENGINEER, UserRole.ADMIN)
+  @ApiOperation({ summary: 'Get expert work summary (status, membership, active services)' })
+  @ApiParam({ name: 'id', description: 'Expert ID' })
+  async getWorkSummary(
+    @CurrentUser() user: TokenPayload,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
+    return this.expertService.getWorkSummary(id, user.sub);
+  }
+
+  @Post(':id/start-rushing')
+  @Roles(UserRole.CUSTOMER, UserRole.ENGINEER, UserRole.ADMIN)
+  @ApiOperation({ summary: 'Start rushing mode (priority order matching)' })
+  @ApiParam({ name: 'id', description: 'Expert ID' })
+  async startRushing(
+    @CurrentUser() user: TokenPayload,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
+    return this.expertService.startRushing(id, user.sub);
+  }
+
+  @Post(':id/stop-rushing')
+  @Roles(UserRole.CUSTOMER, UserRole.ENGINEER, UserRole.ADMIN)
+  @ApiOperation({ summary: 'Stop rushing mode' })
+  @ApiParam({ name: 'id', description: 'Expert ID' })
+  async stopRushing(
+    @CurrentUser() user: TokenPayload,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
+    return this.expertService.stopRushing(id, user.sub);
   }
 }
 

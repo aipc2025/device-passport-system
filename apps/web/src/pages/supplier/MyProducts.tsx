@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -17,6 +17,110 @@ import { marketplaceProductApi } from '../../services/api';
 import { MarketplaceListingStatus, MARKETPLACE_LISTING_STATUS_NAMES } from '@device-passport/shared';
 import toast from 'react-hot-toast';
 import clsx from 'clsx';
+
+// Hook to determine if dropdown should open upward
+function useDropdownPosition(isOpen: boolean) {
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const [openUpward, setOpenUpward] = useState(false);
+
+  useEffect(() => {
+    if (isOpen && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - rect.bottom;
+      // If less than 200px below, open upward
+      setOpenUpward(spaceBelow < 200);
+    }
+  }, [isOpen]);
+
+  return { buttonRef, openUpward };
+}
+
+// Product Action Menu with smart positioning
+interface ProductActionMenuProps {
+  product: any;
+  isOpen: boolean;
+  onToggle: () => void;
+  onClose: () => void;
+  onPause: () => void;
+  onActivate: () => void;
+  onDelete: () => void;
+  t: (key: string, fallback: string) => string;
+}
+
+function ProductActionMenu({
+  product,
+  isOpen,
+  onToggle,
+  onClose,
+  onPause,
+  onActivate,
+  onDelete,
+  t,
+}: ProductActionMenuProps) {
+  const { buttonRef, openUpward } = useDropdownPosition(isOpen);
+
+  return (
+    <div className="relative">
+      <button
+        ref={buttonRef}
+        onClick={onToggle}
+        className="p-2 hover:bg-gray-100 rounded-md"
+      >
+        <MoreVertical className="w-5 h-5 text-gray-400" />
+      </button>
+      {isOpen && (
+        <div
+          className={clsx(
+            'absolute right-0 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-50',
+            openUpward ? 'bottom-full mb-2' : 'top-full mt-2'
+          )}
+        >
+          <Link
+            to={`/supplier/products/${product.id}/edit`}
+            onClick={onClose}
+            className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+          >
+            <Edit className="w-4 h-4" />
+            {t('common.edit', 'Edit')}
+          </Link>
+          {product.status === MarketplaceListingStatus.ACTIVE ? (
+            <button
+              onClick={() => {
+                onPause();
+                onClose();
+              }}
+              className="flex items-center gap-2 w-full px-4 py-2 text-sm text-yellow-700 hover:bg-yellow-50"
+            >
+              <Pause className="w-4 h-4" />
+              {t('supplier.pause', 'Pause')}
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                onActivate();
+                onClose();
+              }}
+              className="flex items-center gap-2 w-full px-4 py-2 text-sm text-green-700 hover:bg-green-50"
+            >
+              <Play className="w-4 h-4" />
+              {t('supplier.activate', 'Activate')}
+            </button>
+          )}
+          <button
+            onClick={() => {
+              onDelete();
+              onClose();
+            }}
+            className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-700 hover:bg-red-50"
+          >
+            <Trash2 className="w-4 h-4" />
+            {t('common.delete', 'Delete')}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function MyProducts() {
   const { t } = useTranslation();
@@ -96,7 +200,7 @@ export default function MyProducts() {
           ))}
         </div>
       ) : products && products.length > 0 ? (
-        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div className="bg-white rounded-lg border border-gray-200 overflow-visible">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
@@ -167,60 +271,20 @@ export default function MyProducts() {
                     </div>
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <div className="relative">
-                      <button
-                        onClick={() => setOpenMenu(openMenu === product.id ? null : product.id)}
-                        className="p-2 hover:bg-gray-100 rounded-md"
-                      >
-                        <MoreVertical className="w-5 h-5 text-gray-400" />
-                      </button>
-                      {openMenu === product.id && (
-                        <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-10">
-                          <Link
-                            to={`/supplier/products/${product.id}/edit`}
-                            className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                          >
-                            <Edit className="w-4 h-4" />
-                            {t('common.edit', 'Edit')}
-                          </Link>
-                          {product.status === MarketplaceListingStatus.ACTIVE ? (
-                            <button
-                              onClick={() => {
-                                pauseMutation.mutate(product.id);
-                                setOpenMenu(null);
-                              }}
-                              className="flex items-center gap-2 w-full px-4 py-2 text-sm text-yellow-700 hover:bg-yellow-50"
-                            >
-                              <Pause className="w-4 h-4" />
-                              {t('supplier.pause', 'Pause')}
-                            </button>
-                          ) : (
-                            <button
-                              onClick={() => {
-                                activateMutation.mutate(product.id);
-                                setOpenMenu(null);
-                              }}
-                              className="flex items-center gap-2 w-full px-4 py-2 text-sm text-green-700 hover:bg-green-50"
-                            >
-                              <Play className="w-4 h-4" />
-                              {t('supplier.activate', 'Activate')}
-                            </button>
-                          )}
-                          <button
-                            onClick={() => {
-                              if (confirm(t('supplier.confirmDelete', 'Are you sure you want to remove this product?'))) {
-                                deleteMutation.mutate(product.id);
-                              }
-                              setOpenMenu(null);
-                            }}
-                            className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-700 hover:bg-red-50"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                            {t('common.delete', 'Delete')}
-                          </button>
-                        </div>
-                      )}
-                    </div>
+                    <ProductActionMenu
+                      product={product}
+                      isOpen={openMenu === product.id}
+                      onToggle={() => setOpenMenu(openMenu === product.id ? null : product.id)}
+                      onClose={() => setOpenMenu(null)}
+                      onPause={() => pauseMutation.mutate(product.id)}
+                      onActivate={() => activateMutation.mutate(product.id)}
+                      onDelete={() => {
+                        if (confirm(t('supplier.confirmDelete', 'Are you sure you want to remove this product?'))) {
+                          deleteMutation.mutate(product.id);
+                        }
+                      }}
+                      t={t}
+                    />
                   </td>
                 </tr>
               ))}

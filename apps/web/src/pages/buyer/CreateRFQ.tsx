@@ -10,6 +10,8 @@ import {
   PurchaseFrequency,
   PURCHASE_FREQUENCY_NAMES,
   RFQStatus,
+  CurrencyCode,
+  CURRENCY_NAMES,
 } from '@device-passport/shared';
 import toast from 'react-hot-toast';
 
@@ -43,7 +45,7 @@ export default function CreateRFQ() {
     formState: { errors },
   } = useForm<RFQFormData>({
     defaultValues: {
-      budgetCurrency: 'USD',
+      budgetCurrency: CurrencyCode.CNY,
       isPublic: true,
       showCompanyInfo: true,
       status: RFQStatus.DRAFT,
@@ -254,11 +256,11 @@ export default function CreateRFQ() {
                 {...register('budgetCurrency')}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500"
               >
-                <option value="USD">USD</option>
-                <option value="EUR">EUR</option>
-                <option value="CNY">CNY</option>
-                <option value="VND">VND</option>
-                <option value="JPY">JPY</option>
+                {Object.values(CurrencyCode).map((currency) => (
+                  <option key={currency} value={currency}>
+                    {currency} ({CURRENCY_NAMES[currency]?.symbol})
+                  </option>
+                ))}
               </select>
             </div>
           </div>

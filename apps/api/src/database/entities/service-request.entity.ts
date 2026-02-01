@@ -8,9 +8,38 @@ import {
   OneToMany,
   JoinColumn,
 } from 'typeorm';
-import { ServiceType, ServiceRequestStatus, ServiceUrgency } from '@device-passport/shared';
+import {
+  ServiceType,
+  ServiceRequestStatus,
+  ServiceUrgency,
+  ServiceRequestCategory,
+  DeviceStatus,
+} from '@device-passport/shared';
 import { Organization } from './organization.entity';
 import { User } from './user.entity';
+import { DevicePassport } from './device-passport.entity';
+
+// Device snapshot at the time of service request creation
+export interface DeviceSnapshot {
+  deviceName: string;
+  deviceModel?: string;
+  manufacturer?: string;
+  currentStatus: DeviceStatus;
+  warrantyExpiry?: Date;
+}
+
+// Labor service details for non-device service requests
+export interface LaborDetails {
+  estimatedDays?: number;
+  workSchedule?: string;
+  requiredCertifications?: string[];
+  experienceYears?: number;
+  requiredWorkers?: number;
+  workScope?: string;
+  safetyRequirements?: string;
+  materialsProvided?: boolean;
+  materialsDescription?: string;
+}
 
 @Entity('service_requests')
 export class ServiceRequest {
@@ -29,12 +58,12 @@ export class ServiceRequest {
   @Column({ name: 'organization_id', nullable: true })
   organizationId: string;
 
-  // Created by user
-  @ManyToOne(() => User)
+  // Created by user (nullable for public requests)
+  @ManyToOne(() => User, { nullable: true })
   @JoinColumn({ name: 'created_by_user_id' })
   createdBy: User;
 
-  @Column({ name: 'created_by_user_id' })
+  @Column({ name: 'created_by_user_id', nullable: true })
   createdByUserId: string;
 
   // Basic information
@@ -50,6 +79,42 @@ export class ServiceRequest {
     length: 50,
   })
   serviceType: ServiceType;
+
+  // Service request category
+  @Column({
+    type: 'varchar',
+    length: 50,
+    default: ServiceRequestCategory.DEVICE_REPAIR,
+  })
+  category: ServiceRequestCategory;
+
+  // ============================================
+  // Device Association Fields
+  // ============================================
+
+  // Related device passport (optional for labor services)
+  @ManyToOne(() => DevicePassport, { nullable: true })
+  @JoinColumn({ name: 'passport_id' })
+  passport: DevicePassport;
+
+  @Column({ name: 'passport_id', nullable: true })
+  passportId: string;
+
+  // Redundant passport code for easier querying
+  @Column({ name: 'passport_code', type: 'varchar', length: 50, nullable: true })
+  passportCode: string;
+
+  // Device info snapshot at request creation time
+  @Column({ name: 'device_snapshot', type: 'jsonb', nullable: true })
+  deviceSnapshot: DeviceSnapshot;
+
+  // ============================================
+  // Labor Service Fields
+  // ============================================
+
+  // Labor service details (for non-device services)
+  @Column({ name: 'labor_details', type: 'jsonb', nullable: true })
+  laborDetails: LaborDetails;
 
   @Column({
     type: 'varchar',

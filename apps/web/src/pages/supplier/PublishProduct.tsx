@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Save } from 'lucide-react';
 import { marketplaceProductApi } from '../../services/api';
-import { ProductLine, PRODUCT_TYPE_NAMES, MarketplaceListingStatus } from '@device-passport/shared';
+import { ProductLine, PRODUCT_TYPE_NAMES, MarketplaceListingStatus, CurrencyCode, CURRENCY_NAMES } from '@device-passport/shared';
 import toast from 'react-hot-toast';
 
 interface ProductFormData {
@@ -36,7 +36,7 @@ export default function PublishProduct() {
   } = useForm<ProductFormData>({
     defaultValues: {
       showPrice: true,
-      priceCurrency: 'USD',
+      priceCurrency: CurrencyCode.CNY,
       status: MarketplaceListingStatus.DRAFT,
     },
   });
@@ -50,8 +50,14 @@ export default function PublishProduct() {
       toast.success(t('supplier.productCreated', 'Product published successfully'));
       navigate('/supplier/products');
     },
-    onError: () => {
-      toast.error(t('supplier.productCreateFailed', 'Failed to publish product'));
+    onError: (error: unknown) => {
+      const err = error as { response?: { data?: { message?: string | string[] } } };
+      const msg = err.response?.data?.message;
+      if (Array.isArray(msg)) {
+        toast.error(msg.join(', '));
+      } else {
+        toast.error(msg || t('supplier.productCreateFailed', 'Failed to publish product'));
+      }
     },
   });
 
@@ -199,11 +205,11 @@ export default function PublishProduct() {
                     {...register('priceCurrency')}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
                   >
-                    <option value="USD">USD</option>
-                    <option value="EUR">EUR</option>
-                    <option value="CNY">CNY</option>
-                    <option value="VND">VND</option>
-                    <option value="JPY">JPY</option>
+                    {Object.values(CurrencyCode).map((currency) => (
+                      <option key={currency} value={currency}>
+                        {currency} ({CURRENCY_NAMES[currency]?.symbol})
+                      </option>
+                    ))}
                   </select>
                 </div>
                 <div>

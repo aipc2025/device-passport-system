@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -10,11 +10,128 @@ import {
   MoreVertical,
   Edit,
   Trash2,
+  Play,
+  XCircle,
 } from 'lucide-react';
 import { marketplaceRfqApi } from '../../services/api';
 import { RFQStatus, RFQ_STATUS_NAMES } from '@device-passport/shared';
 import toast from 'react-hot-toast';
 import clsx from 'clsx';
+
+// Hook to determine if dropdown should open upward
+function useDropdownPosition(isOpen: boolean) {
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const [openUpward, setOpenUpward] = useState(false);
+
+  useEffect(() => {
+    if (isOpen && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - rect.bottom;
+      // If less than 200px below, open upward
+      setOpenUpward(spaceBelow < 200);
+    }
+  }, [isOpen]);
+
+  return { buttonRef, openUpward };
+}
+
+// RFQ Action Menu with smart positioning
+interface RFQActionMenuProps {
+  rfq: any;
+  isOpen: boolean;
+  onToggle: () => void;
+  onClose: () => void;
+  onOpen: () => void;
+  onCloseRfq: () => void;
+  onDelete: () => void;
+  t: (key: string, fallback: string) => string;
+}
+
+function RFQActionMenu({
+  rfq,
+  isOpen,
+  onToggle,
+  onClose,
+  onOpen,
+  onCloseRfq,
+  onDelete,
+  t,
+}: RFQActionMenuProps) {
+  const { buttonRef, openUpward } = useDropdownPosition(isOpen);
+
+  // Determine which actions are available based on status
+  const canEdit = [RFQStatus.DRAFT, RFQStatus.OPEN].includes(rfq.status);
+  const canOpen = [RFQStatus.DRAFT, RFQStatus.CLOSED].includes(rfq.status);
+  const canClose = rfq.status === RFQStatus.OPEN;
+  const canDelete = [RFQStatus.DRAFT, RFQStatus.OPEN, RFQStatus.CLOSED].includes(rfq.status);
+
+  return (
+    <div className="relative">
+      <button
+        ref={buttonRef}
+        onClick={onToggle}
+        className="p-2 hover:bg-gray-100 rounded-md"
+      >
+        <MoreVertical className="w-5 h-5 text-gray-400" />
+      </button>
+      {isOpen && (
+        <div
+          className={clsx(
+            'absolute right-0 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-50',
+            openUpward ? 'bottom-full mb-2' : 'top-full mt-2'
+          )}
+        >
+          {canEdit && (
+            <Link
+              to={`/buyer/rfqs/${rfq.id}/edit`}
+              onClick={onClose}
+              className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+            >
+              <Edit className="w-4 h-4" />
+              {t('common.edit', 'Edit')}
+            </Link>
+          )}
+          {canOpen && (
+            <button
+              onClick={() => {
+                onOpen();
+                onClose();
+              }}
+              className="flex items-center gap-2 w-full px-4 py-2 text-sm text-green-700 hover:bg-green-50"
+            >
+              <Play className="w-4 h-4" />
+              {t('buyer.openRfq', 'Open')}
+            </button>
+          )}
+          {canClose && (
+            <button
+              onClick={() => {
+                onCloseRfq();
+                onClose();
+              }}
+              className="flex items-center gap-2 w-full px-4 py-2 text-sm text-yellow-700 hover:bg-yellow-50"
+            >
+              <XCircle className="w-4 h-4" />
+              {t('buyer.closeRfq', 'Close')}
+            </button>
+          )}
+          {canDelete && (
+            <button
+              onClick={() => {
+                onDelete();
+                onClose();
+              }}
+              className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-700 hover:bg-red-50"
+            >
+              <Trash2 className="w-4 h-4" />
+              {t('common.delete', 'Delete')}
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function MyRFQs() {
   const { t } = useTranslation();
@@ -26,11 +143,32 @@ export default function MyRFQs() {
     queryFn: () => marketplaceRfqApi.getMyRfqs(),
   });
 
+  const updateStatusMutation = useMutation({
+    mutationFn: ({ id, status }: { id: string; status: RFQStatus }) =>
+      marketplaceRfqApi.update(id, { status }),
+    onSuccess: (_, { status }) => {
+      queryClient.invalidateQueries({ queryKey: ['my-rfqs'] });
+      if (status === RFQStatus.OPEN) {
+        toast.success(t('buyer.rfqOpened', 'RFQ opened successfully'));
+      } else if (status === RFQStatus.CLOSED) {
+        toast.success(t('buyer.rfqClosed', 'RFQ closed'));
+      }
+    },
+    onError: (error: unknown) => {
+      const err = error as { response?: { data?: { message?: string } } };
+      toast.error(err.response?.data?.message || t('buyer.updateFailed', 'Failed to update RFQ'));
+    },
+  });
+
   const deleteMutation = useMutation({
     mutationFn: (id: string) => marketplaceRfqApi.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-rfqs'] });
       toast.success(t('buyer.rfqCancelled', 'RFQ cancelled'));
+    },
+    onError: (error: unknown) => {
+      const err = error as { response?: { data?: { message?: string } } };
+      toast.error(err.response?.data?.message || t('buyer.deleteFailed', 'Failed to delete RFQ'));
     },
   });
 
@@ -52,6 +190,11 @@ export default function MyRFQs() {
         return 'bg-gray-100 text-gray-800';
     }
   };
+
+  // Filter out cancelled RFQs
+  const visibleRfqs = rfqs?.filter(
+    (rfq: any) => rfq.status !== RFQStatus.CANCELLED
+  );
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
@@ -81,8 +224,8 @@ export default function MyRFQs() {
             <div key={i} className="bg-gray-100 rounded-lg h-24 animate-pulse" />
           ))}
         </div>
-      ) : rfqs && rfqs.length > 0 ? (
-        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+      ) : visibleRfqs && visibleRfqs.length > 0 ? (
+        <div className="bg-white rounded-lg border border-gray-200 overflow-visible">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
@@ -104,7 +247,7 @@ export default function MyRFQs() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {rfqs.map((rfq: any) => (
+              {visibleRfqs.map((rfq: any) => (
                 <tr key={rfq.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4">
                     <div className="flex items-center">
@@ -153,39 +296,20 @@ export default function MyRFQs() {
                     </div>
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <div className="relative">
-                      <button
-                        onClick={() => setOpenMenu(openMenu === rfq.id ? null : rfq.id)}
-                        className="p-2 hover:bg-gray-100 rounded-md"
-                      >
-                        <MoreVertical className="w-5 h-5 text-gray-400" />
-                      </button>
-                      {openMenu === rfq.id && (
-                        <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-10">
-                          <Link
-                            to={`/buyer/rfqs/${rfq.id}/edit`}
-                            className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                          >
-                            <Edit className="w-4 h-4" />
-                            {t('common.edit', 'Edit')}
-                          </Link>
-                          {rfq.status === RFQStatus.OPEN && (
-                            <button
-                              onClick={() => {
-                                if (confirm(t('buyer.confirmCancel', 'Are you sure you want to cancel this RFQ?'))) {
-                                  deleteMutation.mutate(rfq.id);
-                                }
-                                setOpenMenu(null);
-                              }}
-                              className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-700 hover:bg-red-50"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                              {t('buyer.cancel', 'Cancel')}
-                            </button>
-                          )}
-                        </div>
-                      )}
-                    </div>
+                    <RFQActionMenu
+                      rfq={rfq}
+                      isOpen={openMenu === rfq.id}
+                      onToggle={() => setOpenMenu(openMenu === rfq.id ? null : rfq.id)}
+                      onClose={() => setOpenMenu(null)}
+                      onOpen={() => updateStatusMutation.mutate({ id: rfq.id, status: RFQStatus.OPEN })}
+                      onCloseRfq={() => updateStatusMutation.mutate({ id: rfq.id, status: RFQStatus.CLOSED })}
+                      onDelete={() => {
+                        if (confirm(t('buyer.confirmCancel', 'Are you sure you want to cancel this RFQ?'))) {
+                          deleteMutation.mutate(rfq.id);
+                        }
+                      }}
+                      t={t}
+                    />
                   </td>
                 </tr>
               ))}

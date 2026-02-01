@@ -28,6 +28,9 @@ import ServiceOrderList from './pages/admin/ServiceOrderList';
 import ServiceOrderDetail from './pages/admin/ServiceOrderDetail';
 import SupplierList from './pages/admin/SupplierList';
 import PendingRegistrations from './pages/admin/PendingRegistrations';
+import PointRuleList from './pages/admin/PointRuleList';
+import DeviceTakeoverList from './pages/admin/DeviceTakeoverList';
+import ServiceRequestAdmin from './pages/admin/ServiceRequestAdmin';
 
 // Marketplace pages
 import MarketplaceHome from './pages/marketplace';
@@ -39,11 +42,13 @@ import RFQDetail from './pages/marketplace/RFQDetail';
 // Supplier pages
 import MyProducts from './pages/supplier/MyProducts';
 import PublishProduct from './pages/supplier/PublishProduct';
+import EditProduct from './pages/supplier/EditProduct';
 import SupplierMatches from './pages/supplier/SupplierMatches';
 
 // Buyer pages
 import MyRFQs from './pages/buyer/MyRFQs';
 import CreateRFQ from './pages/buyer/CreateRFQ';
+import EditRFQ from './pages/buyer/EditRFQ';
 import BuyerMatches from './pages/buyer/BuyerMatches';
 
 // Inquiry pages
@@ -55,7 +60,19 @@ import CreateInquiry from './pages/inquiries/CreateInquiry';
 import MatchDetail from './pages/matching/MatchDetail';
 
 // Expert pages
-import { ExpertDashboard, ExpertProfile, ExpertPassport, ServiceRecords, ExpertMatches, ServiceHall } from './pages/expert';
+import { ExpertDashboard, ExpertProfile, ExpertPassport, ServiceRecords, ServiceRecordDetail, ExpertMatches, ServiceHall } from './pages/expert';
+
+// Customer pages
+import MyServiceRecords from './pages/customer/MyServiceRecords';
+
+// Device Takeover pages
+import { DeviceTakeoverApply } from './pages/device-takeover';
+
+// Points pages
+import { MyPoints } from './pages/points';
+
+// Invitation pages
+import { MyInvitations } from './pages/invitation';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -101,6 +118,9 @@ function App() {
           <Route path="/service-orders/:id" element={<ServiceOrderDetail />} />
           <Route path="/suppliers" element={<SupplierList />} />
           <Route path="/registrations" element={<PendingRegistrations />} />
+          <Route path="/point-rules" element={<PointRuleList />} />
+          <Route path="/device-takeover" element={<DeviceTakeoverList />} />
+          <Route path="/service-requests" element={<ServiceRequestAdmin />} />
 
           {/* Marketplace routes */}
           <Route path="/marketplace" element={<MarketplaceHome />} />
@@ -112,11 +132,13 @@ function App() {
           {/* Supplier routes */}
           <Route path="/supplier/products" element={<MyProducts />} />
           <Route path="/supplier/products/publish" element={<PublishProduct />} />
+          <Route path="/supplier/products/:id/edit" element={<EditProduct />} />
           <Route path="/supplier/matches" element={<SupplierMatches />} />
 
           {/* Buyer routes */}
           <Route path="/buyer/rfqs" element={<MyRFQs />} />
           <Route path="/buyer/rfqs/create" element={<CreateRFQ />} />
+          <Route path="/buyer/rfqs/:id/edit" element={<EditRFQ />} />
           <Route path="/buyer/matches" element={<BuyerMatches />} />
 
           {/* Inquiry routes */}
@@ -133,8 +155,21 @@ function App() {
           <Route path="/expert/profile" element={<ExpertProfile />} />
           <Route path="/expert/passport" element={<ExpertPassport />} />
           <Route path="/expert/service-records" element={<ServiceRecords />} />
+          <Route path="/expert/service-records/:id" element={<ServiceRecordDetail />} />
           <Route path="/expert/matches" element={<ExpertMatches />} />
           <Route path="/expert/service-hall" element={<ServiceHall />} />
+
+          {/* Customer routes */}
+          <Route path="/my-service-records" element={<MyServiceRecords />} />
+
+          {/* Device Takeover routes */}
+          <Route path="/device-takeover/apply" element={<DeviceTakeoverApply />} />
+
+          {/* Points routes */}
+          <Route path="/my-points" element={<MyPoints />} />
+
+          {/* Invitation routes */}
+          <Route path="/my-invitations" element={<MyInvitations />} />
         </Route>
 
         {/* Fallback */}

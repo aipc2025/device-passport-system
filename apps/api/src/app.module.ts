@@ -20,6 +20,9 @@ import { ExpertModule } from './modules/expert/expert.module';
 import { ServiceRequestModule } from './modules/service-request/service-request.module';
 import { ExpertMatchingModule } from './modules/expert-matching/expert-matching.module';
 import { ExpertRatingModule } from './modules/expert-rating/expert-rating.module';
+import { PointModule } from './modules/point/point.module';
+import { InvitationModule } from './modules/invitation/invitation.module';
+import { DeviceTakeoverModule } from './modules/device-takeover/device-takeover.module';
 import databaseConfig from './config/database.config';
 import jwtConfig from './config/jwt.config';
 
@@ -73,6 +76,9 @@ import jwtConfig from './config/jwt.config';
     ServiceRequestModule,
     ExpertMatchingModule,
     ExpertRatingModule,
+    PointModule,
+    InvitationModule,
+    DeviceTakeoverModule,
   ],
 })
 export class AppModule {}

@@ -1,15 +1,17 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Grid, List, Loader2 } from 'lucide-react';
-import { marketplaceProductApi } from '../../services/api';
+import { marketplaceProductApi, savedApi } from '../../services/api';
 import { useMarketplaceStore } from '../../store/marketplace.store';
+import { useAuthStore } from '../../store/auth.store';
 import { ProductCard, SearchFilters } from '../../components/marketplace';
 import clsx from 'clsx';
 
 export default function ProductList() {
   const { t } = useTranslation();
   const { filters, sortBy, sortOrder, viewMode, setViewMode, userLocation } = useMarketplaceStore();
+  const { isAuthenticated } = useAuthStore();
   const [page, setPage] = useState(1);
   const limit = 20;
 
@@ -27,8 +29,33 @@ export default function ProductList() {
       }),
   });
 
-  const products = data?.items || [];
+  // Fetch saved product IDs for current user
+  const { data: savedData } = useQuery({
+    queryKey: ['saved-item-ids', 'PRODUCT'],
+    queryFn: () => savedApi.getSavedItemIds('PRODUCT'),
+    enabled: isAuthenticated,
+  });
+
+  const savedProductIds = useMemo(() => {
+    return new Set<string>(savedData?.ids || []);
+  }, [savedData]);
+
+  const rawProducts = data?.items || [];
   const meta = data?.meta || { page: 1, totalPages: 1, total: 0 };
+
+  // Sort products with favorites first
+  const products = useMemo(() => {
+    if (!isAuthenticated || savedProductIds.size === 0) {
+      return rawProducts;
+    }
+    return [...rawProducts].sort((a: any, b: any) => {
+      const aFavorited = savedProductIds.has(a.id);
+      const bFavorited = savedProductIds.has(b.id);
+      if (aFavorited && !bFavorited) return -1;
+      if (!aFavorited && bFavorited) return 1;
+      return 0;
+    });
+  }, [rawProducts, savedProductIds, isAuthenticated]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
@@ -91,7 +118,11 @@ export default function ProductList() {
           )}
         >
           {products.map((product: any) => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard
+              key={product.id}
+              product={product}
+              isFavorited={savedProductIds.has(product.id)}
+            />
           ))}
         </div>
       )}

@@ -14,6 +14,9 @@ import {
   IndustryCode,
   SkillCode,
   ExpertTypeCode,
+  ExpertWorkStatus,
+  ExpertMembershipLevel,
+  CreditLevel,
 } from '@device-passport/shared';
 import { User } from './user.entity';
 import { ExpertWorkHistory } from './expert-work-history.entity';
@@ -174,6 +177,77 @@ export class IndividualExpert {
   // Work history relation
   @OneToMany(() => ExpertWorkHistory, (workHistory) => workHistory.expert)
   workHistories: ExpertWorkHistory[];
+
+  // ============================================
+  // Work Status & Membership Fields
+  // ============================================
+
+  // Work status for service matching
+  @Column({
+    name: 'work_status',
+    type: 'varchar',
+    length: 20,
+    default: ExpertWorkStatus.IDLE,
+  })
+  workStatus: ExpertWorkStatus;
+
+  // Membership level
+  @Column({
+    name: 'membership_level',
+    type: 'varchar',
+    length: 20,
+    default: ExpertMembershipLevel.STANDARD,
+  })
+  membershipLevel: ExpertMembershipLevel;
+
+  // Membership expiration date
+  @Column({ name: 'membership_expires_at', type: 'timestamp', nullable: true })
+  membershipExpiresAt: Date | null;
+
+  // Current active service count
+  @Column({ name: 'active_service_count', type: 'int', default: 0 })
+  activeServiceCount: number;
+
+  // Maximum concurrent services
+  @Column({ name: 'max_concurrent_services', type: 'int', default: 1 })
+  maxConcurrentServices: number;
+
+  // When expert started rushing mode (for priority sorting)
+  @Column({ name: 'rushing_started_at', type: 'timestamp', nullable: true })
+  rushingStartedAt: Date | null;
+
+  // ============================================
+  // Credit System Fields
+  // ============================================
+
+  // Reward points (can be spent)
+  @Column({ name: 'reward_points', type: 'int', default: 0 })
+  rewardPoints: number;
+
+  // Credit score (affects ranking and privileges)
+  @Column({ name: 'credit_score', type: 'int', default: 100 })
+  creditScore: number;
+
+  // Credit level (calculated from credit_score)
+  @Column({
+    name: 'credit_level',
+    type: 'varchar',
+    length: 20,
+    default: CreditLevel.BRONZE,
+  })
+  creditLevel: CreditLevel;
+
+  // Total earned points (historical)
+  @Column({ name: 'total_earned_points', type: 'int', default: 0 })
+  totalEarnedPoints: number;
+
+  // Total spent points (historical)
+  @Column({ name: 'total_spent_points', type: 'int', default: 0 })
+  totalSpentPoints: number;
+
+  // Total penalty points (historical)
+  @Column({ name: 'total_penalty_points', type: 'int', default: 0 })
+  totalPenaltyPoints: number;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

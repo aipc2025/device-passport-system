@@ -4,7 +4,7 @@ import { useRegistrationStore } from '../../../store/registration.store';
 import { registrationApi } from '../../../services/api';
 import FileUploader from '../common/FileUploader';
 import MapPicker from '../../common/MapPicker';
-import { CompanyType, FileCategory } from '@device-passport/shared';
+import { CompanyType, FileCategory, CurrencyCode, CURRENCY_NAMES } from '@device-passport/shared';
 import { CheckCircleIcon, XCircleIcon, MapPinIcon } from '@heroicons/react/24/outline';
 
 export default function BusinessLicenseStep() {
@@ -219,18 +219,15 @@ export default function BusinessLicenseStep() {
                 placeholder="0.00"
               />
               <select
-                value={companyData.capitalCurrency || 'USD'}
+                value={companyData.capitalCurrency || CurrencyCode.CNY}
                 onChange={(e) => updateCompanyData({ capitalCurrency: e.target.value })}
-                className="select w-24"
+                className="select w-28"
               >
-                <option value="USD">USD</option>
-                <option value="EUR">EUR</option>
-                <option value="CNY">CNY</option>
-                <option value="VND">VND</option>
-                <option value="GBP">GBP</option>
-                <option value="JPY">JPY</option>
-                <option value="KRW">KRW</option>
-                <option value="THB">THB</option>
+                {Object.values(CurrencyCode).map((currency) => (
+                  <option key={currency} value={currency}>
+                    {currency} ({CURRENCY_NAMES[currency]?.symbol})
+                  </option>
+                ))}
               </select>
             </div>
           </div>

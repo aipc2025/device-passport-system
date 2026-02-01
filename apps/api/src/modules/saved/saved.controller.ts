@@ -92,4 +92,31 @@ export class SavedController {
     await this.savedService.removeSavedItem(user.sub, id);
     return { success: true };
   }
+
+  @Post('toggle')
+  @Roles(UserRole.CUSTOMER, UserRole.OPERATOR, UserRole.ADMIN)
+  @ApiOperation({ summary: 'Toggle save status of an item' })
+  async toggleSave(
+    @CurrentUser() user: TokenPayload,
+    @Body() dto: CreateSavedItemDto,
+  ) {
+    return this.savedService.toggleSave(
+      user.sub,
+      user.organizationId || '',
+      dto.itemType,
+      dto.itemId,
+    );
+  }
+
+  @Get('ids/:type')
+  @Roles(UserRole.CUSTOMER, UserRole.OPERATOR, UserRole.ADMIN)
+  @ApiOperation({ summary: 'Get saved item IDs for a specific type' })
+  @ApiParam({ name: 'type', enum: SavedItemType })
+  async getSavedItemIds(
+    @CurrentUser() user: TokenPayload,
+    @Param('type') type: SavedItemType,
+  ) {
+    const ids = await this.savedService.getSavedItemIds(user.sub, type);
+    return { ids };
+  }
 }

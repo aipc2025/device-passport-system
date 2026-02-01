@@ -9,6 +9,7 @@ import {
   Query,
   UseGuards,
   ParseUUIDPipe,
+  BadRequestException,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -90,28 +91,34 @@ export class MarketplaceController {
 
   @Get('products/my/list')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.OPERATOR, UserRole.ADMIN)
+  @Roles(UserRole.CUSTOMER, UserRole.OPERATOR, UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get my published products' })
   async getMyProducts(@CurrentUser() user: TokenPayload) {
-    return this.marketplaceService.getMyProducts(user.organizationId!);
+    if (!user.organizationId) {
+      throw new BadRequestException('Organization is required to view products. Please complete your company registration.');
+    }
+    return this.marketplaceService.getMyProducts(user.organizationId);
   }
 
   @Post('products')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.OPERATOR, UserRole.ADMIN)
+  @Roles(UserRole.CUSTOMER, UserRole.OPERATOR, UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Publish a product to marketplace' })
   async createProduct(
     @CurrentUser() user: TokenPayload,
     @Body() dto: CreateMarketplaceProductDto,
   ) {
-    return this.marketplaceService.createProduct(user.organizationId!, dto);
+    if (!user.organizationId) {
+      throw new BadRequestException('Organization is required to publish products. Please complete your company registration.');
+    }
+    return this.marketplaceService.createProduct(user.organizationId, dto);
   }
 
   @Patch('products/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.OPERATOR, UserRole.ADMIN)
+  @Roles(UserRole.CUSTOMER, UserRole.OPERATOR, UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update a marketplace product' })
   @ApiParam({ name: 'id', description: 'Marketplace product ID' })
@@ -120,12 +127,15 @@ export class MarketplaceController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateMarketplaceProductDto,
   ) {
-    return this.marketplaceService.updateProduct(user.organizationId!, id, dto);
+    if (!user.organizationId) {
+      throw new BadRequestException('Organization is required');
+    }
+    return this.marketplaceService.updateProduct(user.organizationId, id, dto);
   }
 
   @Delete('products/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.OPERATOR, UserRole.ADMIN)
+  @Roles(UserRole.CUSTOMER, UserRole.OPERATOR, UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Remove a product from marketplace' })
   @ApiParam({ name: 'id', description: 'Marketplace product ID' })
@@ -133,13 +143,16 @@ export class MarketplaceController {
     @CurrentUser() user: TokenPayload,
     @Param('id', ParseUUIDPipe) id: string,
   ) {
-    await this.marketplaceService.deleteProduct(user.organizationId!, id);
+    if (!user.organizationId) {
+      throw new BadRequestException('Organization is required');
+    }
+    await this.marketplaceService.deleteProduct(user.organizationId, id);
     return { success: true };
   }
 
   @Post('products/:id/pause')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.OPERATOR, UserRole.ADMIN)
+  @Roles(UserRole.CUSTOMER, UserRole.OPERATOR, UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Pause a product listing' })
   @ApiParam({ name: 'id', description: 'Marketplace product ID' })
@@ -147,12 +160,15 @@ export class MarketplaceController {
     @CurrentUser() user: TokenPayload,
     @Param('id', ParseUUIDPipe) id: string,
   ) {
-    return this.marketplaceService.pauseProduct(user.organizationId!, id);
+    if (!user.organizationId) {
+      throw new BadRequestException('Organization is required');
+    }
+    return this.marketplaceService.pauseProduct(user.organizationId, id);
   }
 
   @Post('products/:id/activate')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.OPERATOR, UserRole.ADMIN)
+  @Roles(UserRole.CUSTOMER, UserRole.OPERATOR, UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Activate a product listing' })
   @ApiParam({ name: 'id', description: 'Marketplace product ID' })
@@ -160,7 +176,10 @@ export class MarketplaceController {
     @CurrentUser() user: TokenPayload,
     @Param('id', ParseUUIDPipe) id: string,
   ) {
-    return this.marketplaceService.activateProduct(user.organizationId!, id);
+    if (!user.organizationId) {
+      throw new BadRequestException('Organization is required');
+    }
+    return this.marketplaceService.activateProduct(user.organizationId, id);
   }
 
   // ==========================================
@@ -173,7 +192,10 @@ export class MarketplaceController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get my RFQs' })
   async getMyRequirements(@CurrentUser() user: TokenPayload) {
-    return this.marketplaceService.getMyRequirements(user.organizationId!);
+    if (!user.organizationId) {
+      throw new BadRequestException('Organization is required to view RFQs. Please complete your company registration.');
+    }
+    return this.marketplaceService.getMyRequirements(user.organizationId);
   }
 
   @Post('requirements')
@@ -185,8 +207,11 @@ export class MarketplaceController {
     @CurrentUser() user: TokenPayload,
     @Body() dto: CreateBuyerRequirementDto,
   ) {
+    if (!user.organizationId) {
+      throw new BadRequestException('Organization is required to create RFQs. Please complete your company registration.');
+    }
     return this.marketplaceService.createRequirement(
-      user.organizationId!,
+      user.organizationId,
       user.sub,
       dto,
     );
@@ -203,8 +228,11 @@ export class MarketplaceController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateBuyerRequirementDto,
   ) {
+    if (!user.organizationId) {
+      throw new BadRequestException('Organization is required');
+    }
     return this.marketplaceService.updateRequirement(
-      user.organizationId!,
+      user.organizationId,
       id,
       dto,
     );
@@ -220,7 +248,10 @@ export class MarketplaceController {
     @CurrentUser() user: TokenPayload,
     @Param('id', ParseUUIDPipe) id: string,
   ) {
-    await this.marketplaceService.deleteRequirement(user.organizationId!, id);
+    if (!user.organizationId) {
+      throw new BadRequestException('Organization is required');
+    }
+    await this.marketplaceService.deleteRequirement(user.organizationId, id);
     return { success: true };
   }
 }

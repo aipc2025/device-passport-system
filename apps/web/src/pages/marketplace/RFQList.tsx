@@ -1,15 +1,17 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Grid, List, Loader2 } from 'lucide-react';
-import { marketplaceRfqApi } from '../../services/api';
+import { marketplaceRfqApi, savedApi } from '../../services/api';
 import { useMarketplaceStore } from '../../store/marketplace.store';
+import { useAuthStore } from '../../store/auth.store';
 import { RFQCard, SearchFilters } from '../../components/marketplace';
 import clsx from 'clsx';
 
 export default function RFQList() {
   const { t } = useTranslation();
   const { filters, sortBy, sortOrder, viewMode, setViewMode } = useMarketplaceStore();
+  const { isAuthenticated } = useAuthStore();
   const [page, setPage] = useState(1);
   const limit = 20;
 
@@ -25,8 +27,33 @@ export default function RFQList() {
       }),
   });
 
-  const rfqs = data?.items || [];
+  // Fetch saved RFQ IDs for current user
+  const { data: savedData } = useQuery({
+    queryKey: ['saved-item-ids', 'RFQ'],
+    queryFn: () => savedApi.getSavedItemIds('RFQ'),
+    enabled: isAuthenticated,
+  });
+
+  const savedRfqIds = useMemo(() => {
+    return new Set<string>(savedData?.ids || []);
+  }, [savedData]);
+
+  const rawRfqs = data?.items || [];
   const meta = data?.meta || { page: 1, totalPages: 1, total: 0 };
+
+  // Sort RFQs with favorites first
+  const rfqs = useMemo(() => {
+    if (!isAuthenticated || savedRfqIds.size === 0) {
+      return rawRfqs;
+    }
+    return [...rawRfqs].sort((a: any, b: any) => {
+      const aFavorited = savedRfqIds.has(a.id);
+      const bFavorited = savedRfqIds.has(b.id);
+      if (aFavorited && !bFavorited) return -1;
+      if (!aFavorited && bFavorited) return 1;
+      return 0;
+    });
+  }, [rawRfqs, savedRfqIds, isAuthenticated]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
@@ -89,7 +116,11 @@ export default function RFQList() {
           )}
         >
           {rfqs.map((rfq: any) => (
-            <RFQCard key={rfq.id} rfq={rfq} />
+            <RFQCard
+              key={rfq.id}
+              rfq={rfq}
+              isFavorited={savedRfqIds.has(rfq.id)}
+            />
           ))}
         </div>
       )}

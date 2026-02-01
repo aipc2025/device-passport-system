@@ -10,12 +10,16 @@ export const api = axios.create({
   },
 });
 
-// Request interceptor to add auth token
+// Request interceptor to add auth token and handle FormData
 api.interceptors.request.use(
   (config) => {
     const token = useAuthStore.getState().accessToken;
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+    }
+    // Remove Content-Type for FormData - let browser set it with boundary
+    if (config.data instanceof FormData) {
+      delete config.headers['Content-Type'];
     }
     return config;
   },
@@ -162,18 +166,16 @@ export const uploadApi = {
     if (passportCode) {
       formData.append('passportCode', passportCode);
     }
-    const response = await api.post('/upload/public', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    // Don't set Content-Type header - axios will set it automatically with the correct boundary
+    const response = await api.post('/upload/public', formData);
     return response.data;
   },
   uploadMultiple: async (files: File[], fileCategory: string) => {
     const formData = new FormData();
     files.forEach((file) => formData.append('files', file));
     formData.append('fileCategory', fileCategory);
-    const response = await api.post('/upload/multiple', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    // Don't set Content-Type header - axios will set it automatically with the correct boundary
+    const response = await api.post('/upload/multiple', formData);
     return response.data;
   },
   getFile: async (id: string) => {
@@ -293,6 +295,14 @@ export const serviceOrderApi = {
   addRecord: async (id: string, data: Record<string, unknown>) => {
     const response = await api.post(`/service-orders/${id}/records`, data);
     return response.data.data;
+  },
+  getAvailableEngineers: async () => {
+    const response = await api.get('/service-orders/assignees/available');
+    return response.data.data || response.data;
+  },
+  assignEngineer: async (orderId: string, engineerId: string) => {
+    const response = await api.post(`/service-orders/${orderId}/assign/${engineerId}`);
+    return response.data.data || response.data;
   },
 };
 
@@ -503,6 +513,14 @@ export const savedApi = {
     const response = await api.delete(`/saved/${id}`);
     return response.data;
   },
+  toggle: async (data: { itemType: string; itemId: string }) => {
+    const response = await api.post('/saved/toggle', data);
+    return response.data;
+  },
+  getSavedItemIds: async (type: string) => {
+    const response = await api.get(`/saved/ids/${type}`);
+    return response.data;
+  },
 };
 
 // ==========================================
@@ -594,6 +612,50 @@ export const expertApi = {
   },
   dismissExpertMatch: async (matchId: string) => {
     const response = await api.post(`/expert-matching/${matchId}/dismiss`);
+    return response.data.data || response.data;
+  },
+
+  // Admin Expert Matching
+  pushToExperts: async (serviceRequestId: string, expertIds: string[], source?: string) => {
+    const response = await api.post(`/expert-matching/push/${serviceRequestId}`, { expertIds, source });
+    return response.data.data || response.data;
+  },
+  getRushingExperts: async () => {
+    const response = await api.get('/expert-matching/rushing-experts');
+    return response.data.data || response.data;
+  },
+  searchExpertsForRequest: async (serviceRequestId: string, options?: { keyword?: string; workStatus?: string; minScore?: number; limit?: number }) => {
+    const response = await api.get(`/expert-matching/search/${serviceRequestId}`, { params: options });
+    return response.data.data || response.data;
+  },
+  triggerAutoMatchRushing: async (serviceRequestId?: string) => {
+    const response = await api.post('/expert-matching/auto-match-rushing', null, { params: { serviceRequestId } });
+    return response.data.data || response.data;
+  },
+  getMatchesForServiceRequest: async (serviceRequestId: string, limit = 50) => {
+    const response = await api.get(`/expert-matching/service-request/${serviceRequestId}`, { params: { limit } });
+    return response.data.data || response.data;
+  },
+  runMatchingForRequest: async (serviceRequestId: string) => {
+    const response = await api.post(`/expert-matching/service-request/${serviceRequestId}/run`);
+    return response.data.data || response.data;
+  },
+
+  // Work Status Management
+  getWorkSummary: async (expertId: string) => {
+    const response = await api.get(`/experts/${expertId}/work-summary`);
+    return response.data.data || response.data;
+  },
+  updateWorkStatus: async (expertId: string, status: string) => {
+    const response = await api.patch(`/experts/${expertId}/work-status`, { status });
+    return response.data.data || response.data;
+  },
+  startRushing: async (expertId: string) => {
+    const response = await api.post(`/experts/${expertId}/start-rushing`);
+    return response.data.data || response.data;
+  },
+  stopRushing: async (expertId: string) => {
+    const response = await api.post(`/experts/${expertId}/stop-rushing`);
     return response.data.data || response.data;
   },
 };
@@ -705,6 +767,84 @@ export const ratingApi = {
   },
 };
 
+// Service Request API
+export const serviceRequestApi = {
+  // Create public service request (no auth required)
+  createPublic: async (data: Record<string, unknown>) => {
+    const response = await api.post('/service-requests/public', data);
+    return response.data.data || response.data;
+  },
+  // Get service types
+  getTypes: async () => {
+    const response = await api.get('/service-requests/types');
+    return response.data.data || response.data;
+  },
+  // Get public service requests
+  getPublic: async (params?: Record<string, unknown>) => {
+    const response = await api.get('/service-requests/public', { params });
+    return response.data.data || response.data;
+  },
+  // Get public service request detail
+  getPublicDetail: async (id: string) => {
+    const response = await api.get(`/service-requests/public/${id}`);
+    return response.data.data || response.data;
+  },
+  // Authenticated endpoints
+  create: async (data: Record<string, unknown>) => {
+    const response = await api.post('/service-requests', data);
+    return response.data.data || response.data;
+  },
+  getMy: async () => {
+    const response = await api.get('/service-requests/my');
+    return response.data.data || response.data;
+  },
+  getById: async (id: string) => {
+    const response = await api.get(`/service-requests/${id}`);
+    return response.data.data || response.data;
+  },
+  update: async (id: string, data: Record<string, unknown>) => {
+    const response = await api.patch(`/service-requests/${id}`, data);
+    return response.data.data || response.data;
+  },
+  publish: async (id: string) => {
+    const response = await api.post(`/service-requests/${id}/publish`);
+    return response.data.data || response.data;
+  },
+  cancel: async (id: string, reason?: string) => {
+    const response = await api.post(`/service-requests/${id}/cancel`, { reason });
+    return response.data.data || response.data;
+  },
+  complete: async (id: string) => {
+    const response = await api.post(`/service-requests/${id}/complete`);
+    return response.data.data || response.data;
+  },
+  // Applications
+  getApplications: async (id: string) => {
+    const response = await api.get(`/service-requests/${id}/applications`);
+    return response.data.data || response.data;
+  },
+  apply: async (id: string, data?: Record<string, unknown>) => {
+    const response = await api.post(`/service-requests/${id}/apply`, data);
+    return response.data.data || response.data;
+  },
+  getMyApplications: async () => {
+    const response = await api.get('/service-requests/applications/my');
+    return response.data.data || response.data;
+  },
+  acceptApplication: async (applicationId: string) => {
+    const response = await api.post(`/service-requests/applications/${applicationId}/accept`);
+    return response.data.data || response.data;
+  },
+  rejectApplication: async (applicationId: string, reason?: string) => {
+    const response = await api.post(`/service-requests/applications/${applicationId}/reject`, { reason });
+    return response.data.data || response.data;
+  },
+  withdrawApplication: async (applicationId: string) => {
+    const response = await api.delete(`/service-requests/applications/${applicationId}`);
+    return response.data.data || response.data;
+  },
+};
+
 // Admin Expert API
 export const adminExpertApi = {
   getAllExperts: async (params?: {
@@ -723,3 +863,139 @@ export const adminExpertApi = {
     return response.data.data || response.data;
   },
 };
+
+// Device Takeover API
+export const deviceTakeoverApi = {
+  // Create a takeover request
+  create: async (data: Record<string, unknown>) => {
+    const response = await api.post('/device-takeover', data);
+    return response.data.data || response.data;
+  },
+
+  // Get my takeover requests
+  getMyRequests: async () => {
+    const response = await api.get('/device-takeover/my-requests');
+    return response.data.data || response.data;
+  },
+
+  // Get single request
+  getById: async (id: string) => {
+    const response = await api.get(`/device-takeover/${id}`);
+    return response.data.data || response.data;
+  },
+
+  // Admin endpoints
+  getAll: async (params?: { status?: string; page?: number; limit?: number }) => {
+    const response = await api.get('/admin/device-takeover', { params });
+    return response.data.data || response.data;
+  },
+
+  assignExpert: async (id: string, expertId: string) => {
+    const response = await api.post(`/admin/device-takeover/${id}/assign-expert`, { expertId });
+    return response.data.data || response.data;
+  },
+
+  approve: async (id: string, notes?: string) => {
+    const response = await api.post(`/admin/device-takeover/${id}/approve`, { notes });
+    return response.data.data || response.data;
+  },
+
+  reject: async (id: string, reason: string) => {
+    const response = await api.post(`/admin/device-takeover/${id}/reject`, { reason });
+    return response.data.data || response.data;
+  },
+
+  // Expert inspection
+  submitInspection: async (id: string, data: Record<string, unknown>) => {
+    const response = await api.post(`/device-takeover/expert/${id}/inspection-report`, data);
+    return response.data.data || response.data;
+  },
+};
+
+// Points API
+export const pointsApi = {
+  // Get my point account
+  getMyAccount: async () => {
+    const response = await api.get('/points/my-account');
+    return response.data.data || response.data;
+  },
+
+  // Get my transactions
+  getMyTransactions: async (params?: { page?: number; limit?: number; pointType?: string }) => {
+    const response = await api.get('/points/my-transactions', { params });
+    return response.data.data || response.data;
+  },
+
+  // Get active rules (for displaying to users)
+  getRules: async () => {
+    const response = await api.get('/points/rules');
+    return response.data.data || response.data;
+  },
+
+  // Admin endpoints
+  getAllRules: async () => {
+    const response = await api.get('/admin/point-rules');
+    return response.data.data || response.data;
+  },
+
+  getStatistics: async () => {
+    const response = await api.get('/admin/point-rules/statistics');
+    return response.data.data || response.data;
+  },
+
+  createRule: async (data: Record<string, unknown>) => {
+    const response = await api.post('/admin/point-rules', data);
+    return response.data.data || response.data;
+  },
+
+  updateRule: async (id: string, data: Record<string, unknown>) => {
+    const response = await api.patch(`/admin/point-rules/${id}`, data);
+    return response.data.data || response.data;
+  },
+
+  deleteRule: async (id: string) => {
+    const response = await api.delete(`/admin/point-rules/${id}`);
+    return response.data.data || response.data;
+  },
+
+  seedDefaultRules: async () => {
+    const response = await api.post('/admin/point-rules/seed');
+    return response.data.data || response.data;
+  },
+};
+
+// Invitation API
+export const invitationApi = {
+  // Generate an invitation code
+  generateCode: async (data?: { maxUses?: number; expiresInDays?: number; campaign?: string; channel?: string }) => {
+    const response = await api.post('/invitations/codes', data);
+    return response.data.data || response.data;
+  },
+
+  // Get my invitation codes
+  getMyCodes: async () => {
+    const response = await api.get('/invitations/codes');
+    return response.data.data || response.data;
+  },
+
+  // Deactivate an invitation code
+  deactivateCode: async (id: string) => {
+    const response = await api.delete(`/invitations/codes/${id}`);
+    return response.data.data || response.data;
+  },
+
+  // Validate an invitation code (public)
+  validateCode: async (code: string) => {
+    const response = await api.get(`/invitations/validate/${code}`);
+    return response.data.data || response.data;
+  },
+
+  // Get my invitation records and stats
+  getMyRecords: async () => {
+    const response = await api.get('/invitations/records');
+    return response.data.data || response.data;
+  },
+};
+
+// Alias for ratingApi (for backward compatibility)
+export const expertRatingApi = ratingApi;

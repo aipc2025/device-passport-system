@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Package, MapPin, Clock, Eye, MessageSquare, Star } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { MarketplaceListingStatus, PRODUCT_TYPE_NAMES } from '@device-passport/shared';
+import FavoriteButton from './FavoriteButton';
 
 interface ProductCardProps {
   product: {
@@ -27,9 +28,10 @@ interface ProductCardProps {
   };
   onContact?: () => void;
   showActions?: boolean;
+  isFavorited?: boolean;
 }
 
-export default function ProductCard({ product, onContact, showActions = true }: ProductCardProps) {
+export default function ProductCard({ product, onContact, showActions = true, isFavorited = false }: ProductCardProps) {
   const { t } = useTranslation();
 
   const formatPrice = (min?: number, max?: number, currency = 'USD') => {
@@ -65,6 +67,13 @@ export default function ProductCard({ product, onContact, showActions = true }: 
               </p>
             )}
           </div>
+          <FavoriteButton
+            itemId={product.id}
+            itemType="PRODUCT"
+            isFavorited={isFavorited}
+            size="md"
+            className="flex-shrink-0 ml-2"
+          />
         </div>
 
         {/* Category badge */}

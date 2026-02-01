@@ -16,13 +16,18 @@ import {
   ExpertApplicationStatus,
   ServiceType,
   ServiceUrgency,
+  ServiceRequestCategory,
 } from '@device-passport/shared';
+import { LaborDetails } from '../../database/entities/service-request.entity';
 
 interface CreateServiceRequestDto {
   title: string;
   description: string;
   serviceType: ServiceType;
+  category?: ServiceRequestCategory;
   urgency?: ServiceUrgency;
+  passportCode?: string;
+  laborDetails?: LaborDetails;
   serviceLocation?: string;
   locationLat?: number;
   locationLng?: number;
@@ -37,6 +42,27 @@ interface CreateServiceRequestDto {
   requiredSkills?: string[];
   isPublic?: boolean;
   showCompanyInfo?: boolean;
+}
+
+interface CreatePublicServiceRequestDto {
+  title: string;
+  description: string;
+  serviceType: ServiceType;
+  category?: ServiceRequestCategory;
+  urgency?: ServiceUrgency;
+  passportCode?: string;
+  laborDetails?: LaborDetails;
+  serviceLocation?: string;
+  locationLat?: number;
+  locationLng?: number;
+  contactName: string;
+  contactPhone: string;
+  contactEmail: string;
+  budgetMin?: number;
+  budgetMax?: number;
+  budgetCurrency?: string;
+  preferredDate?: string;
+  requiredSkills?: string[];
 }
 
 interface UpdateServiceRequestDto {
@@ -117,6 +143,61 @@ export class ServiceRequestService {
       status: ServiceRequestStatus.DRAFT,
       preferredDate: data.preferredDate ? new Date(data.preferredDate) : undefined,
       deadline: data.deadline ? new Date(data.deadline) : undefined,
+    });
+
+    return this.serviceRequestRepository.save(serviceRequest);
+  }
+
+  /**
+   * Create a public service request (no authentication required)
+   * Used by guests/visitors to submit service requests
+   */
+  async createPublic(data: CreatePublicServiceRequestDto): Promise<ServiceRequest> {
+    // Generate request code
+    const requestCode = await this.generateRequestCode();
+
+    // Determine category based on serviceType if not provided
+    let category = data.category;
+    if (!category) {
+      // Map old serviceType to new category for backwards compatibility
+      const typeToCategory: Record<ServiceType, ServiceRequestCategory> = {
+        [ServiceType.REPAIR]: ServiceRequestCategory.DEVICE_REPAIR,
+        [ServiceType.MAINTENANCE]: ServiceRequestCategory.DEVICE_MAINTENANCE,
+        [ServiceType.INSPECTION]: ServiceRequestCategory.DEVICE_INSPECTION,
+        [ServiceType.INSTALLATION]: ServiceRequestCategory.DEVICE_INSTALLATION,
+        [ServiceType.UPGRADE]: ServiceRequestCategory.DEVICE_REPAIR,
+        [ServiceType.CONSULTATION]: ServiceRequestCategory.CONSULTING_TECHNICAL,
+      };
+      category = typeToCategory[data.serviceType] || ServiceRequestCategory.DEVICE_REPAIR;
+    }
+
+    const serviceRequest = this.serviceRequestRepository.create({
+      title: data.title,
+      description: data.description,
+      serviceType: data.serviceType,
+      category,
+      urgency: data.urgency || ServiceUrgency.NORMAL,
+      passportCode: data.passportCode,
+      laborDetails: data.laborDetails,
+      serviceLocation: data.serviceLocation,
+      locationLat: data.locationLat,
+      locationLng: data.locationLng,
+      contactName: data.contactName,
+      contactPhone: data.contactPhone,
+      contactEmail: data.contactEmail,
+      budgetMin: data.budgetMin,
+      budgetMax: data.budgetMax,
+      budgetCurrency: data.budgetCurrency || 'USD',
+      requiredSkills: data.requiredSkills || [],
+      isPublic: true,
+      showCompanyInfo: false,
+      requestCode,
+      // Public requests have no user ID - will be linked later if user registers
+      createdByUserId: null as any,
+      organizationId: undefined,
+      // Public requests are immediately OPEN for experts to see
+      status: ServiceRequestStatus.OPEN,
+      preferredDate: data.preferredDate ? new Date(data.preferredDate) : undefined,
     });
 
     return this.serviceRequestRepository.save(serviceRequest);

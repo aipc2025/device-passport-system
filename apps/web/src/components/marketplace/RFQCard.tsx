@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { FileText, MapPin, Calendar, Eye, Users, Clock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { RFQStatus, PRODUCT_TYPE_NAMES, PURCHASE_FREQUENCY_NAMES } from '@device-passport/shared';
+import FavoriteButton from './FavoriteButton';
 
 interface RFQCardProps {
   rfq: {
@@ -30,9 +31,10 @@ interface RFQCardProps {
   };
   onQuote?: () => void;
   showActions?: boolean;
+  isFavorited?: boolean;
 }
 
-export default function RFQCard({ rfq, onQuote, showActions = true }: RFQCardProps) {
+export default function RFQCard({ rfq, onQuote, showActions = true, isFavorited = false }: RFQCardProps) {
   const { t } = useTranslation();
 
   const formatBudget = (min?: number, max?: number, currency = 'USD') => {
@@ -79,6 +81,13 @@ export default function RFQCard({ rfq, onQuote, showActions = true }: RFQCardPro
               </p>
             )}
           </div>
+          <FavoriteButton
+            itemId={rfq.id}
+            itemType="RFQ"
+            isFavorited={isFavorited}
+            size="md"
+            className="flex-shrink-0 ml-2"
+          />
         </div>
 
         {/* Category badge */}

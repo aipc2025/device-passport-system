@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   ArrowLeft,
   ClipboardList,
@@ -9,11 +10,22 @@ import {
   MapPin,
   Calendar,
   Clock,
+  UserPlus,
+  X,
+  Search,
 } from 'lucide-react';
 import { serviceOrderApi } from '../../services/api';
 import { ServiceOrder, ServiceRecord, ServiceOrderStatus, ServicePriority } from '@device-passport/shared';
 import { format } from 'date-fns';
 import clsx from 'clsx';
+import toast from 'react-hot-toast';
+
+interface Engineer {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+}
 
 const statusColors: Record<ServiceOrderStatus, string> = {
   [ServiceOrderStatus.PENDING]: 'badge-warning',
@@ -33,6 +45,9 @@ const priorityColors: Record<ServicePriority, string> = {
 
 export default function ServiceOrderDetail() {
   const { id } = useParams<{ id: string }>();
+  const queryClient = useQueryClient();
+  const [showAssignModal, setShowAssignModal] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const { data: order, isLoading } = useQuery<ServiceOrder>({
     queryKey: ['service-order', id],
@@ -45,6 +60,29 @@ export default function ServiceOrderDetail() {
     queryFn: () => serviceOrderApi.getRecords(id!),
     enabled: !!id,
   });
+
+  const { data: availableEngineers } = useQuery<Engineer[]>({
+    queryKey: ['available-engineers'],
+    queryFn: () => serviceOrderApi.getAvailableEngineers(),
+    enabled: showAssignModal,
+  });
+
+  const assignMutation = useMutation({
+    mutationFn: (engineerId: string) => serviceOrderApi.assignEngineer(id!, engineerId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['service-order', id] });
+      setShowAssignModal(false);
+      toast.success('Engineer assigned successfully');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Failed to assign engineer');
+    },
+  });
+
+  const filteredEngineers = availableEngineers?.filter((eng) =>
+    eng.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    eng.email.toLowerCase().includes(searchTerm.toLowerCase())
+  ) || [];
 
   if (isLoading) {
     return (
@@ -253,21 +291,114 @@ export default function ServiceOrderDetail() {
           </div>
 
           {/* Assigned Engineer */}
-          {order.assignedEngineerName && (
-            <div className="card p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Assigned Engineer</h2>
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center">
-                  <span className="text-primary-600 font-medium">
-                    {order.assignedEngineerName.charAt(0).toUpperCase()}
-                  </span>
+          <div className="card p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Assigned Engineer</h2>
+            {order.assignedEngineerName ? (
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center">
+                    <span className="text-primary-600 font-medium">
+                      {order.assignedEngineerName.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                  <span className="font-medium text-gray-900">{order.assignedEngineerName}</span>
                 </div>
-                <span className="font-medium text-gray-900">{order.assignedEngineerName}</span>
+                <button
+                  onClick={() => setShowAssignModal(true)}
+                  className="text-sm text-blue-600 hover:text-blue-800"
+                >
+                  Change
+                </button>
               </div>
-            </div>
-          )}
+            ) : (
+              <div className="text-center py-4">
+                <p className="text-gray-500 mb-3">No engineer assigned yet</p>
+                <button
+                  onClick={() => setShowAssignModal(true)}
+                  className="btn-primary flex items-center gap-2 mx-auto"
+                >
+                  <UserPlus className="h-4 w-4" />
+                  Assign Engineer
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
+
+      {/* Assign Engineer Modal */}
+      {showAssignModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 max-h-[80vh] flex flex-col">
+            <div className="flex items-center justify-between p-4 border-b">
+              <h2 className="text-lg font-semibold">Assign Engineer</h2>
+              <button
+                onClick={() => setShowAssignModal(false)}
+                className="p-1 hover:bg-gray-100 rounded"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="p-4 border-b">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search engineers..."
+                  className="input pl-10"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-4">
+              {filteredEngineers.length === 0 ? (
+                <p className="text-center text-gray-500 py-4">No engineers found</p>
+              ) : (
+                <div className="space-y-2">
+                  {filteredEngineers.map((engineer) => (
+                    <button
+                      key={engineer.id}
+                      onClick={() => assignMutation.mutate(engineer.id)}
+                      disabled={assignMutation.isPending}
+                      className={clsx(
+                        'w-full p-3 rounded-lg border text-left hover:border-blue-500 hover:bg-blue-50 transition-colors',
+                        assignMutation.isPending && 'opacity-50 cursor-not-allowed'
+                      )}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center">
+                          <span className="text-gray-600 font-medium">
+                            {engineer.name.charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900">{engineer.name}</p>
+                          <p className="text-sm text-gray-500">{engineer.email}</p>
+                        </div>
+                        <span className="ml-auto text-xs px-2 py-1 bg-gray-100 rounded">
+                          {engineer.role}
+                        </span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="p-4 border-t">
+              <button
+                onClick={() => setShowAssignModal(false)}
+                className="btn-secondary w-full"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -18,6 +18,9 @@ import {
   IndustryCode,
   SkillCode,
   ExpertType,
+  ExpertWorkStatus,
+  ExpertMembershipLevel,
+  getCreditLevelFromScore,
   generateExpertPassportCode,
   determineExpertTypeCode,
 } from '@device-passport/shared';
@@ -570,6 +573,253 @@ export class ExpertService {
   }
 
   // ==========================================
+  // Work Status Management
+  // ==========================================
+
+  /**
+   * Update expert work status
+   * Only allows manual updates to RUSHING, IDLE, OFF_DUTY
+   * BOOKED and IN_SERVICE are set automatically by the system
+   */
+  async updateWorkStatus(
+    expertId: string,
+    userId: string,
+    status: ExpertWorkStatus,
+  ): Promise<IndividualExpert> {
+    const expert = await this.getProfile(expertId, userId);
+
+    // Only allow manual updates to certain statuses
+    const allowedManualStatuses = [
+      ExpertWorkStatus.RUSHING,
+      ExpertWorkStatus.IDLE,
+      ExpertWorkStatus.OFF_DUTY,
+    ];
+
+    if (!allowedManualStatuses.includes(status)) {
+      throw new BadRequestException(
+        `Cannot manually set status to ${status}. This status is set automatically by the system.`,
+      );
+    }
+
+    // Cannot change status if currently in service
+    if (expert.workStatus === ExpertWorkStatus.IN_SERVICE) {
+      throw new BadRequestException(
+        'Cannot change status while currently in service. Complete the current service first.',
+      );
+    }
+
+    // Cannot change status if booked (has pending services)
+    if (expert.workStatus === ExpertWorkStatus.BOOKED && status === ExpertWorkStatus.OFF_DUTY) {
+      throw new BadRequestException(
+        'Cannot go off duty while having booked services. Cancel or complete pending services first.',
+      );
+    }
+
+    // Update rushing start time
+    if (status === ExpertWorkStatus.RUSHING && expert.workStatus !== ExpertWorkStatus.RUSHING) {
+      expert.rushingStartedAt = new Date();
+    } else if (status !== ExpertWorkStatus.RUSHING) {
+      expert.rushingStartedAt = null;
+    }
+
+    expert.workStatus = status;
+    return this.expertRepository.save(expert);
+  }
+
+  /**
+   * Start rushing mode (requires paid membership)
+   */
+  async startRushing(expertId: string, userId: string): Promise<IndividualExpert> {
+    const expert = await this.getProfile(expertId, userId);
+
+    if (expert.workStatus === ExpertWorkStatus.IN_SERVICE) {
+      throw new BadRequestException('Cannot start rushing while in service');
+    }
+
+    if (expert.workStatus === ExpertWorkStatus.RUSHING) {
+      throw new BadRequestException('Already in rushing mode');
+    }
+
+    // Check membership level for rushing mode access
+    const hasValidMembership = this.hasValidPaidMembership(expert);
+
+    if (!hasValidMembership) {
+      throw new BadRequestException(
+        'Rushing mode requires an active paid membership (Silver, Gold, or Diamond). ' +
+        'Please upgrade your membership to access this feature.'
+      );
+    }
+
+    expert.workStatus = ExpertWorkStatus.RUSHING;
+    expert.rushingStartedAt = new Date();
+
+    return this.expertRepository.save(expert);
+  }
+
+  /**
+   * Check if expert has a valid paid membership
+   */
+  private hasValidPaidMembership(expert: IndividualExpert): boolean {
+    // Standard members don't have rushing access
+    if (expert.membershipLevel === ExpertMembershipLevel.STANDARD) {
+      return false;
+    }
+
+    // Check if membership is still valid (not expired)
+    if (expert.membershipExpiresAt) {
+      const now = new Date();
+      if (expert.membershipExpiresAt < now) {
+        return false;
+      }
+    }
+
+    // Paid membership levels: SILVER, GOLD, DIAMOND
+    const paidLevels = [
+      ExpertMembershipLevel.SILVER,
+      ExpertMembershipLevel.GOLD,
+      ExpertMembershipLevel.DIAMOND,
+    ];
+
+    return paidLevels.includes(expert.membershipLevel);
+  }
+
+  /**
+   * Stop rushing mode
+   */
+  async stopRushing(expertId: string, userId: string): Promise<IndividualExpert> {
+    const expert = await this.getProfile(expertId, userId);
+
+    if (expert.workStatus !== ExpertWorkStatus.RUSHING) {
+      throw new BadRequestException('Not currently in rushing mode');
+    }
+
+    // If expert has booked services, go to BOOKED, otherwise IDLE
+    if (expert.activeServiceCount > 0) {
+      expert.workStatus = ExpertWorkStatus.BOOKED;
+    } else {
+      expert.workStatus = ExpertWorkStatus.IDLE;
+    }
+
+    expert.rushingStartedAt = null;
+
+    return this.expertRepository.save(expert);
+  }
+
+  /**
+   * Get work summary for expert dashboard
+   */
+  async getWorkSummary(expertId: string, userId: string): Promise<{
+    workStatus: ExpertWorkStatus;
+    membershipLevel: ExpertMembershipLevel;
+    membershipExpiresAt: Date | null;
+    membershipExpired: boolean;
+    canUseRushingMode: boolean;
+    activeServiceCount: number;
+    maxConcurrentServices: number;
+    rushingStartedAt: Date | null;
+    rewardPoints: number;
+    creditScore: number;
+    creditLevel: string;
+    pendingOrders: number;
+    inProgressOrders: number;
+  }> {
+    const expert = await this.getProfile(expertId, userId);
+
+    // Get pending orders count
+    const pendingOrders = await this.serviceRecordRepository.count({
+      where: {
+        expertId: expert.id,
+        status: ServiceRecordStatus.PENDING,
+      },
+    });
+
+    // Get in-progress orders count
+    const inProgressOrders = await this.serviceRecordRepository.count({
+      where: {
+        expertId: expert.id,
+        status: ServiceRecordStatus.IN_PROGRESS,
+      },
+    });
+
+    // Check if membership is expired
+    const membershipExpired = expert.membershipExpiresAt
+      ? expert.membershipExpiresAt < new Date()
+      : false;
+
+    // Check if expert can use rushing mode
+    const canUseRushingMode = this.hasValidPaidMembership(expert);
+
+    return {
+      workStatus: expert.workStatus,
+      membershipLevel: expert.membershipLevel,
+      membershipExpiresAt: expert.membershipExpiresAt,
+      membershipExpired,
+      canUseRushingMode,
+      activeServiceCount: expert.activeServiceCount,
+      maxConcurrentServices: expert.maxConcurrentServices,
+      rushingStartedAt: expert.rushingStartedAt,
+      rewardPoints: expert.rewardPoints,
+      creditScore: expert.creditScore,
+      creditLevel: expert.creditLevel,
+      pendingOrders,
+      inProgressOrders,
+    };
+  }
+
+  /**
+   * System method to update expert status to BOOKED (called when accepting a service)
+   */
+  async setBookedStatus(expertId: string): Promise<void> {
+    const expert = await this.expertRepository.findOne({ where: { id: expertId } });
+    if (!expert) return;
+
+    if (expert.workStatus === ExpertWorkStatus.RUSHING ||
+        expert.workStatus === ExpertWorkStatus.IDLE) {
+      expert.workStatus = ExpertWorkStatus.BOOKED;
+      expert.rushingStartedAt = null;
+      expert.activeServiceCount += 1;
+      await this.expertRepository.save(expert);
+    }
+  }
+
+  /**
+   * System method to update expert status to IN_SERVICE (called when starting a service)
+   */
+  async setInServiceStatus(expertId: string): Promise<void> {
+    const expert = await this.expertRepository.findOne({ where: { id: expertId } });
+    if (!expert) return;
+
+    expert.workStatus = ExpertWorkStatus.IN_SERVICE;
+    await this.expertRepository.save(expert);
+  }
+
+  /**
+   * System method to restore expert status after completing a service
+   */
+  async restoreStatusAfterService(expertId: string): Promise<void> {
+    const expert = await this.expertRepository.findOne({ where: { id: expertId } });
+    if (!expert) return;
+
+    expert.activeServiceCount = Math.max(0, expert.activeServiceCount - 1);
+
+    // Check if expert has other active services
+    const activeServices = await this.serviceRecordRepository.count({
+      where: {
+        expertId: expert.id,
+        status: In([ServiceRecordStatus.PENDING, ServiceRecordStatus.IN_PROGRESS]),
+      },
+    });
+
+    if (activeServices > 0) {
+      expert.workStatus = ExpertWorkStatus.BOOKED;
+    } else {
+      expert.workStatus = ExpertWorkStatus.IDLE;
+    }
+
+    await this.expertRepository.save(expert);
+  }
+
+  // ==========================================
   // Admin: Get All Experts with Passport Info
   // ==========================================
 
@@ -633,6 +883,16 @@ export class ExpertService {
         avgRating: expert.avgRating,
         totalReviews: expert.totalReviews,
         completedServices: expert.completedServices,
+        // New work status and membership fields
+        workStatus: expert.workStatus,
+        membershipLevel: expert.membershipLevel,
+        membershipExpiresAt: expert.membershipExpiresAt,
+        activeServiceCount: expert.activeServiceCount,
+        rushingStartedAt: expert.rushingStartedAt,
+        // Credit system fields
+        rewardPoints: expert.rewardPoints,
+        creditScore: expert.creditScore,
+        creditLevel: expert.creditLevel,
         createdAt: expert.createdAt,
       })),
       total,

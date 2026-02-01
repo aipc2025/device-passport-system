@@ -83,9 +83,18 @@ export class ServiceOrderController {
     return this.serviceOrderService.update(id, updateDto, user.sub);
   }
 
+  @Get('assignees/available')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.OPERATOR, UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get available engineers for assignment' })
+  async getAvailableEngineers() {
+    return this.serviceOrderService.getAvailableEngineers();
+  }
+
   @Post(':id/assign/:engineerId')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.OPERATOR)
+  @Roles(UserRole.OPERATOR, UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Assign engineer to service order' })
   async assignEngineer(

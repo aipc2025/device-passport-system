@@ -14,6 +14,7 @@ import { useAuthStore } from '../../store/auth.store';
 import { expertApi } from '../../services/api';
 import { ServiceRecordStatus, SERVICE_RECORD_STATUS_NAMES } from '@device-passport/shared';
 import clsx from 'clsx';
+import WorkStatusCard from '../../components/expert/WorkStatusCard';
 
 interface DashboardStats {
   candidateOrders: number;
@@ -114,6 +115,11 @@ export default function ExpertDashboard() {
         <p className="text-gray-600 mt-1">
           {t('expert.dashboardDesc', 'Overview of your service orders and activities')}
         </p>
+      </div>
+
+      {/* Work Status Card */}
+      <div className="mb-6">
+        <WorkStatusCard />
       </div>
 
       {/* Stats Cards */}

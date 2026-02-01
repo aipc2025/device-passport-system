@@ -171,6 +171,50 @@ export class SavedService {
   }
 
   /**
+   * Toggle save status - save if not saved, remove if saved
+   */
+  async toggleSave(
+    userId: string,
+    organizationId: string,
+    itemType: SavedItemType,
+    itemId: string,
+  ): Promise<{ isSaved: boolean; savedItemId?: string }> {
+    const existing = await this.savedItemRepository.findOne({
+      where: { userId, itemType, itemId },
+    });
+
+    if (existing) {
+      // Remove if already saved
+      await this.savedItemRepository.remove(existing);
+      return { isSaved: false };
+    } else {
+      // Validate item exists before saving
+      await this.validateItem(itemType, itemId);
+
+      // Save the item
+      const savedItem = this.savedItemRepository.create({
+        userId,
+        organizationId,
+        itemType,
+        itemId,
+      });
+      const saved = await this.savedItemRepository.save(savedItem);
+      return { isSaved: true, savedItemId: saved.id };
+    }
+  }
+
+  /**
+   * Get all saved item IDs for a specific type
+   */
+  async getSavedItemIds(userId: string, itemType: SavedItemType): Promise<string[]> {
+    const savedItems = await this.savedItemRepository.find({
+      where: { userId, itemType },
+      select: ['itemId'],
+    });
+    return savedItems.map((item) => item.itemId);
+  }
+
+  /**
    * Validate that the item exists
    */
   private async validateItem(itemType: SavedItemType, itemId: string): Promise<void> {

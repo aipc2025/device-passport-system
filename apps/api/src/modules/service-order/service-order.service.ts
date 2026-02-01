@@ -284,6 +284,19 @@ export class ServiceOrderService {
     return this.serviceOrderRepository.save(order);
   }
 
+  async getAvailableEngineers(): Promise<{ id: string; name: string; email: string; role: string }[]> {
+    const engineers = await this.userRepository.find({
+      where: [
+        { role: 'ENGINEER' as any },
+        { role: 'OPERATOR' as any },
+        { role: 'ADMIN' as any },
+      ],
+      select: ['id', 'name', 'email', 'role'],
+      order: { name: 'ASC' },
+    });
+    return engineers;
+  }
+
   private async generateOrderNumber(): Promise<string> {
     const year = new Date().getFullYear();
     const month = (new Date().getMonth() + 1).toString().padStart(2, '0');

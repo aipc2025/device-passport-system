@@ -9,8 +9,62 @@ import {
   IsUUID,
   MinLength,
   ArrayMinSize,
+  IsBoolean,
+  ValidateNested,
+  IsDateString,
 } from 'class-validator';
-import { ExpertType } from '@device-passport/shared';
+import { Type } from 'class-transformer';
+import { ExpertType, IndustryCode, SkillCode } from '@device-passport/shared';
+
+// Work history entry DTO
+export class WorkHistoryDto {
+  @ApiProperty()
+  @IsString()
+  companyName: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsEmail()
+  companyContactEmail?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  companyContactPhone?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  companyAddress?: string;
+
+  @ApiProperty()
+  @IsString()
+  position: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @ApiProperty()
+  @IsDateString()
+  startDate: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsDateString()
+  endDate?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  isCurrent?: boolean;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  isPublic?: boolean;
+}
 
 export class ExpertRegistrationDto {
   // User info
@@ -125,4 +179,38 @@ export class ExpertRegistrationDto {
   @IsOptional()
   @IsUUID()
   photoFileId?: string;
+
+  // Industries - for expert passport code
+  @ApiPropertyOptional({ enum: IndustryCode, isArray: true })
+  @IsOptional()
+  @IsArray()
+  @IsEnum(IndustryCode, { each: true })
+  industries?: IndustryCode[];
+
+  // Skills - for expert passport code
+  @ApiPropertyOptional({ enum: SkillCode, isArray: true })
+  @IsOptional()
+  @IsArray()
+  @IsEnum(SkillCode, { each: true })
+  skills?: SkillCode[];
+
+  // Nationality (ISO 3166-1 Alpha-2 code)
+  @ApiPropertyOptional({ description: 'Nationality ISO Alpha-2 code (e.g., CN, US)' })
+  @IsOptional()
+  @IsString()
+  nationality?: string;
+
+  // Work history
+  @ApiPropertyOptional({ type: [WorkHistoryDto] })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => WorkHistoryDto)
+  workHistory?: WorkHistoryDto[];
+
+  // Profile visibility
+  @ApiPropertyOptional({ description: 'Whether profile is publicly visible' })
+  @IsOptional()
+  @IsBoolean()
+  isProfilePublic?: boolean;
 }

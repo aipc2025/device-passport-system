@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRegistrationStore } from '../../../store/registration.store';
-import { PurchaseFrequency, FileCategory } from '@device-passport/shared';
+import { PurchaseFrequency, FileCategory, CurrencyCode, CURRENCY_NAMES } from '@device-passport/shared';
 import { PlusIcon, TrashIcon, CubeIcon, PaperClipIcon } from '@heroicons/react/24/outline';
 import FileUploader from '../common/FileUploader';
 
@@ -17,8 +17,6 @@ interface BuyerProductRequirement {
   attachmentFileIds?: string[];
 }
 
-// Common currency options (including VND for Vietnam)
-const CURRENCIES = ['USD', 'EUR', 'CNY', 'VND', 'JPY', 'GBP', 'KRW', 'TWD', 'HKD', 'SGD', 'AUD', 'THB', 'MYR'];
 
 export default function BuyerRequirementsStep() {
   const { t } = useTranslation();
@@ -42,7 +40,7 @@ export default function BuyerRequirementsStep() {
   const [isAddingProduct, setIsAddingProduct] = useState(false);
   const [newProduct, setNewProduct] = useState<BuyerProductRequirement>({
     productName: '',
-    budgetCurrency: 'USD',
+    budgetCurrency: CurrencyCode.CNY,
   });
 
   const saveProductRequirements = (requirements: BuyerProductRequirement[]) => {
@@ -57,7 +55,7 @@ export default function BuyerRequirementsStep() {
 
     const updatedRequirements = [...productRequirements, newProduct];
     saveProductRequirements(updatedRequirements);
-    setNewProduct({ productName: '', budgetCurrency: 'USD' });
+    setNewProduct({ productName: '', budgetCurrency: CurrencyCode.CNY });
     setIsAddingProduct(false);
   };
 
@@ -149,8 +147,10 @@ export default function BuyerRequirementsStep() {
                   onChange={(e) => setNewProduct({ ...newProduct, budgetCurrency: e.target.value })}
                   className="select"
                 >
-                  {CURRENCIES.map((curr) => (
-                    <option key={curr} value={curr}>{curr}</option>
+                  {Object.values(CurrencyCode).map((currency) => (
+                    <option key={currency} value={currency}>
+                      {currency} ({CURRENCY_NAMES[currency]?.symbol})
+                    </option>
                   ))}
                 </select>
               </div>
@@ -226,7 +226,7 @@ export default function BuyerRequirementsStep() {
                 type="button"
                 onClick={() => {
                   setIsAddingProduct(false);
-                  setNewProduct({ productName: '', budgetCurrency: 'USD' });
+                  setNewProduct({ productName: '', budgetCurrency: CurrencyCode.CNY });
                 }}
                 className="btn-secondary"
               >

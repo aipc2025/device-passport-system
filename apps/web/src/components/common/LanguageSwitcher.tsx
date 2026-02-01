@@ -43,10 +43,6 @@ export default function LanguageSwitcher({ variant = 'light' }: LanguageSwitcher
     ? 'hover:bg-gray-100 text-gray-700'
     : 'hover:bg-gray-700 text-gray-200';
 
-  const activeStyles = variant === 'light'
-    ? 'bg-primary-50 text-primary-700'
-    : 'bg-gray-700 text-primary-400';
-
   return (
     <div className="relative" ref={dropdownRef}>
       <button
@@ -68,20 +64,21 @@ export default function LanguageSwitcher({ variant = 'light' }: LanguageSwitcher
           'absolute right-0 mt-1 py-1 w-40 rounded-md z-50',
           dropdownStyles
         )}>
-          {languages.map((lang) => (
-            <button
-              key={lang.code}
-              onClick={() => handleLanguageChange(lang.code)}
-              className={clsx(
-                'w-full px-3 py-2 text-left text-sm flex items-center gap-2 transition-colors',
-                itemStyles,
-                i18n.language === lang.code && activeStyles
-              )}
-            >
-              <span>{lang.flag}</span>
-              <span>{lang.nativeName}</span>
-            </button>
-          ))}
+          {languages
+            .filter((lang) => lang.code !== i18n.language)
+            .map((lang) => (
+              <button
+                key={lang.code}
+                onClick={() => handleLanguageChange(lang.code)}
+                className={clsx(
+                  'w-full px-3 py-2 text-left text-sm flex items-center gap-2 transition-colors',
+                  itemStyles
+                )}
+              >
+                <span>{lang.flag}</span>
+                <span>{lang.nativeName}</span>
+              </button>
+            ))}
         </div>
       )}
     </div>

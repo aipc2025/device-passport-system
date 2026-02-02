@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './store/auth.store';
 import { useServiceWorker } from './hooks/usePWA';
+import ErrorBoundary from './components/common/ErrorBoundary';
 
 // Layouts
 import PublicLayout from './components/layouts/PublicLayout';
@@ -96,7 +97,8 @@ function App() {
   useServiceWorker();
 
   return (
-    <BrowserRouter>
+    <ErrorBoundary>
+      <BrowserRouter>
       <Routes>
         {/* Public routes */}
         <Route element={<PublicLayout />}>
@@ -186,6 +188,7 @@ function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
+    </ErrorBoundary>
   );
 }
 

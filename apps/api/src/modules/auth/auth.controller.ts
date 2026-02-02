@@ -1,5 +1,6 @@
 import { Controller, Post, Body, Get, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { LoginDto, RegisterDto, RefreshTokenDto } from './dto';
 import { Public, CurrentUser } from '../../common/decorators';
@@ -13,6 +14,9 @@ export class AuthController {
 
   @Post('login')
   @Public()
+  @Throttle({ short: { limit: 3, ttl: 1000 } }) // Max 3 login attempts per second
+  @Throttle({ medium: { limit: 10, ttl: 60000 } }) // Max 10 login attempts per minute
+  @Throttle({ long: { limit: 30, ttl: 900000 } }) // Max 30 login attempts per 15 minutes
   @ApiOperation({ summary: 'User login' })
   async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
@@ -20,6 +24,9 @@ export class AuthController {
 
   @Post('register')
   @Public()
+  @Throttle({ short: { limit: 2, ttl: 1000 } }) // Max 2 registrations per second
+  @Throttle({ medium: { limit: 5, ttl: 60000 } }) // Max 5 registrations per minute
+  @Throttle({ long: { limit: 20, ttl: 900000 } }) // Max 20 registrations per 15 minutes
   @ApiOperation({ summary: 'User registration' })
   async register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
@@ -27,6 +34,8 @@ export class AuthController {
 
   @Post('refresh')
   @Public()
+  @Throttle({ short: { limit: 5, ttl: 1000 } }) // Max 5 refresh requests per second
+  @Throttle({ medium: { limit: 20, ttl: 60000 } }) // Max 20 refresh requests per minute
   @ApiOperation({ summary: 'Refresh access token' })
   async refresh(@Body() refreshDto: RefreshTokenDto) {
     return this.authService.refreshToken(refreshDto.refreshToken);

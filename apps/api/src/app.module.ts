@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 import { join } from 'path';
 import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
@@ -38,6 +40,25 @@ import jwtConfig from './config/jwt.config';
       load: [databaseConfig, jwtConfig],
       envFilePath: ['.env.local', '.env'],
     }),
+
+    // Rate Limiting
+    ThrottlerModule.forRoot([
+      {
+        name: 'short',
+        ttl: 1000, // 1 second
+        limit: 10, // 10 requests per second
+      },
+      {
+        name: 'medium',
+        ttl: 60000, // 1 minute
+        limit: 100, // 100 requests per minute
+      },
+      {
+        name: 'long',
+        ttl: 900000, // 15 minutes
+        limit: 1000, // 1000 requests per 15 minutes
+      },
+    ]),
 
     // Database
     TypeOrmModule.forRootAsync({
@@ -87,6 +108,12 @@ import jwtConfig from './config/jwt.config';
     WebSocketModule,
     ExportModule,
     AnalyticsModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
   ],
 })
 export class AppModule {}

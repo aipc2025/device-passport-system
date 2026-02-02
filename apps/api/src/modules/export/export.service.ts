@@ -108,7 +108,8 @@ export class ExportService {
     };
 
     // Generate buffer
-    return await workbook.xlsx.writeBuffer() as Buffer;
+    const buffer = await workbook.xlsx.writeBuffer();
+    return Buffer.from(buffer);
   }
 
   /**
@@ -209,7 +210,8 @@ export class ExportService {
       to: `F${events.length + 1}`,
     };
 
-    return await workbook.xlsx.writeBuffer() as Buffer;
+    const buffer = await workbook.xlsx.writeBuffer();
+    return Buffer.from(buffer);
   }
 
   /**
@@ -270,7 +272,8 @@ export class ExportService {
       row.height = 120;
     });
 
-    return await workbook.xlsx.writeBuffer() as Buffer;
+    const buffer = await workbook.xlsx.writeBuffer();
+    return Buffer.from(buffer);
   }
 
   /**
@@ -339,6 +342,7 @@ export class ExportService {
       to: `J${orders.length + 1}`,
     };
 
-    return await workbook.xlsx.writeBuffer() as Buffer;
+    const buffer = await workbook.xlsx.writeBuffer();
+    return Buffer.from(buffer);
   }
 }

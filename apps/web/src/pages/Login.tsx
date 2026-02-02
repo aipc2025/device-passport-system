@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
+import { Helmet } from 'react-helmet-async';
 import { LogIn, AlertCircle } from 'lucide-react';
 import { authApi } from '../services/api';
 import { useAuthStore } from '../store/auth.store';
@@ -41,11 +42,15 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4">
-      <div className="max-w-md w-full">
-        <div className="text-center mb-8">
-          <LogIn className="h-12 w-12 text-primary-600 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-gray-900">Sign in to your account</h1>
+    <>
+      <Helmet>
+        <title>Login - Device Passport System</title>
+      </Helmet>
+      <div className="min-h-[80vh] flex items-center justify-center px-4">
+        <div className="max-w-md w-full">
+          <div className="text-center mb-8">
+            <LogIn className="h-12 w-12 text-primary-600 mx-auto mb-4" />
+            <h1 className="text-2xl font-bold text-gray-900">Sign in to your account</h1>
           <p className="text-gray-600 mt-2">
             Or{' '}
             <Link to="/register" className="text-primary-600 hover:text-primary-500">
@@ -111,5 +116,6 @@ export default function Login() {
         </div>
       </div>
     </div>
+    </>
   );
 }

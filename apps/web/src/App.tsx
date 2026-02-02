@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './store/auth.store';
+import { useServiceWorker } from './hooks/usePWA';
 
 // Layouts
 import PublicLayout from './components/layouts/PublicLayout';
@@ -85,6 +86,9 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 }
 
 function App() {
+  // Register service worker for PWA support
+  useServiceWorker();
+
   return (
     <BrowserRouter>
       <Routes>

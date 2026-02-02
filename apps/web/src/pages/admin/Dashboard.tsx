@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { Package, ClipboardList, CheckCircle, AlertTriangle, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { passportApi, serviceOrderApi } from '../../services/api';
@@ -60,11 +61,15 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t('dashboard.title')}</h1>
+    <>
+      <Helmet>
+        <title>Dashboard - Device Passport System</title>
+      </Helmet>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">{t('dashboard.title')}</h1>
           <p className="text-gray-600">{t('dashboard.welcome')}, {user?.name}</p>
         </div>
         {hasRole([UserRole.OPERATOR]) && (
@@ -161,5 +166,6 @@ export default function Dashboard() {
         </div>
       </div>
     </div>
+    </>
   );
 }

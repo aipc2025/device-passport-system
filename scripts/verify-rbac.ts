@@ -14,7 +14,6 @@
  */
 
 import axios, { AxiosInstance } from 'axios';
-import * as chalk from 'chalk';
 
 const API_URL = process.env.API_URL || 'http://localhost:3000/api/v1';
 
@@ -71,7 +70,7 @@ class RBACVerifier {
    * Siemens QC should NOT see Sinopec devices
    */
   async testOrganizationIsolation() {
-    console.log(chalk.blue('\n📋 Test 1: Organization Isolation'));
+    console.log('\n📋 Test 1: Organization Isolation');
     const start = Date.now();
 
     try {
@@ -118,7 +117,7 @@ class RBACVerifier {
    * Wang QC (PLC only) should NOT see other product lines
    */
   async testProductLineRestriction() {
-    console.log(chalk.blue('\n📋 Test 2: Product Line Restriction'));
+    console.log(('\n📋 Test 2: Product Line Restriction'));
     const start = Date.now();
 
     try {
@@ -177,7 +176,7 @@ class RBACVerifier {
    * Customer Engineer (OWN) should only see own service requests
    */
   async testDataScope() {
-    console.log(chalk.blue('\n📋 Test 3: Data Scope (OWN vs ALL)'));
+    console.log(('\n📋 Test 3: Data Scope (OWN vs ALL)'));
     const start = Date.now();
 
     try {
@@ -226,7 +225,7 @@ class RBACVerifier {
    * Supplier Viewer should NOT be able to create devices
    */
   async testPermissionChecks() {
-    console.log(chalk.blue('\n📋 Test 4: Permission Checks'));
+    console.log(('\n📋 Test 4: Permission Checks'));
     const start = Date.now();
 
     try {
@@ -279,7 +278,7 @@ class RBACVerifier {
    * Siemens user should NOT be able to view Sinopec data
    */
   async testCrossOrganizationDenial() {
-    console.log(chalk.blue('\n📋 Test 5: Cross-Organization Access Denial'));
+    console.log(('\n📋 Test 5: Cross-Organization Access Denial'));
     const start = Date.now();
 
     try {
@@ -348,7 +347,7 @@ class RBACVerifier {
    * Platform QC should be able to see all organizations' data
    */
   async testPlatformOverride() {
-    console.log(chalk.blue('\n📋 Test 6: Platform Override'));
+    console.log(('\n📋 Test 6: Platform Override'));
     const start = Date.now();
 
     try {
@@ -392,9 +391,9 @@ class RBACVerifier {
    * Run all tests
    */
   async runAll() {
-    console.log(chalk.bold.green('\n🚀 Starting RBAC Verification Tests\n'));
-    console.log(chalk.gray('API URL:'), API_URL);
-    console.log(chalk.gray('━'.repeat(60)));
+    console.log(('\n🚀 Starting RBAC Verification Tests\n'));
+    console.log(('API URL:'), API_URL);
+    console.log(('━'.repeat(60)));
 
     try {
       await this.testOrganizationIsolation();
@@ -404,7 +403,7 @@ class RBACVerifier {
       await this.testCrossOrganizationDenial();
       await this.testPlatformOverride();
     } catch (error: any) {
-      console.error(chalk.red(`\n❌ Fatal error: ${error.message}`));
+      console.error((`\n❌ Fatal error: ${error.message}`));
     }
 
     this.printResults();
@@ -414,27 +413,27 @@ class RBACVerifier {
    * Print test results summary
    */
   printResults() {
-    console.log(chalk.gray('\n' + '━'.repeat(60)));
-    console.log(chalk.bold.green('\n📊 Test Results Summary\n'));
+    console.log(('\n' + '━'.repeat(60)));
+    console.log(('\n📊 Test Results Summary\n'));
 
     const passed = this.results.filter((r) => r.passed).length;
     const total = this.results.length;
     const passRate = ((passed / total) * 100).toFixed(1);
 
     this.results.forEach((result) => {
-      const icon = result.passed ? chalk.green('✓') : chalk.red('✗');
-      const duration = result.duration ? chalk.gray(`(${result.duration}ms)`) : '';
+      const icon = result.passed ? ('✓') : ('✗');
+      const duration = result.duration ? (`(${result.duration}ms)`) : '';
       console.log(`${icon} ${result.name} ${duration}`);
       console.log(`  ${result.message}\n`);
     });
 
-    console.log(chalk.gray('━'.repeat(60)));
+    console.log(('━'.repeat(60)));
 
     if (passed === total) {
-      console.log(chalk.bold.green(`\n✅ All ${total} tests passed! (${passRate}%)\n`));
+      console.log((`\n✅ All ${total} tests passed! (${passRate}%)\n`));
     } else {
       console.log(
-        chalk.bold.yellow(
+        (
           `\n⚠️  ${passed}/${total} tests passed (${passRate}%)\n`,
         ),
       );
@@ -447,6 +446,6 @@ class RBACVerifier {
 // Run tests
 const verifier = new RBACVerifier();
 verifier.runAll().catch((error) => {
-  console.error(chalk.red('\n❌ Verification failed:', error.message));
+  console.error(('\n❌ Verification failed:', error.message));
   process.exit(1);
 });

@@ -133,16 +133,16 @@ export async function seedRBACTestData(dataSource: DataSource): Promise<void> {
     isActive: true,
   });
 
-  // Supplier QC - Only PLC Product Line
+  // Supplier QC - Only PF (Packaging Filling) Product Line
   const supplierQC_PLC = userRepository.create({
     email: 'qc.wang@siemens.com.cn',
     password: hashedPassword,
-    name: 'Wang QC (PLC Only)',
+    name: 'Wang QC (PF Only)',
     role: UserRole.SUPPLIER_QC,
     organizationId: supplierOrg.id,
     scopeConfig: {
       dataScope: DataScope.ALL,
-      productLines: [ProductLine.PLC], // ⭐ Only sees PLC products
+      productLines: [ProductLine.PF], // ⭐ Only sees PF (Packaging Filling) products
       canApprove: true,
     },
     isActive: true,

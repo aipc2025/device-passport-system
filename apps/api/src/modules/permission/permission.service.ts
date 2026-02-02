@@ -240,7 +240,7 @@ export class PermissionService {
    * Apply data scope filtering to a query builder
    * Ensures organization-level data isolation and scope-based filtering
    */
-  applyDataScope<T>(
+  applyDataScope<T extends Record<string, any>>(
     qb: SelectQueryBuilder<T>,
     userPerms: UserPermissions,
     alias: string,

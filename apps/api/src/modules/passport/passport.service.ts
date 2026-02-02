@@ -14,12 +14,14 @@ import {
   PaginatedResponse,
   PassportListItem,
   generateQRCodeContent,
+  TokenPayload,
 } from '@device-passport/shared';
 import { DevicePassport, User, Organization } from '../../database/entities';
 import { CreatePassportDto, UpdatePassportDto, UpdateStatusDto } from './dto';
 import { PassportCodeService } from './passport-code.service';
 import { LifecycleService } from '../lifecycle/lifecycle.service';
 import { ConfigService } from '@nestjs/config';
+import { PermissionService } from '../permission/permission.service';
 
 @Injectable()
 export class PassportService {
@@ -35,11 +37,12 @@ export class PassportService {
     private passportCodeService: PassportCodeService,
     private lifecycleService: LifecycleService,
     private configService: ConfigService,
+    private permissionService: PermissionService,
   ) {
     this.baseUrl = this.configService.get('VITE_API_URL') || 'http://localhost:3000';
   }
 
-  async findAll(filters: PassportQueryFilters): Promise<PaginatedResponse<PassportListItem>> {
+  async findAll(filters: PassportQueryFilters, user: TokenPayload): Promise<PaginatedResponse<PassportListItem>> {
     const {
       search,
       productLine,
@@ -55,6 +58,12 @@ export class PassportService {
     } = filters;
 
     const queryBuilder = this.passportRepository.createQueryBuilder('passport');
+
+    // Apply RBAC filtering
+    const userPerms = await this.permissionService.getUserPermissions(user.sub);
+    if (userPerms) {
+      this.permissionService.applyDataScope(queryBuilder, userPerms, 'passport');
+    }
 
     // Apply filters
     if (search) {

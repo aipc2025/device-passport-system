@@ -26,8 +26,8 @@ export class PassportController {
   @Get()
   @Roles(UserRole.CUSTOMER)
   @ApiOperation({ summary: 'Get all device passports' })
-  async findAll(@Query() query: PassportQueryDto) {
-    return this.passportService.findAll(query);
+  async findAll(@Query() query: PassportQueryDto, @CurrentUser() user: TokenPayload) {
+    return this.passportService.findAll(query, user);
   }
 
   @Get(':id')

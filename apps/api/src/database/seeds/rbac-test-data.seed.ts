@@ -20,51 +20,67 @@ export async function seedRBACTestData(dataSource: DataSource): Promise<void> {
   console.log('🌱 Seeding RBAC test data...');
 
   // ============================================
-  // 1. Create Organizations
+  // 1. Create Organizations (skip if exists)
   // ============================================
 
   // Platform Organization (Luna Medical)
-  const platformOrg = organizationRepository.create({
-    id: '00000000-0000-0000-0000-000000000001',
-    name: 'Luna Medical Platform',
-    code: 'LMP',
-    type: OrganizationType.INTERNAL,
-    city: 'Shanghai',
-    country: 'China',
-    email: 'contact@luna.medical',
-    website: 'https://luna.medical',
-    isActive: true,
+  let platformOrg = await organizationRepository.findOne({
+    where: { code: 'LMP' },
   });
+  if (!platformOrg) {
+    platformOrg = organizationRepository.create({
+      id: '00000000-0000-0000-0000-000000000001',
+      name: 'Luna Medical Platform',
+      code: 'LMP',
+      type: OrganizationType.INTERNAL,
+      city: 'Shanghai',
+      country: 'China',
+      email: 'contact@luna.medical',
+      website: 'https://luna.medical',
+      isActive: true,
+    });
+    await organizationRepository.save(platformOrg);
+  }
 
   // Supplier Organization (Siemens China)
-  const supplierOrg = organizationRepository.create({
-    id: '00000000-0000-0000-0000-000000000002',
-    name: 'Siemens China',
-    code: 'SIE',
-    type: OrganizationType.SUPPLIER,
-    city: 'Beijing',
-    country: 'China',
-    email: 'contact@siemens.com.cn',
-    website: 'https://siemens.com.cn',
-    isActive: true,
+  let supplierOrg = await organizationRepository.findOne({
+    where: { code: 'SIE' },
   });
+  if (!supplierOrg) {
+    supplierOrg = organizationRepository.create({
+      id: '00000000-0000-0000-0000-000000000002',
+      name: 'Siemens China',
+      code: 'SIE',
+      type: OrganizationType.SUPPLIER,
+      city: 'Beijing',
+      country: 'China',
+      email: 'contact@siemens.com.cn',
+      website: 'https://siemens.com.cn',
+      isActive: true,
+    });
+    await organizationRepository.save(supplierOrg);
+  }
 
   // Customer Organization (Sinopec)
-  const customerOrg = organizationRepository.create({
-    id: '00000000-0000-0000-0000-000000000003',
-    name: 'China Petroleum & Chemical Corporation',
-    code: 'SPC',
-    type: OrganizationType.CUSTOMER,
-    city: 'Beijing',
-    country: 'China',
-    email: 'procurement@sinopec.com',
-    website: 'https://sinopec.com',
-    isActive: true,
+  let customerOrg = await organizationRepository.findOne({
+    where: { code: 'SPC' },
   });
+  if (!customerOrg) {
+    customerOrg = organizationRepository.create({
+      id: '00000000-0000-0000-0000-000000000003',
+      name: 'China Petroleum & Chemical Corporation',
+      code: 'SPC',
+      type: OrganizationType.CUSTOMER,
+      city: 'Beijing',
+      country: 'China',
+      email: 'procurement@sinopec.com',
+      website: 'https://sinopec.com',
+      isActive: true,
+    });
+    await organizationRepository.save(customerOrg);
+  }
 
-  await organizationRepository.save([platformOrg, supplierOrg, customerOrg]);
-
-  console.log('✅ Created 3 organizations: Platform, Supplier, Customer');
+  console.log('✅ Organizations ready: Platform, Supplier, Customer');
 
   // ============================================
   // 2. Create Platform Users (Luna Medical)
@@ -112,9 +128,16 @@ export async function seedRBACTestData(dataSource: DataSource): Promise<void> {
     isActive: true,
   });
 
-  await userRepository.save([platformAdmin, platformQC, platformOperator]);
+  // Save only if user doesn't exist
+  const platformUsers = [platformAdmin, platformQC, platformOperator];
+  for (const user of platformUsers) {
+    const exists = await userRepository.findOne({ where: { email: user.email } });
+    if (!exists) {
+      await userRepository.save(user);
+    }
+  }
 
-  console.log('✅ Created 3 platform users (Admin, QC, Operator)');
+  console.log('✅ Platform users ready (Admin, QC, Operator)');
 
   // ============================================
   // 3. Create Supplier Users (Siemens China)
@@ -202,16 +225,23 @@ export async function seedRBACTestData(dataSource: DataSource): Promise<void> {
     isActive: true,
   });
 
-  await userRepository.save([
+  // Save only if user doesn't exist
+  const supplierUsers = [
     supplierAdmin,
     supplierQC_PLC,
     supplierQC_All,
     supplierPacker,
     supplierShipper,
     supplierViewer,
-  ]);
+  ];
+  for (const user of supplierUsers) {
+    const exists = await userRepository.findOne({ where: { email: user.email } });
+    if (!exists) {
+      await userRepository.save(user);
+    }
+  }
 
-  console.log('✅ Created 6 supplier users (Admin, 2xQC, Packer, Shipper, Viewer)');
+  console.log('✅ Supplier users ready (Admin, 2xQC, Packer, Shipper, Viewer)');
 
   // ============================================
   // 4. Create Customer Users (Sinopec)
@@ -243,9 +273,16 @@ export async function seedRBACTestData(dataSource: DataSource): Promise<void> {
     isActive: true,
   });
 
-  await userRepository.save([customerAdmin, customerEngineer]);
+  // Save only if user doesn't exist
+  const customerUsers = [customerAdmin, customerEngineer];
+  for (const user of customerUsers) {
+    const exists = await userRepository.findOne({ where: { email: user.email } });
+    if (!exists) {
+      await userRepository.save(user);
+    }
+  }
 
-  console.log('✅ Created 2 customer users (Admin, Engineer)');
+  console.log('✅ Customer users ready (Admin, Engineer)');
 
   // ============================================
   // Summary

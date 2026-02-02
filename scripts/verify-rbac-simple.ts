@@ -22,7 +22,7 @@ class RBACVerifier {
         email,
         password,
       });
-      return response.data.accessToken;
+      return response.data.data.accessToken;
     } catch (error: any) {
       throw new Error(`Login failed for ${email}: ${error.response?.data?.message || error.message}`);
     }
@@ -36,7 +36,7 @@ class RBACVerifier {
         headers: { Authorization: `Bearer ${siemensToken}` },
       });
 
-      const devices = response.data;
+      const devices = response.data.data.data;
       const otherOrgDevices = devices.filter(
         (d: any) => d.organizationId !== '00000000-0000-0000-0000-000000000002'
       );

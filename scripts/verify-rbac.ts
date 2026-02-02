@@ -38,7 +38,7 @@ class RBACVerifier {
         password,
       });
 
-      const token = response.data.accessToken;
+      const token = response.data.data.accessToken;
       this.tokens.set(email, token);
       return token;
     } catch (error: any) {
@@ -80,7 +80,7 @@ class RBACVerifier {
 
       // Try to get all devices (should only see Siemens devices)
       const response = await siemensClient.get('/passports');
-      const devices = response.data;
+      const devices = response.data.data.data;
 
       // Check if any device belongs to other organizations
       const otherOrgDevices = devices.filter(
@@ -127,7 +127,7 @@ class RBACVerifier {
 
       // Get devices
       const response = await wangClient.get('/passports');
-      const devices = response.data;
+      const devices = response.data.data.data;
 
       // Check if any non-PLC device is visible
       const nonPLCDevices = devices.filter((d: any) => d.productLine !== 'PLC');
@@ -152,7 +152,7 @@ class RBACVerifier {
       const liToken = await this.login('qc.li@siemens.com.cn', 'Password123!');
       const liClient = this.createClient(liToken);
       const liResponse = await liClient.get('/passports');
-      const liDevices = liResponse.data;
+      const liDevices = liResponse.data.data.data;
 
       if (liDevices.length > devices.length) {
         this.addResult(
@@ -186,14 +186,14 @@ class RBACVerifier {
 
       // Get service requests
       const engineerResponse = await engineerClient.get('/service-requests');
-      const engineerRequests = engineerResponse.data;
+      const engineerRequests = engineerResponse.data.data.data;
 
       // Login as Customer Admin (ALL scope)
       const adminToken = await this.login('admin@sinopec.com', 'Password123!');
       const adminClient = this.createClient(adminToken);
 
       const adminResponse = await adminClient.get('/service-requests');
-      const adminRequests = adminResponse.data;
+      const adminRequests = adminResponse.data.data.data;
 
       if (adminRequests.length >= engineerRequests.length) {
         this.addResult(
@@ -292,7 +292,7 @@ class RBACVerifier {
 
       // Get Sinopec's service requests
       const sinopecResponse = await sinopecClient.get('/service-requests');
-      const sinopecRequests = sinopecResponse.data;
+      const sinopecRequests = sinopecResponse.data.data.data;
 
       if (sinopecRequests.length > 0) {
         const requestId = sinopecRequests[0].id;
@@ -357,7 +357,7 @@ class RBACVerifier {
 
       // Get all devices (should see all orgs)
       const response = await platformClient.get('/passports');
-      const devices = response.data;
+      const devices = response.data.data.data;
 
       // Count unique organizations
       const uniqueOrgs = new Set(devices.map((d: any) => d.organizationId));

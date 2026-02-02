@@ -1,5 +1,6 @@
 import { DataSource } from 'typeorm';
 import * as dotenv from 'dotenv';
+import { join } from 'path';
 
 dotenv.config({ path: '.env.local' });
 dotenv.config({ path: '.env' });
@@ -11,8 +12,8 @@ export const AppDataSource = new DataSource({
   username: process.env.DATABASE_USER || 'passport_user',
   password: process.env.DATABASE_PASSWORD || 'passport_password',
   database: process.env.DATABASE_NAME || 'device_passport',
-  entities: [__dirname + '/entities/*.entity{.ts,.js}'],
-  migrations: [__dirname + '/migrations/*{.ts,.js}'],
+  entities: [join(__dirname, 'entities', '*.entity{.ts,.js}')],
+  migrations: [join(__dirname, 'migrations', '*{.ts,.js}')],
   synchronize: false,
   logging: true,
 });

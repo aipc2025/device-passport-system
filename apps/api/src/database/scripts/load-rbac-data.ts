@@ -4,7 +4,12 @@
  */
 
 import { DataSource } from 'typeorm';
-import { seedRBACTestData } from '../apps/api/src/database/seeds/rbac-test-data.seed';
+import { seedRBACTestData } from '../seeds/rbac-test-data.seed';
+import * as dotenv from 'dotenv';
+import { join } from 'path';
+
+// Load environment variables from root
+dotenv.config({ path: join(__dirname, '../../../../../.env') });
 
 async function main() {
   console.log('📦 Loading RBAC test data...\n');
@@ -16,7 +21,7 @@ async function main() {
     username: process.env.DATABASE_USER || 'passport_user',
     password: process.env.DATABASE_PASSWORD || 'passport_password',
     database: process.env.DATABASE_NAME || 'device_passport',
-    entities: ['apps/api/src/database/entities/**/*.entity.ts'],
+    entities: [join(__dirname, '../entities/**/*.entity{.ts,.js}')],
     synchronize: false,
   });
 

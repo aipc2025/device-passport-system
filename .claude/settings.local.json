@@ -93,7 +93,12 @@
       "Bash(pnpm run typecheck:*)",
       "Bash(pnpm test:*)",
       "Bash(chmod:*)",
-      "Bash(npm test:*)"
+      "Bash(npm test:*)",
+      "Bash(npm run seed:*)",
+      "Bash(start-all.bat)",
+      "Bash(tasklist:*)",
+      "Bash(npm run db:query:*)",
+      "Bash(npm run start:dev:*)"
     ]
   }
 }

@@ -252,7 +252,7 @@ describe('PassportCodeService', () => {
         ProductLine.IP,
         ProductLine.QI,
         ProductLine.MP,
-        ProductLine.AS,
+        ProductLine.CS,
       ];
 
       const codes = await Promise.all(

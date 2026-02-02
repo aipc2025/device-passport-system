@@ -4,19 +4,16 @@ import {
   parseExpertPassportCode,
   validateExpertPassportCode,
   formatExpertPassportCode,
-  encodeExpertType,
-  decodeExpertType,
-  encodeIndustryCode,
-  decodeIndustryCode,
-  encodeSkillCode,
-  decodeSkillCode,
+  formatBirthYearMonth,
+  parseBirthYearMonth,
+  determineExpertTypeCode,
 } from './expert-passport-code';
-import { ExpertType } from '../types';
+import { ExpertTypeCode, IndustryCode, SkillCode } from '../enums';
 
 describe('Expert Passport Code Utilities', () => {
   describe('calculateExpertChecksum', () => {
     it('should calculate checksum for a valid expert code', () => {
-      const code = 'EP-TECH-2601-000001';
+      const code = 'EP-TAM-8506-CN-000001';
       const checksum = calculateExpertChecksum(code);
       expect(checksum).toBeDefined();
       expect(checksum).toHaveLength(2);
@@ -24,259 +21,298 @@ describe('Expert Passport Code Utilities', () => {
     });
 
     it('should produce consistent checksums', () => {
-      const code = 'EP-TECH-2601-000001';
+      const code = 'EP-TAM-8506-CN-000001';
       const checksum1 = calculateExpertChecksum(code);
       const checksum2 = calculateExpertChecksum(code);
       expect(checksum1).toBe(checksum2);
     });
 
     it('should produce different checksums for different codes', () => {
-      const code1 = 'EP-TECH-2601-000001';
-      const code2 = 'EP-TECH-2601-000002';
+      const code1 = 'EP-TAM-8506-CN-000001';
+      const code2 = 'EP-TAM-8506-CN-000002';
       const checksum1 = calculateExpertChecksum(code1);
       const checksum2 = calculateExpertChecksum(code2);
       expect(checksum1).not.toBe(checksum2);
     });
   });
 
-  describe('encodeExpertType and decodeExpertType', () => {
-    it('should encode TECHNICAL type', () => {
-      expect(encodeExpertType([ExpertType.TECHNICAL])).toBe('T');
+  describe('formatBirthYearMonth', () => {
+    it('should format date to YYMM', () => {
+      const date = new Date('1985-06-15');
+      expect(formatBirthYearMonth(date)).toBe('8506');
     });
 
-    it('should encode BUSINESS type', () => {
-      expect(encodeExpertType([ExpertType.BUSINESS])).toBe('B');
+    it('should pad month with zero', () => {
+      const date = new Date('2000-01-01');
+      expect(formatBirthYearMonth(date)).toBe('0001');
     });
 
-    it('should encode both types as ALL', () => {
-      expect(encodeExpertType([ExpertType.TECHNICAL, ExpertType.BUSINESS])).toBe('A');
-    });
-
-    it('should decode T to TECHNICAL', () => {
-      expect(decodeExpertType('T')).toEqual([ExpertType.TECHNICAL]);
-    });
-
-    it('should decode B to BUSINESS', () => {
-      expect(decodeExpertType('B')).toEqual([ExpertType.BUSINESS]);
-    });
-
-    it('should decode A to both types', () => {
-      const result = decodeExpertType('A');
-      expect(result).toContain(ExpertType.TECHNICAL);
-      expect(result).toContain(ExpertType.BUSINESS);
-      expect(result).toHaveLength(2);
-    });
-
-    it('should return empty array for invalid code', () => {
-      expect(decodeExpertType('X')).toEqual([]);
+    it('should handle December', () => {
+      const date = new Date('1990-12-31');
+      expect(formatBirthYearMonth(date)).toBe('9012');
     });
   });
 
-  describe('encodeIndustryCode and decodeIndustryCode', () => {
-    it('should encode known industries', () => {
-      expect(encodeIndustryCode(['Automotive'])).toBe('A');
-      expect(encodeIndustryCode(['Building Materials'])).toBe('B');
-      expect(encodeIndustryCode(['Chemical'])).toBe('C');
+  describe('parseBirthYearMonth', () => {
+    it('should parse YYMM to year and month', () => {
+      const result = parseBirthYearMonth('8506');
+      expect(result).toEqual({ year: 1985, month: 6 });
     });
 
-    it('should encode multiple industries alphabetically', () => {
-      const code = encodeIndustryCode(['Automotive', 'Building Materials']);
-      expect(code).toBe('AB');
+    it('should handle 20xx years', () => {
+      const result = parseBirthYearMonth('0001');
+      expect(result).toEqual({ year: 2000, month: 1 });
     });
 
-    it('should limit to 5 industries', () => {
-      const industries = [
-        'Automotive',
-        'Building Materials',
-        'Chemical',
-        'Electronics',
-        'Food & Beverage',
-        'General Equipment', // This should be ignored
-      ];
-      const code = encodeIndustryCode(industries);
-      expect(code).toHaveLength(5);
+    it('should return null for invalid format', () => {
+      expect(parseBirthYearMonth('850')).toBeNull();
+      expect(parseBirthYearMonth('abc')).toBeNull();
     });
 
-    it('should decode industry codes', () => {
-      const industries = decodeIndustryCode('AB');
-      expect(industries).toContain('Automotive');
-      expect(industries).toContain('Building Materials');
-      expect(industries).toHaveLength(2);
-    });
-
-    it('should handle empty industry list', () => {
-      expect(encodeIndustryCode([])).toBe('');
-      expect(decodeIndustryCode('')).toEqual([]);
+    it('should return null for invalid month', () => {
+      expect(parseBirthYearMonth('8513')).toBeNull();
+      expect(parseBirthYearMonth('8500')).toBeNull();
     });
   });
 
-  describe('encodeSkillCode and decodeSkillCode', () => {
-    it('should encode known skills', () => {
-      expect(encodeSkillCode(['PLC Programming'])).toContain('PL');
-      expect(encodeSkillCode(['Robot Programming'])).toContain('RB');
+  describe('determineExpertTypeCode', () => {
+    it('should return T for technical only', () => {
+      expect(determineExpertTypeCode(true, false)).toBe(ExpertTypeCode.T);
     });
 
-    it('should encode multiple skills', () => {
-      const code = encodeSkillCode(['PLC Programming', 'HMI Development']);
-      expect(code).toHaveLength(4); // PL + HM
+    it('should return B for business only', () => {
+      expect(determineExpertTypeCode(false, true)).toBe(ExpertTypeCode.B);
     });
 
-    it('should limit to 5 skills', () => {
-      const skills = [
-        'PLC Programming',
-        'HMI Development',
-        'Robot Programming',
-        'Motion Control',
-        'Vision System',
-        'Safety System', // This should be ignored
-      ];
-      const code = encodeSkillCode(skills);
-      expect(code).toHaveLength(10); // 5 skills * 2 chars
+    it('should return A for both', () => {
+      expect(determineExpertTypeCode(true, true)).toBe(ExpertTypeCode.A);
     });
 
-    it('should decode skill codes', () => {
-      const skills = decodeSkillCode('PLHM');
-      expect(skills).toContain('PLC Programming');
-      expect(skills).toContain('HMI Development');
-      expect(skills).toHaveLength(2);
-    });
-
-    it('should handle empty skill list', () => {
-      expect(encodeSkillCode([])).toBe('');
-      expect(decodeSkillCode('')).toEqual([]);
+    it('should return T as default', () => {
+      expect(determineExpertTypeCode(false, false)).toBe(ExpertTypeCode.T);
     });
   });
 
   describe('generateExpertPassportCode', () => {
+    const testDate = new Date('1985-06-15');
+
     it('should generate a valid expert passport code', () => {
       const code = generateExpertPassportCode(
-        [ExpertType.TECHNICAL],
-        2026,
-        1,
-        1,
-        ['Automotive'],
-        ['PLC Programming']
+        ExpertTypeCode.T,
+        IndustryCode.A,
+        SkillCode.PL,
+        testDate,
+        'CN',
+        1
       );
-      expect(code).toMatch(/^EP-T[A-Z0-9]+-2601-000001-[A-Z0-9]{2}$/);
+      expect(code).toMatch(/^EP-TAPL-8506-CN-000001-[A-Z0-9]{2}$/);
     });
 
-    it('should include industry and skill codes', () => {
+    it('should include correct components', () => {
       const code = generateExpertPassportCode(
-        [ExpertType.TECHNICAL],
-        2026,
-        1,
-        1,
-        ['Automotive'],
-        ['PLC Programming']
+        ExpertTypeCode.T,
+        IndustryCode.A,
+        SkillCode.PL,
+        testDate,
+        'CN',
+        1
       );
-      expect(code).toContain('TA'); // T = Technical, A = Automotive
-      expect(code).toContain('PL'); // PL = PLC Programming
+      expect(code).toContain('EP');
+      expect(code).toContain('TAPL');
+      expect(code).toContain('8506');
+      expect(code).toContain('CN');
+      expect(code).toContain('000001');
     });
 
     it('should pad sequence number with zeros', () => {
       const code = generateExpertPassportCode(
-        [ExpertType.TECHNICAL],
-        2026,
-        1,
-        42,
-        ['Automotive'],
-        ['PLC Programming']
+        ExpertTypeCode.T,
+        IndustryCode.A,
+        SkillCode.PL,
+        testDate,
+        'CN',
+        42
       );
       expect(code).toMatch(/-000042-/);
     });
 
-    it('should throw error for invalid year', () => {
+    it('should throw error for invalid expert type', () => {
       expect(() =>
-        generateExpertPassportCode([ExpertType.TECHNICAL], 1999, 1, 1, ['Automotive'], [
-          'PLC Programming',
-        ])
-      ).toThrow('Year must be between 2000 and 2099');
+        generateExpertPassportCode(
+          'X' as ExpertTypeCode,
+          IndustryCode.A,
+          SkillCode.PL,
+          testDate,
+          'CN',
+          1
+        )
+      ).toThrow('Invalid expert type code');
     });
 
-    it('should throw error for invalid month', () => {
+    it('should throw error for invalid industry', () => {
       expect(() =>
-        generateExpertPassportCode([ExpertType.TECHNICAL], 2026, 0, 1, ['Automotive'], [
-          'PLC Programming',
-        ])
-      ).toThrow('Month must be between 1 and 12');
+        generateExpertPassportCode(
+          ExpertTypeCode.T,
+          'X' as IndustryCode,
+          SkillCode.PL,
+          testDate,
+          'CN',
+          1
+        )
+      ).toThrow('Invalid industry code');
+    });
+
+    it('should throw error for invalid skill', () => {
+      expect(() =>
+        generateExpertPassportCode(
+          ExpertTypeCode.T,
+          IndustryCode.A,
+          'XX' as SkillCode,
+          testDate,
+          'CN',
+          1
+        )
+      ).toThrow('Invalid skill code');
+    });
+
+    it('should throw error for invalid nationality code', () => {
+      expect(() =>
+        generateExpertPassportCode(
+          ExpertTypeCode.T,
+          IndustryCode.A,
+          SkillCode.PL,
+          testDate,
+          'C',
+          1
+        )
+      ).toThrow('Nationality code must be exactly 2 letters');
     });
 
     it('should throw error for invalid sequence', () => {
       expect(() =>
-        generateExpertPassportCode([ExpertType.TECHNICAL], 2026, 1, -1, ['Automotive'], [
-          'PLC Programming',
-        ])
-      ).toThrow('Sequence must be between 0 and 999999');
+        generateExpertPassportCode(
+          ExpertTypeCode.T,
+          IndustryCode.A,
+          SkillCode.PL,
+          testDate,
+          'CN',
+          0
+        )
+      ).toThrow('Sequence must be between 1 and 999999');
+
+      expect(() =>
+        generateExpertPassportCode(
+          ExpertTypeCode.T,
+          IndustryCode.A,
+          SkillCode.PL,
+          testDate,
+          'CN',
+          1000000
+        )
+      ).toThrow('Sequence must be between 1 and 999999');
     });
 
     it('should generate different codes for different expert types', () => {
       const code1 = generateExpertPassportCode(
-        [ExpertType.TECHNICAL],
-        2026,
-        1,
-        1,
-        ['Automotive'],
-        ['PLC Programming']
+        ExpertTypeCode.T,
+        IndustryCode.A,
+        SkillCode.PL,
+        testDate,
+        'CN',
+        1
       );
       const code2 = generateExpertPassportCode(
-        [ExpertType.BUSINESS],
-        2026,
-        1,
-        1,
-        ['Automotive'],
-        ['PLC Programming']
+        ExpertTypeCode.B,
+        IndustryCode.A,
+        SkillCode.PL,
+        testDate,
+        'CN',
+        1
       );
       expect(code1).toMatch(/^EP-T/);
       expect(code2).toMatch(/^EP-B/);
+    });
+
+    it('should accept lowercase nationality', () => {
+      const code = generateExpertPassportCode(
+        ExpertTypeCode.T,
+        IndustryCode.A,
+        SkillCode.PL,
+        testDate,
+        'cn',
+        1
+      );
+      expect(code).toContain('-CN-');
     });
   });
 
   describe('parseExpertPassportCode', () => {
     it('should parse a valid expert passport code', () => {
       const code = generateExpertPassportCode(
-        [ExpertType.TECHNICAL],
-        2026,
-        1,
-        1,
-        ['Automotive'],
-        ['PLC Programming']
+        ExpertTypeCode.T,
+        IndustryCode.A,
+        SkillCode.PL,
+        new Date('1985-06-15'),
+        'CN',
+        1
       );
       const parts = parseExpertPassportCode(code);
       expect(parts).toBeDefined();
       expect(parts?.prefix).toBe('EP');
-      expect(parts?.yearMonth).toBe('2601');
+      expect(parts?.expertType).toBe(ExpertTypeCode.T);
+      expect(parts?.industry).toBe(IndustryCode.A);
+      expect(parts?.skill).toBe(SkillCode.PL);
+      expect(parts?.birthYearMonth).toBe('8506');
+      expect(parts?.nationality).toBe('CN');
       expect(parts?.sequence).toBe(1);
     });
 
     it('should return null for invalid format', () => {
       expect(parseExpertPassportCode('INVALID-CODE')).toBeNull();
-      expect(parseExpertPassportCode('EP-T-26-000001-A7')).toBeNull(); // Invalid year-month
+      expect(parseExpertPassportCode('EP-T-26-000001-A7')).toBeNull();
+    });
+
+    it('should return null for invalid expert type', () => {
+      expect(parseExpertPassportCode('EP-XAM-8506-CN-000001-A7')).toBeNull();
+    });
+
+    it('should return null for invalid industry', () => {
+      expect(parseExpertPassportCode('EP-TXM-8506-CN-000001-A7')).toBeNull();
+    });
+
+    it('should return null for invalid skill', () => {
+      expect(parseExpertPassportCode('EP-TAXX-8506-CN-000001-A7')).toBeNull();
+    });
+
+    it('should return null for invalid birth month', () => {
+      expect(parseExpertPassportCode('EP-TAM-8513-CN-000001-A7')).toBeNull();
     });
 
     it('should handle case-insensitive parsing', () => {
       const code = generateExpertPassportCode(
-        [ExpertType.TECHNICAL],
-        2026,
-        1,
-        1,
-        ['Automotive'],
-        ['PLC Programming']
+        ExpertTypeCode.T,
+        IndustryCode.A,
+        SkillCode.PL,
+        new Date('1985-06-15'),
+        'CN',
+        1
       );
       const lowerCase = code.toLowerCase();
       const parts = parseExpertPassportCode(lowerCase);
       expect(parts).toBeDefined();
+      expect(parts?.expertType).toBe(ExpertTypeCode.T);
     });
   });
 
   describe('validateExpertPassportCode', () => {
     it('should validate a correct expert passport code', () => {
       const code = generateExpertPassportCode(
-        [ExpertType.TECHNICAL],
-        2026,
-        1,
-        1,
-        ['Automotive'],
-        ['PLC Programming']
+        ExpertTypeCode.T,
+        IndustryCode.A,
+        SkillCode.PL,
+        new Date('1985-06-15'),
+        'CN',
+        1
       );
       const result = validateExpertPassportCode(code);
       expect(result.valid).toBe(true);
@@ -291,37 +327,66 @@ describe('Expert Passport Code Utilities', () => {
     });
 
     it('should reject code with invalid checksum', () => {
-      const code = 'EP-TAPL-2601-000001-XX';
+      const code = 'EP-TAM-8506-CN-000001-XX';
       const result = validateExpertPassportCode(code);
       expect(result.valid).toBe(false);
       expect(result.error).toBe('Invalid checksum');
+    });
+
+    it('should validate codes with different checksums', () => {
+      const code1 = generateExpertPassportCode(
+        ExpertTypeCode.T,
+        IndustryCode.A,
+        SkillCode.PL,
+        new Date('1985-06-15'),
+        'CN',
+        1
+      );
+      const code2 = generateExpertPassportCode(
+        ExpertTypeCode.T,
+        IndustryCode.A,
+        SkillCode.PL,
+        new Date('1985-06-15'),
+        'CN',
+        2
+      );
+      expect(validateExpertPassportCode(code1).valid).toBe(true);
+      expect(validateExpertPassportCode(code2).valid).toBe(true);
+      expect(code1).not.toBe(code2);
     });
   });
 
   describe('formatExpertPassportCode', () => {
     it('should convert to uppercase', () => {
-      expect(formatExpertPassportCode('ep-tapl-2601-000001-a7')).toBe(
-        'EP-TAPL-2601-000001-A7'
+      expect(formatExpertPassportCode('ep-tam-8506-cn-000001-a7')).toBe(
+        'EP-TAM-8506-CN-000001-A7'
       );
     });
 
     it('should trim whitespace', () => {
-      expect(formatExpertPassportCode('  EP-TAPL-2601-000001-A7  ')).toBe(
-        'EP-TAPL-2601-000001-A7'
+      expect(formatExpertPassportCode('  EP-TAM-8506-CN-000001-A7  ')).toBe(
+        'EP-TAM-8506-CN-000001-A7'
       );
+    });
+
+    it('should handle already formatted code', () => {
+      const code = 'EP-TAM-8506-CN-000001-A7';
+      expect(formatExpertPassportCode(code)).toBe(code);
     });
   });
 
   describe('Integration: Full workflow', () => {
     it('should generate, validate, and parse an expert passport code', () => {
+      const testDate = new Date('1985-06-15');
+
       // Generate code
       const code = generateExpertPassportCode(
-        [ExpertType.TECHNICAL],
-        2026,
-        1,
-        1,
-        ['Automotive', 'Electronics'],
-        ['PLC Programming', 'HMI Development']
+        ExpertTypeCode.T,
+        IndustryCode.A,
+        SkillCode.PL,
+        testDate,
+        'CN',
+        1
       );
 
       // Validate code
@@ -331,34 +396,25 @@ describe('Expert Passport Code Utilities', () => {
       // Parse code
       const parts = parseExpertPassportCode(code);
       expect(parts).toBeDefined();
-      expect(parts?.yearMonth).toBe('2601');
+      expect(parts?.birthYearMonth).toBe('8506');
       expect(parts?.sequence).toBe(1);
-
-      // Decode expert types
-      const expertTypes = decodeExpertType(parts!.expertTypeCode);
-      expect(expertTypes).toContain(ExpertType.TECHNICAL);
-
-      // Decode industries
-      const industries = decodeIndustryCode(parts!.industryCode);
-      expect(industries).toContain('Automotive');
-      expect(industries).toContain('Electronics');
-
-      // Decode skills
-      const skills = decodeSkillCode(parts!.skillCode);
-      expect(skills).toContain('PLC Programming');
-      expect(skills).toContain('HMI Development');
+      expect(parts?.expertType).toBe(ExpertTypeCode.T);
+      expect(parts?.industry).toBe(IndustryCode.A);
+      expect(parts?.skill).toBe(SkillCode.PL);
     });
 
     it('should handle multiple sequential codes', () => {
       const codes = [];
+      const testDate = new Date('1985-06-15');
+
       for (let i = 1; i <= 100; i++) {
         const code = generateExpertPassportCode(
-          [ExpertType.TECHNICAL],
-          2026,
-          1,
-          i,
-          ['Automotive'],
-          ['PLC Programming']
+          ExpertTypeCode.T,
+          IndustryCode.A,
+          SkillCode.PL,
+          testDate,
+          'CN',
+          i
         );
         codes.push(code);
 
@@ -369,6 +425,46 @@ describe('Expert Passport Code Utilities', () => {
       // Ensure all codes are unique
       const uniqueCodes = new Set(codes);
       expect(uniqueCodes.size).toBe(100);
+    });
+
+    it('should handle different expert profiles', () => {
+      const testDate = new Date('1990-03-20');
+
+      // Technical expert
+      const techCode = generateExpertPassportCode(
+        ExpertTypeCode.T,
+        IndustryCode.A,
+        SkillCode.PL,
+        testDate,
+        'US',
+        1
+      );
+      expect(validateExpertPassportCode(techCode).valid).toBe(true);
+      expect(techCode).toContain('TAPL');
+
+      // Business expert
+      const bizCode = generateExpertPassportCode(
+        ExpertTypeCode.B,
+        IndustryCode.C,
+        SkillCode.RB,
+        testDate,
+        'GB',
+        2
+      );
+      expect(validateExpertPassportCode(bizCode).valid).toBe(true);
+      expect(bizCode).toContain('BCRB');
+
+      // All-round expert
+      const allCode = generateExpertPassportCode(
+        ExpertTypeCode.A,
+        IndustryCode.E,
+        SkillCode.HM,
+        testDate,
+        'DE',
+        3
+      );
+      expect(validateExpertPassportCode(allCode).valid).toBe(true);
+      expect(allCode).toContain('AEHM');
     });
   });
 });

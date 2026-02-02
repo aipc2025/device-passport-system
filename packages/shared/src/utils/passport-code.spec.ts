@@ -9,7 +9,7 @@ import {
   generateQRCodeContent,
   extractPassportCodeFromQR,
 } from './passport-code';
-import { ProductLine, OriginCode } from '../types';
+import { ProductLine, OriginCode } from '../enums';
 
 describe('Passport Code Utilities', () => {
   describe('calculateChecksum', () => {

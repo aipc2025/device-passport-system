@@ -20,6 +20,7 @@ out/
 *.swp
 *.swo
 .DS_Store
+.claude/settings.local.json
 
 # Logs
 logs/
@@ -30,6 +31,9 @@ pnpm-debug.log*
 # Testing
 coverage/
 .nyc_output/
+test-results/
+playwright-report/
+playwright/.cache/
 
 # Turbo
 .turbo/

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { QrCode, Search, AlertCircle } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import { scanApi } from '../services/api';
 import toast from 'react-hot-toast';
 
@@ -46,8 +47,13 @@ export default function Scan() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-12">
-      <div className="text-center mb-8">
+    <>
+      <Helmet>
+        <title>{t('scan.pageTitle', 'Scan Device Passport - Device Passport System')}</title>
+        <meta name="description" content={t('scan.pageDescription', 'Scan or enter device passport code to view equipment information and service history')} />
+      </Helmet>
+      <div className="max-w-2xl mx-auto px-4 py-12">
+        <div className="text-center mb-8">
         <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-primary-100 text-primary-600 mb-4">
           <QrCode className="h-8 w-8" />
         </div>
@@ -121,5 +127,6 @@ export default function Scan() {
         </div>
       </div>
     </div>
+    </>
   );
 }

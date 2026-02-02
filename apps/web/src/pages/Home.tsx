@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { QrCode, Shield, Clock, Wrench, ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 
 export default function Home() {
   const { t } = useTranslation();
@@ -41,9 +42,14 @@ export default function Home() {
   ];
 
   return (
-    <div>
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-primary-600 to-primary-800 text-white">
+    <>
+      <Helmet>
+        <title>{t('home.pageTitle', 'Device Passport System - B2B Equipment Lifecycle Management')}</title>
+        <meta name="description" content={t('home.pageDescription', 'B2B Device Passport Traceability System for equipment lifecycle management with digital QR code tracking')} />
+      </Helmet>
+      <div>
+        {/* Hero Section */}
+        <section className="bg-gradient-to-r from-primary-600 to-primary-800 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <div className="text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
@@ -129,6 +135,7 @@ export default function Home() {
           </div>
         </div>
       </section>
-    </div>
+      </div>
+    </>
   );
 }

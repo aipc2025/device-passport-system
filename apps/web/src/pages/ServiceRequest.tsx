@@ -42,6 +42,7 @@ import {
 import toast from 'react-hot-toast';
 import MapPicker from '../components/common/MapPicker';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import { useAuthStore } from '../store/auth.store';
 
 interface UploadedFile {
@@ -353,8 +354,12 @@ export default function ServiceRequest() {
 
   if (isSubmitted) {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-12 text-center">
-        <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
+      <>
+        <Helmet>
+          <title>{t('serviceRequest.successPageTitle', 'Request Submitted - Device Passport System')}</title>
+        </Helmet>
+        <div className="max-w-2xl mx-auto px-4 py-12 text-center">
+          <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
         <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('serviceRequest.submitted', 'Request Submitted!')}</h1>
         <p className="text-gray-600 mb-6">
           {t('serviceRequest.submittedMessage', 'We have received your service request. Our experts will contact you shortly.')}
@@ -362,14 +367,20 @@ export default function ServiceRequest() {
         <button onClick={() => navigate('/')} className="btn-primary">
           {t('common.returnHome', 'Return to Home')}
         </button>
-      </div>
+        </div>
+      </>
     );
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="text-center mb-8">
+    <>
+      <Helmet>
+        <title>{t('serviceRequest.pageTitle', 'Request Service - Device Passport System')}</title>
+        <meta name="description" content={t('serviceRequest.pageDescription', 'Submit a service request for device repair, maintenance, installation or expert consultation')} />
+      </Helmet>
+      <div className="max-w-3xl mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="text-center mb-8">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">{t('serviceRequest.title', 'Service Request')}</h1>
         <p className="text-gray-600 text-sm sm:text-base">{t('serviceRequest.subtitle', 'Tell us what you need and we will match you with the right experts')}</p>
       </div>
@@ -872,6 +883,7 @@ export default function ServiceRequest() {
           </div>
         )}
       </form>
-    </div>
+      </div>
+    </>
   );
 }

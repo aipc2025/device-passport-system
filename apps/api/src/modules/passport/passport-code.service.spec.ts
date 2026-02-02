@@ -69,6 +69,7 @@ describe('PassportCodeService', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
+    jest.restoreAllMocks();
   });
 
   describe('generateCode', () => {
@@ -80,9 +81,12 @@ describe('PassportCodeService', () => {
         yearMonth: expect.any(String),
         productLine: ProductLine.PF,
         originCode: OriginCode.CN,
-        currentSequence: 1,
+        currentSequence: 0, // New counter starts at 0
       });
-      (queryRunner.manager.save as jest.Mock).mockImplementation((entity) => entity);
+      (queryRunner.manager.save as jest.Mock).mockImplementation((entity) => {
+        // Service already incremented, just return the entity
+        return Promise.resolve(entity);
+      });
 
       const code = await service.generateCode(ProductLine.PF, OriginCode.CN);
 
@@ -126,9 +130,12 @@ describe('PassportCodeService', () => {
         yearMonth: expect.any(String),
         productLine: ProductLine.IP,
         originCode: OriginCode.DE,
-        currentSequence: 1,
+        currentSequence: 0,
       });
-      (queryRunner.manager.save as jest.Mock).mockImplementation((entity) => entity);
+      (queryRunner.manager.save as jest.Mock).mockImplementation((entity) => {
+        // Service already incremented, just return the entity
+        return Promise.resolve(entity);
+      });
 
       const code = await service.generateCode(ProductLine.IP, OriginCode.DE, 'SIE');
 
@@ -168,33 +175,42 @@ describe('PassportCodeService', () => {
 
     it('should generate sequential codes correctly', async () => {
       const codes: string[] = [];
-      let currentSequence = 0;
+      let currentSequence = -1; // Start at -1 to detect first call
+
+      // Reset mocks for this test
+      jest.clearAllMocks();
 
       (queryRunner.manager.findOne as jest.Mock).mockImplementation(() => {
-        if (currentSequence === 0) {
-          return null;
+        if (currentSequence === -1) {
+          // First call - no counter exists yet
+          return Promise.resolve(null);
         }
-        return {
+        // Subsequent calls - return existing counter
+        return Promise.resolve({
           id: '1',
           companyCode: 'MED',
-          yearMonth: '2601',
+          yearMonth: '2602',
           productLine: ProductLine.PF,
           originCode: OriginCode.CN,
           currentSequence,
+        });
+      });
+
+      (queryRunner.manager.create as jest.Mock).mockImplementation(() => {
+        // Create returns a new counter starting at 0
+        return {
+          companyCode: 'MED',
+          yearMonth: '2602',
+          productLine: ProductLine.PF,
+          originCode: OriginCode.CN,
+          currentSequence: 0,
         };
       });
 
-      (queryRunner.manager.create as jest.Mock).mockReturnValue({
-        companyCode: 'MED',
-        yearMonth: '2601',
-        productLine: ProductLine.PF,
-        originCode: OriginCode.CN,
-        currentSequence: 1,
-      });
-
       (queryRunner.manager.save as jest.Mock).mockImplementation((entity) => {
+        // Service increments before saving, so we just store the incremented value
         currentSequence = entity.currentSequence;
-        return entity;
+        return Promise.resolve(entity);
       });
 
       // Generate 10 codes

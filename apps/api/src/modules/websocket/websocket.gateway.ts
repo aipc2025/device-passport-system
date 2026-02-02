@@ -14,15 +14,6 @@ import { JwtService } from '@nestjs/jwt';
 interface AuthSocket extends Socket {
   userId?: string;
   userRole?: string;
-  id: string;
-  handshake: {
-    auth?: { token?: string };
-    headers?: { authorization?: string };
-  };
-  join(room: string | string[]): void;
-  leave(room: string): void;
-  emit(event: string, ...args: any[]): boolean;
-  disconnect(close?: boolean): void;
 }
 
 @WSGateway({

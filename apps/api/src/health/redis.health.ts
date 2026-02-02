@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { HealthIndicator, HealthIndicatorResult, HealthCheckError } from '@nestjs/terminus';
+import { HealthIndicator, HealthIndicatorResult } from '@nestjs/terminus';
 import Redis from 'ioredis';
 
 @Injectable()
-export class RedisHealthIndicator extends HealthIndicator {
+export class RedisHealthIndicator extends HealthIndicator implements OnModuleDestroy {
   private redis: Redis | null = null;
 
   constructor(private readonly configService: ConfigService) {
@@ -16,34 +16,44 @@ export class RedisHealthIndicator extends HealthIndicator {
       // Get Redis URL from environment or use default
       const redisUrl = this.configService.get<string>('REDIS_URL') || 'redis://localhost:6379';
 
-      // Create temporary Redis connection for health check
+      // Create temporary Redis connection for health check if not exists
       if (!this.redis) {
         this.redis = new Redis(redisUrl, {
           retryStrategy: () => null, // Don't retry on health check
           maxRetriesPerRequest: 1,
-          lazyConnect: true,
+          enableOfflineQueue: false,
+          connectTimeout: 2000,
         });
       }
 
-      // Connect and ping Redis
-      await this.redis.connect();
-      const pingResult = await this.redis.ping();
+      // Ping Redis with timeout
+      const pingResult = await Promise.race([
+        this.redis.ping(),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Redis ping timeout')), 2000)
+        ),
+      ]) as string;
 
       if (pingResult !== 'PONG') {
         throw new Error('Redis ping failed');
       }
 
-      // Get Redis info for additional metrics
-      const info = await this.redis.info('stats');
-      const serverInfo = await this.redis.info('server');
+      // Get basic info (with error handling)
+      let connectedClients = 0;
+      let uptimeSeconds = 0;
 
-      // Extract connected clients count
-      const connectedClientsMatch = info.match(/connected_clients:(\d+)/);
-      const connectedClients = connectedClientsMatch ? parseInt(connectedClientsMatch[1], 10) : 0;
+      try {
+        const info = await this.redis.info('stats');
+        const serverInfo = await this.redis.info('server');
 
-      // Extract uptime
-      const uptimeMatch = serverInfo.match(/uptime_in_seconds:(\d+)/);
-      const uptimeSeconds = uptimeMatch ? parseInt(uptimeMatch[1], 10) : 0;
+        const connectedClientsMatch = info.match(/connected_clients:(\d+)/);
+        connectedClients = connectedClientsMatch ? parseInt(connectedClientsMatch[1], 10) : 0;
+
+        const uptimeMatch = serverInfo.match(/uptime_in_seconds:(\d+)/);
+        uptimeSeconds = uptimeMatch ? parseInt(uptimeMatch[1], 10) : 0;
+      } catch (infoError) {
+        // Info gathering failed but ping succeeded, still mark as healthy
+      }
 
       return this.getStatus(key, true, {
         status: 'up',
@@ -54,11 +64,11 @@ export class RedisHealthIndicator extends HealthIndicator {
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
-      // Return warning status instead of throwing error if Redis is optional
+      // Return warning status instead of throwing error (Redis is optional)
       return this.getStatus(key, true, {
         status: 'optional',
         message: `Redis check skipped: ${errorMessage}`,
-        warning: 'Redis is configured but not available',
+        warning: 'Redis is configured but not currently available',
       });
     }
   }
@@ -66,7 +76,11 @@ export class RedisHealthIndicator extends HealthIndicator {
   async onModuleDestroy() {
     // Clean up Redis connection when module is destroyed
     if (this.redis) {
-      await this.redis.quit();
+      try {
+        await this.redis.quit();
+      } catch (error) {
+        // Ignore errors during cleanup
+      }
       this.redis = null;
     }
   }

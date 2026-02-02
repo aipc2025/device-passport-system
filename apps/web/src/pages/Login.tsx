@@ -128,17 +128,6 @@ export default function Login() {
             {isLoading ? 'Signing in...' : 'Sign in'}
           </button>
         </form>
-
-        <div className="mt-6 card p-4 bg-gray-50">
-          <h3 className="text-sm font-medium text-gray-900 mb-2">Demo Accounts:</h3>
-          <div className="text-xs text-gray-600 space-y-1 font-mono">
-            <p>admin@luna.top / password123 (Admin)</p>
-            <p>operator@luna.top / password123 (Operator)</p>
-            <p>engineer@luna.top / password123 (Engineer)</p>
-            <p>customer@luna.top / password123 (Customer)</p>
-            <p>expert@luna.top / password123 (Expert)</p>
-          </div>
-        </div>
       </div>
     </div>
     </>

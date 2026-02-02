@@ -258,7 +258,7 @@ describe('ServiceRequestService', () => {
       };
       const publishedRequest = {
         ...draftRequest,
-        status: ServiceRequestStatus.PUBLISHED,
+        status: ServiceRequestStatus.OPEN,
       };
 
       serviceRequestRepository.findOne.mockResolvedValue(draftRequest as ServiceRequest);
@@ -266,7 +266,7 @@ describe('ServiceRequestService', () => {
 
       const result = await service.publish('request-123', 'user-123');
 
-      expect(result.status).toBe(ServiceRequestStatus.PUBLISHED);
+      expect(result.status).toBe(ServiceRequestStatus.OPEN);
       expect(serviceRequestRepository.save).toHaveBeenCalled();
     });
 
@@ -294,7 +294,7 @@ describe('ServiceRequestService', () => {
     it('should throw BadRequestException if request already published', async () => {
       const publishedRequest = {
         ...mockServiceRequest,
-        status: ServiceRequestStatus.PUBLISHED,
+        status: ServiceRequestStatus.OPEN,
         createdByUserId: 'user-123',
       };
       serviceRequestRepository.findOne.mockResolvedValue(publishedRequest as ServiceRequest);
@@ -309,7 +309,7 @@ describe('ServiceRequestService', () => {
     it('should cancel an active service request', async () => {
       const activeRequest = {
         ...mockServiceRequest,
-        status: ServiceRequestStatus.PUBLISHED,
+        status: ServiceRequestStatus.OPEN,
         createdByUserId: 'user-123',
       };
       const cancelledRequest = {
@@ -468,7 +468,7 @@ describe('ServiceRequestService', () => {
     it('should accept an expert application successfully', async () => {
       const publishedRequest = {
         ...mockServiceRequest,
-        status: ServiceRequestStatus.PUBLISHED,
+        status: ServiceRequestStatus.OPEN,
         createdByUserId: 'user-123',
       };
       const pendingApp = {
@@ -486,7 +486,7 @@ describe('ServiceRequestService', () => {
       applicationRepository.save.mockResolvedValue(acceptedApp as any);
       serviceRequestRepository.save.mockResolvedValue({
         ...publishedRequest,
-        status: ServiceRequestStatus.ACCEPTED,
+        status: ServiceRequestStatus.IN_PROGRESS,
         assignedExpertId: 'expert-123',
         assignedAt: new Date(),
       } as ServiceRequest);
@@ -527,7 +527,7 @@ describe('ServiceRequestService', () => {
     it('should reject an expert application successfully', async () => {
       const publishedRequest = {
         ...mockServiceRequest,
-        status: ServiceRequestStatus.PUBLISHED,
+        status: ServiceRequestStatus.OPEN,
         createdByUserId: 'user-123',
       };
       const pendingApp = {
@@ -594,7 +594,7 @@ describe('ServiceRequestService', () => {
     it('should throw BadRequestException if request not in progress yet', async () => {
       const publishedRequest = {
         ...mockServiceRequest,
-        status: ServiceRequestStatus.PUBLISHED,
+        status: ServiceRequestStatus.OPEN,
         createdByUserId: 'user-123',
       };
       serviceRequestRepository.findOne.mockResolvedValue(publishedRequest as ServiceRequest);

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { User, UserRole } from '@device-passport/shared';
+import { User, UserRole, ROLE_PERMISSION_LEVELS } from '@device-passport/shared';
 
 interface AuthState {
   user: Omit<User, 'password'> | null;
@@ -50,17 +50,8 @@ export const useAuthStore = create<AuthState>()(
         const user = get().user;
         if (!user) return false;
 
-        const roleHierarchy: Record<UserRole, number> = {
-          [UserRole.PUBLIC]: 0,
-          [UserRole.CUSTOMER]: 1,
-          [UserRole.ENGINEER]: 2,
-          [UserRole.QC_INSPECTOR]: 3,
-          [UserRole.OPERATOR]: 4,
-          [UserRole.ADMIN]: 5,
-        };
-
-        const userLevel = roleHierarchy[user.role];
-        const minRequired = Math.min(...roles.map((r) => roleHierarchy[r]));
+        const userLevel = ROLE_PERMISSION_LEVELS[user.role];
+        const minRequired = Math.min(...roles.map((r) => ROLE_PERMISSION_LEVELS[r]));
 
         return userLevel >= minRequired;
       },

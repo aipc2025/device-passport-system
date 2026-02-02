@@ -46,6 +46,25 @@ export default function Home() {
       <Helmet>
         <title>{t('home.pageTitle', 'Device Passport System - B2B Equipment Lifecycle Management')}</title>
         <meta name="description" content={t('home.pageDescription', 'B2B Device Passport Traceability System for equipment lifecycle management with digital QR code tracking')} />
+
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={window.location.href} />
+        <meta property="og:title" content={t('home.pageTitle', 'Device Passport System - B2B Equipment Lifecycle Management')} />
+        <meta property="og:description" content={t('home.pageDescription', 'B2B Device Passport Traceability System for equipment lifecycle management with digital QR code tracking')} />
+        <meta property="og:image" content="/luna-logo.png" />
+
+        {/* Twitter */}
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content={window.location.href} />
+        <meta property="twitter:title" content={t('home.pageTitle', 'Device Passport System - B2B Equipment Lifecycle Management')} />
+        <meta property="twitter:description" content={t('home.pageDescription', 'B2B Device Passport Traceability System for equipment lifecycle management with digital QR code tracking')} />
+        <meta property="twitter:image" content="/luna-logo.png" />
+
+        {/* Additional SEO */}
+        <meta name="keywords" content="device passport, equipment lifecycle, traceability, QR code, B2B, asset management" />
+        <meta name="author" content="LUNA INDUSTRY" />
+        <link rel="canonical" href={window.location.href} />
       </Helmet>
       <div>
         {/* Hero Section */}

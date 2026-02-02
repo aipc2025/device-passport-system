@@ -51,6 +51,25 @@ export default function Scan() {
       <Helmet>
         <title>{t('scan.pageTitle', 'Scan Device Passport - Device Passport System')}</title>
         <meta name="description" content={t('scan.pageDescription', 'Scan or enter device passport code to view equipment information and service history')} />
+
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={window.location.href} />
+        <meta property="og:title" content={t('scan.pageTitle', 'Scan Device Passport - Device Passport System')} />
+        <meta property="og:description" content={t('scan.pageDescription', 'Scan or enter device passport code to view equipment information and service history')} />
+        <meta property="og:image" content="/luna-logo.png" />
+
+        {/* Twitter */}
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content={window.location.href} />
+        <meta property="twitter:title" content={t('scan.pageTitle', 'Scan Device Passport - Device Passport System')} />
+        <meta property="twitter:description" content={t('scan.pageDescription', 'Scan or enter device passport code to view equipment information and service history')} />
+        <meta property="twitter:image" content="/luna-logo.png" />
+
+        {/* Additional SEO */}
+        <meta name="keywords" content="QR code scan, device passport, equipment tracking, device traceability, equipment information" />
+        <meta name="author" content="LUNA INDUSTRY" />
+        <link rel="canonical" href={window.location.href} />
       </Helmet>
       <div className="max-w-2xl mx-auto px-4 py-12">
         <div className="text-center mb-8">

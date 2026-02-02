@@ -377,6 +377,25 @@ export default function ServiceRequest() {
       <Helmet>
         <title>{t('serviceRequest.pageTitle', 'Request Service - Device Passport System')}</title>
         <meta name="description" content={t('serviceRequest.pageDescription', 'Submit a service request for device repair, maintenance, installation or expert consultation')} />
+
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={window.location.href} />
+        <meta property="og:title" content={t('serviceRequest.pageTitle', 'Request Service - Device Passport System')} />
+        <meta property="og:description" content={t('serviceRequest.pageDescription', 'Submit a service request for device repair, maintenance, installation or expert consultation')} />
+        <meta property="og:image" content="/luna-logo.png" />
+
+        {/* Twitter */}
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content={window.location.href} />
+        <meta property="twitter:title" content={t('serviceRequest.pageTitle', 'Request Service - Device Passport System')} />
+        <meta property="twitter:description" content={t('serviceRequest.pageDescription', 'Submit a service request for device repair, maintenance, installation or expert consultation')} />
+        <meta property="twitter:image" content="/luna-logo.png" />
+
+        {/* Additional SEO */}
+        <meta name="keywords" content="service request, equipment repair, maintenance, equipment installation, device consultation, technical support" />
+        <meta name="author" content="LUNA INDUSTRY" />
+        <link rel="canonical" href={window.location.href} />
       </Helmet>
       <div className="max-w-3xl mx-auto px-4 py-8">
         {/* Header */}

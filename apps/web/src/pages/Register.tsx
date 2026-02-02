@@ -50,6 +50,26 @@ export default function Register() {
     <>
       <Helmet>
         <title>Register - Device Passport System</title>
+        <meta name="description" content="Create a new business account to access Device Passport System features including equipment tracking and service management" />
+
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={window.location.href} />
+        <meta property="og:title" content="Register - Device Passport System" />
+        <meta property="og:description" content="Create a new business account to access Device Passport System features including equipment tracking and service management" />
+        <meta property="og:image" content="/luna-logo.png" />
+
+        {/* Twitter */}
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content={window.location.href} />
+        <meta property="twitter:title" content="Register - Device Passport System" />
+        <meta property="twitter:description" content="Create a new business account to access Device Passport System features including equipment tracking and service management" />
+        <meta property="twitter:image" content="/luna-logo.png" />
+
+        {/* Additional SEO */}
+        <meta name="keywords" content="register, signup, business account, B2B registration, equipment system, device management account" />
+        <meta name="author" content="LUNA INDUSTRY" />
+        <link rel="canonical" href={window.location.href} />
       </Helmet>
       <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
       <div className="max-w-md w-full">

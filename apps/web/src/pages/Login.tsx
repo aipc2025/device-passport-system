@@ -50,6 +50,26 @@ export default function Login() {
     <>
       <Helmet>
         <title>Login - Device Passport System</title>
+        <meta name="description" content="Sign in to your Device Passport System account to manage equipment, track devices, and access service features" />
+
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={window.location.href} />
+        <meta property="og:title" content="Login - Device Passport System" />
+        <meta property="og:description" content="Sign in to your Device Passport System account to manage equipment, track devices, and access service features" />
+        <meta property="og:image" content="/luna-logo.png" />
+
+        {/* Twitter */}
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content={window.location.href} />
+        <meta property="twitter:title" content="Login - Device Passport System" />
+        <meta property="twitter:description" content="Sign in to your Device Passport System account to manage equipment, track devices, and access service features" />
+        <meta property="twitter:image" content="/luna-logo.png" />
+
+        {/* Additional SEO */}
+        <meta name="keywords" content="login, authentication, B2B portal, device management, equipment system access" />
+        <meta name="author" content="LUNA INDUSTRY" />
+        <link rel="canonical" href={window.location.href} />
       </Helmet>
       <div className="min-h-[80vh] flex items-center justify-center px-4">
         <div className="max-w-md w-full">

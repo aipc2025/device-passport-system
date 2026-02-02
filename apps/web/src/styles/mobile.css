@@ -1,0 +1,263 @@
+/* Mobile-specific styles and utilities */
+
+/* Safe area support for iOS notch */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .safe-area-left {
+    padding-left: env(safe-area-inset-left);
+  }
+
+  .safe-area-right {
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+/* Touch-friendly tap targets (minimum 44x44px) */
+.tap-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Prevent text selection on mobile for UI elements */
+.no-select {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Smooth scrolling for mobile */
+.smooth-scroll {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Hide scrollbar on mobile */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Pull-to-refresh styling */
+.ptr-container {
+  overscroll-behavior-y: contain;
+}
+
+/* Bottom sheet backdrop */
+.bottom-sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Bottom sheet */
+.bottom-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  border-radius: 16px 16px 0 0;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Swipeable card */
+.swipeable-card {
+  touch-action: pan-y;
+  will-change: transform;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Haptic feedback styles */
+.haptic {
+  transition: transform 0.1s;
+}
+
+.haptic:active {
+  transform: scale(0.95);
+}
+
+/* Mobile-specific focus styles */
+@media (pointer: coarse) {
+  /* Larger tap targets on touch devices */
+  button,
+  a,
+  input[type="button"],
+  input[type="submit"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Remove hover effects on touch devices */
+  *:hover {
+    /* Reset hover styles if needed */
+  }
+}
+
+/* Orientation specific styles */
+@media (orientation: portrait) {
+  .portrait-only {
+    display: block;
+  }
+  .landscape-only {
+    display: none;
+  }
+}
+
+@media (orientation: landscape) {
+  .portrait-only {
+    display: none;
+  }
+  .landscape-only {
+    display: block;
+  }
+}
+
+/* PWA specific styles */
+@media (display-mode: standalone) {
+  /* Styles when app is installed as PWA */
+  .pwa-only {
+    display: block;
+  }
+  .browser-only {
+    display: none;
+  }
+
+  /* Hide browser UI hints when in standalone mode */
+  .install-prompt {
+    display: none;
+  }
+}
+
+@media (display-mode: browser) {
+  .pwa-only {
+    display: none;
+  }
+  .browser-only {
+    display: block;
+  }
+}
+
+/* Loading skeleton for mobile */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 25%,
+    #e0e0e0 50%,
+    #f0f0f0 75%
+  );
+  background-size: 200% 100%;
+  animation: loading 1.5s ease-in-out infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Mobile card layout */
+.mobile-card {
+  @apply bg-white rounded-lg shadow-md p-4 mb-4;
+}
+
+/* Mobile input styles */
+.mobile-input {
+  @apply w-full px-4 py-3 text-base border border-gray-300 rounded-lg;
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+}
+
+/* Mobile button styles */
+.mobile-btn-primary {
+  @apply w-full px-6 py-3 bg-blue-600 text-white text-base font-medium rounded-lg;
+  @apply active:bg-blue-700 transition-colors tap-target;
+}
+
+.mobile-btn-secondary {
+  @apply w-full px-6 py-3 bg-gray-200 text-gray-800 text-base font-medium rounded-lg;
+  @apply active:bg-gray-300 transition-colors tap-target;
+}
+
+/* Mobile list items */
+.mobile-list-item {
+  @apply flex items-center gap-3 p-4 bg-white border-b border-gray-200;
+  @apply active:bg-gray-50 transition-colors;
+}
+
+/* Mobile header */
+.mobile-header {
+  @apply fixed top-0 left-0 right-0 z-40 bg-white border-b border-gray-200;
+  @apply shadow-sm safe-area-top;
+}
+
+/* Mobile content area */
+.mobile-content {
+  @apply pt-16 pb-20 px-4;
+}
+
+/* Prevent zoom on input focus (iOS) */
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="tel"],
+input[type="password"],
+select,
+textarea {
+  font-size: 16px !important;
+}
+
+/* Landscape mode adjustments */
+@media (max-height: 500px) and (orientation: landscape) {
+  .mobile-header {
+    @apply py-2;
+  }
+
+  .mobile-content {
+    @apply pt-12 pb-16;
+  }
+}
+
+/* iPhone X and newer notch support */
+@supports (padding-top: constant(safe-area-inset-top)) {
+  .safe-area-top {
+    padding-top: constant(safe-area-inset-top);
+  }
+
+  .safe-area-bottom {
+    padding-bottom: constant(safe-area-inset-bottom);
+  }
+}

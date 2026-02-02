@@ -23,6 +23,7 @@ import { ExpertRatingModule } from './modules/expert-rating/expert-rating.module
 import { PointModule } from './modules/point/point.module';
 import { InvitationModule } from './modules/invitation/invitation.module';
 import { DeviceTakeoverModule } from './modules/device-takeover/device-takeover.module';
+import { LocationModule } from './modules/location/location.module';
 import databaseConfig from './config/database.config';
 import jwtConfig from './config/jwt.config';
 
@@ -79,6 +80,7 @@ import jwtConfig from './config/jwt.config';
     PointModule,
     InvitationModule,
     DeviceTakeoverModule,
+    LocationModule,
   ],
 })
 export class AppModule {}

@@ -1,0 +1,82 @@
+import { useQuery } from '@tanstack/react-query';
+import { apiClient } from '../lib/api-client';
+
+interface NearbySearchParams {
+  latitude: number;
+  longitude: number;
+  radius?: number; // in kilometers
+  type: 'experts' | 'service-requests' | 'devices';
+  enabled?: boolean;
+}
+
+interface NearbyItem {
+  id: string;
+  name: string;
+  distance: number; // in kilometers
+  latitude: number;
+  longitude: number;
+  type: string;
+  metadata?: Record<string, any>;
+}
+
+export function useNearbySearch({
+  latitude,
+  longitude,
+  radius = 50,
+  type,
+  enabled = true,
+}: NearbySearchParams) {
+  return useQuery({
+    queryKey: ['nearby', type, latitude, longitude, radius],
+    queryFn: async () => {
+      const response = await apiClient.get<{ items: NearbyItem[]; total: number }>(
+        `/api/v1/location/nearby/${type}`,
+        {
+          params: {
+            lat: latitude,
+            lng: longitude,
+            radius,
+          },
+        }
+      );
+      return response.data;
+    },
+    enabled: enabled && !!latitude && !!longitude,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+}
+
+// Calculate distance between two coordinates (Haversine formula)
+export function calculateDistance(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number
+): number {
+  const R = 6371; // Earth's radius in kilometers
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) *
+      Math.cos(toRad(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+function toRad(degrees: number): number {
+  return (degrees * Math.PI) / 180;
+}
+
+// Format distance for display
+export function formatDistance(km: number): string {
+  if (km < 1) {
+    return `${Math.round(km * 1000)}米`;
+  }
+  if (km < 10) {
+    return `${km.toFixed(1)}公里`;
+  }
+  return `${Math.round(km)}公里`;
+}

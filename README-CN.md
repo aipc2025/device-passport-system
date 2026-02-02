@@ -39,11 +39,20 @@ start-all.bat
 
 ## 测试账号
 
+⚠️ **重要：正确的测试账号信息**
+
+**所有账号统一密码**: `DevTest2026!@#$`
+
 | 角色 | 邮箱 | 密码 |
 |------|------|------|
-| 管理员 | admin@example.com | Admin123! |
-| 用户 | user@example.com | User123! |
-| 专家 | expert@example.com | Expert123! |
+| 管理员 | admin@luna.top | DevTest2026!@#$ |
+| 操作员 | operator@luna.top | DevTest2026!@#$ |
+| 工程师 | engineer@luna.top | DevTest2026!@#$ |
+| 质检员 | qc@luna.top | DevTest2026!@#$ |
+| 客户 | customer@luna.top | DevTest2026!@#$ |
+| 专家 | expert@luna.top | DevTest2026!@#$ |
+
+📖 **详细说明请查看**: [TEST-ACCOUNTS.md](./TEST-ACCOUNTS.md)
 
 ---
 

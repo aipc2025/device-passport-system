@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import { registrationApi } from '../../services/api';
 import {
   RegistrationType,
@@ -623,7 +624,11 @@ export default function PendingRegistrations() {
   }
 
   return (
-    <div className="space-y-6">
+    <>
+      <Helmet>
+        <title>Pending Registrations - Device Passport System</title>
+      </Helmet>
+      <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{t('admin.pendingRegistrations', 'Pending Registrations')}</h1>
@@ -791,5 +796,6 @@ export default function PendingRegistrations() {
         </div>
       )}
     </div>
+    </>
   );
 }

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import {
   Award,
   Search,
@@ -174,7 +175,11 @@ export default function PointRuleList() {
   const activeRules = filteredRules.filter((r) => r.isActive);
 
   return (
-    <div className="space-y-6">
+    <>
+      <Helmet>
+        <title>Point Rules - Device Passport System</title>
+      </Helmet>
+      <div className="space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
@@ -499,5 +504,6 @@ export default function PointRuleList() {
         )}
       </div>
     </div>
+    </>
   );
 }

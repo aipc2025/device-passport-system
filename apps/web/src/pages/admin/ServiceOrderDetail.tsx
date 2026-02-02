@@ -19,6 +19,7 @@ import { ServiceOrder, ServiceRecord, ServiceOrderStatus, ServicePriority } from
 import { format } from 'date-fns';
 import clsx from 'clsx';
 import toast from 'react-hot-toast';
+import { Helmet } from 'react-helmet-async';
 
 interface Engineer {
   id: string;
@@ -104,11 +105,15 @@ export default function ServiceOrderDetail() {
   }
 
   return (
-    <div className="space-y-6">
-      <Link
-        to="/service-orders"
-        className="inline-flex items-center text-gray-600 hover:text-gray-900"
-      >
+    <>
+      <Helmet>
+        <title>{`${order.orderNumber} - ${order.title} - Device Passport System`}</title>
+      </Helmet>
+      <div className="space-y-6">
+        <Link
+          to="/service-orders"
+          className="inline-flex items-center text-gray-600 hover:text-gray-900"
+        >
         <ArrowLeft className="h-4 w-4 mr-1" />
         Back to Service Orders
       </Link>
@@ -400,5 +405,6 @@ export default function ServiceOrderDetail() {
         </div>
       )}
     </div>
+    </>
   );
 }

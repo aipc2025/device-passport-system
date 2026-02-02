@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Edit2, Trash2, X, Building2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import { organizationApi } from '../../services/api';
 import { useAuthStore } from '../../store/auth.store';
 import { UserRole, OrganizationType } from '@device-passport/shared';
@@ -172,9 +173,13 @@ export default function SupplierList() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
+    <>
+      <Helmet>
+        <title>{t('supplier.pageTitle', 'Suppliers - Device Passport System')}</title>
+      </Helmet>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{t('supplier.title')}</h1>
           <p className="text-gray-600">{t('supplier.description')}</p>
@@ -450,5 +455,6 @@ export default function SupplierList() {
         </div>
       )}
     </div>
+    </>
   );
 }

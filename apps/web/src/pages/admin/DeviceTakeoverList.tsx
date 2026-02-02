@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import {
   Package,
   Search,
@@ -152,7 +153,11 @@ export default function DeviceTakeoverList() {
   const reviewingCount = requests.filter((r) => r.status === TakeoverStatus.REVIEWING).length;
 
   return (
-    <div className="space-y-6">
+    <>
+      <Helmet>
+        <title>Device Takeover - Device Passport System</title>
+      </Helmet>
+      <div className="space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
@@ -508,5 +513,6 @@ export default function DeviceTakeoverList() {
         </div>
       )}
     </div>
+    </>
   );
 }

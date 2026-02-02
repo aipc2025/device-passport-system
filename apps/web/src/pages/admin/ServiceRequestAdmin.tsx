@@ -1,6 +1,7 @@
 import { useState, useMemo, lazy, Suspense } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import {
   Search,
   Users,
@@ -244,7 +245,11 @@ export default function ServiceRequestAdmin() {
   };
 
   return (
-    <div className="space-y-6">
+    <>
+      <Helmet>
+        <title>Service Requests - Device Passport System</title>
+      </Helmet>
+      <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -657,5 +662,6 @@ export default function ServiceRequestAdmin() {
         </div>
       )}
     </div>
+    </>
   );
 }

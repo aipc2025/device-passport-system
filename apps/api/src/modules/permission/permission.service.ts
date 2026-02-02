@@ -20,47 +20,58 @@ import { User } from '../../database/entities';
 export class PermissionService {
   private readonly logger = new Logger(PermissionService.name);
 
-  // Role-based permission definitions
+  // Role-based permission definitions with granular permissions
+  // Format: resource.action.scope (e.g., device.view.own, device.view.org, device.view.all)
   private readonly rolePermissions: Record<UserRole, string[]> = {
     // Public - minimal permissions
-    [UserRole.PUBLIC]: ['scan.read'],
+    [UserRole.PUBLIC]: ['scan.read', 'device.view.public'],
 
-    // Customer - view own data
+    // Customer - view own organization data
     [UserRole.CUSTOMER]: [
       'scan.read',
-      'device.read',
+      'device.view.org',
+      'device.scan',
       'service-request.create',
-      'service-request.read',
+      'service-request.view.own',
+      'service-request.update.own',
+      'order.view.org',
     ],
 
-    // Engineer - execute services
+    // Engineer - execute services (platform internal)
     [UserRole.ENGINEER]: [
       'scan.read',
-      'device.read',
-      'device.update',
-      'service-order.read',
+      'device.view.org',
+      'device.update.own',
+      'service-order.view.all',
       'service-order.update',
       'service-record.create',
+      'manual.view',
     ],
 
-    // QC Inspector - quality control
+    // QC Inspector - quality control (platform internal)
     [UserRole.QC_INSPECTOR]: [
       'scan.read',
-      'device.read',
-      'device.update',
-      'qc.read',
+      'device.view.all',
+      'device.update.all',
+      'qc.view.all',
+      'qc.inspect',
       'qc.approve',
+      'qc.reject',
+      'qc.override', // Platform QC can override supplier QC
       'device.status.update',
+      'shipping.block', // Can block shipping if QC fails
     ],
 
-    // Operator - create and manage devices
+    // Operator - create and manage devices (platform internal)
     [UserRole.OPERATOR]: [
       'scan.read',
       'device.*',  // All device operations
       'passport.*',  // All passport operations
-      'service-order.read',
+      'qc.view.all',
+      'service-order.view.all',
       'service-order.update',
-      'user.read',
+      'user.view.org',
+      'report.view',
     ],
 
     // Admin - full platform access
@@ -69,41 +80,49 @@ export class PermissionService {
     // Supplier Viewer - read-only access to own org
     [UserRole.SUPPLIER_VIEWER]: [
       'scan.read',
-      'device.read',
-      'passport.read',
+      'device.view.org',
+      'passport.view.org',
+      'order.view.org',
+      'qc.view.org',
     ],
 
     // Supplier QC - quality control at supplier
     [UserRole.SUPPLIER_QC]: [
       'scan.read',
-      'device.read',
-      'device.update',
-      'qc.read',
-      'qc.create',
+      'device.view.org',
+      'device.update.own',
+      'qc.view.org',
+      'qc.inspect',
       'qc.approve',
+      'qc.reject',
+      'qc.create',
       'device.status.update',
+      'workflow.qc-to-package', // Can transition from QC to Package
     ],
 
     // Supplier Packer - packaging at supplier
     [UserRole.SUPPLIER_PACKER]: [
       'scan.read',
-      'device.read',
-      'device.update',
-      'package.read',
+      'device.view.org',
+      'device.update.own',
+      'package.view.org',
       'package.create',
-      'package.approve',
+      'package.update',
       'device.status.update',
+      'workflow.package-to-ship', // Can transition from Package to Ship
     ],
 
     // Supplier Shipper - shipping at supplier
     [UserRole.SUPPLIER_SHIPPER]: [
       'scan.read',
-      'device.read',
-      'device.update',
-      'shipping.read',
+      'device.view.org',
+      'device.update.own',
+      'shipping.view.org',
       'shipping.create',
       'shipping.update',
+      'shipping.track',
       'device.status.update',
+      'workflow.ship-to-transit', // Can transition to In Transit
     ],
 
     // Supplier Admin - manage supplier org
@@ -114,9 +133,12 @@ export class PermissionService {
       'qc.*',
       'package.*',
       'shipping.*',
-      'user.read',
-      'user.create',
-      'user.update',
+      'workflow.*', // Can handle all workflow transitions
+      'user.view.org',
+      'user.create.org',
+      'user.update.org',
+      'report.view.org',
+      'report.export',
     ],
   };
 

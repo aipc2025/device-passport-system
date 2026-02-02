@@ -1,85 +1,84 @@
 @echo off
-chcp 65001 >nul
 echo ==========================================
-echo   设备护照系统 - 服务状态检查
+echo   Device Passport System - Service Check
 echo ==========================================
 echo.
 
-echo [1/6] 检查Docker服务...
+echo [1/6] Checking Docker service...
 docker ps >nul 2>&1
 if %errorlevel% equ 0 (
-    echo ✅ Docker服务运行正常
+    echo OK: Docker service is running
 ) else (
-    echo ❌ Docker服务未运行
+    echo Error: Docker service is not running
 )
 
 echo.
-echo [2/6] 检查PostgreSQL数据库...
+echo [2/6] Checking PostgreSQL database...
 docker ps | findstr device-passport-db | findstr "Up" >nul 2>&1
 if %errorlevel% equ 0 (
-    echo ✅ PostgreSQL数据库运行正常
+    echo OK: PostgreSQL database is running
 ) else (
-    echo ❌ PostgreSQL数据库未运行
+    echo Error: PostgreSQL database is not running
 )
 
 echo.
-echo [3/6] 检查Redis缓存...
+echo [3/6] Checking Redis cache...
 docker ps | findstr device-passport-redis | findstr "Up" >nul 2>&1
 if %errorlevel% equ 0 (
-    echo ✅ Redis缓存运行正常
+    echo OK: Redis cache is running
 ) else (
-    echo ❌ Redis缓存未运行
+    echo Error: Redis cache is not running
 )
 
 echo.
-echo [4/6] 检查API服务 (端口3000)...
+echo [4/6] Checking API service (port 3000)...
 netstat -ano | findstr ":3000.*LISTENING" >nul 2>&1
 if %errorlevel% equ 0 (
-    echo ✅ API服务运行正常
+    echo OK: API service is running
     curl -s http://localhost:3000/api/v1 >nul 2>&1
     if %errorlevel% equ 0 (
-        echo    └─ API响应正常
+        echo    API is responding
     ) else (
-        echo    └─ ⚠️  API未响应
+        echo    Warning: API is not responding
     )
 ) else (
-    echo ❌ API服务未运行（端口3000未监听）
+    echo Error: API service is not running (port 3000)
 )
 
 echo.
-echo [5/6] 检查Web服务 (端口5173)...
+echo [5/6] Checking Web service (port 5173)...
 netstat -ano | findstr ":5173.*LISTENING" >nul 2>&1
 if %errorlevel% equ 0 (
-    echo ✅ Web服务运行正常
+    echo OK: Web service is running
 ) else (
-    echo ❌ Web服务未运行（端口5173未监听）
+    echo Error: Web service is not running (port 5173)
 )
 
 echo.
-echo [6/6] 检查Adminer (端口8080)...
+echo [6/6] Checking Adminer (port 8080)...
 netstat -ano | findstr ":8080.*LISTENING" >nul 2>&1
 if %errorlevel% equ 0 (
-    echo ✅ Adminer运行正常
+    echo OK: Adminer is running
 ) else (
-    echo ❌ Adminer未运行（端口8080未监听）
+    echo Error: Adminer is not running (port 8080)
 )
 
 echo.
 echo ==========================================
-echo   网络配置信息
+echo   Network Configuration
 echo ==========================================
 echo.
 ipconfig | findstr "IPv4"
 echo.
 
 echo ==========================================
-echo   访问地址
+echo   Access URLs
 echo ==========================================
-echo   本机访问：
+echo   Local Access:
 echo     - Web: http://localhost:5173
 echo     - API: http://localhost:3000/api/v1
 echo.
-echo   局域网访问（使用本机IP）：
+echo   LAN Access (use your IP):
 echo     - Web: http://192.168.71.21:5173
 echo     - API: http://192.168.71.21:3000/api/v1
 echo     - Swagger: http://192.168.71.21:3000/api/docs

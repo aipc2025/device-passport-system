@@ -1,28 +1,27 @@
 @echo off
-chcp 65001 >nul
 echo ==========================================
-echo   设备护照系统 - 停止所有服务
+echo   Device Passport System - Stop All
 echo ==========================================
 echo.
 
-echo [1/2] 停止数据库和Redis...
+echo [1/2] Stopping database and Redis...
 cd docker
 docker-compose down
 cd ..
-echo ✅ 数据库和Redis已停止
+echo OK: Database and Redis stopped
 
 echo.
-echo [2/2] 停止Node进程...
+echo [2/2] Stopping Node processes...
 taskkill /F /IM node.exe >nul 2>&1
 if %errorlevel% equ 0 (
-    echo ✅ Node进程已停止
+    echo OK: Node processes stopped
 ) else (
-    echo ℹ️  没有运行中的Node进程
+    echo Info: No running Node processes
 )
 
 echo.
 echo ==========================================
-echo   所有服务已停止
+echo   All services stopped
 echo ==========================================
 echo.
 pause

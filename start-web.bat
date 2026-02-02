@@ -1,34 +1,33 @@
 @echo off
-chcp 65001 >nul
 echo ==========================================
-echo   设备护照系统 - 前端启动脚本
+echo   Device Passport System - Web Frontend
 echo   Server IP: 192.168.71.21
 echo ==========================================
 echo.
 
-echo [1/2] 检查API服务是否运行...
+echo [1/2] Checking API server...
 curl -s http://localhost:3000/api/v1 >nul 2>&1
 if %errorlevel% neq 0 (
-    echo ⚠️  警告：API服务可能未启动
-    echo    请先运行 start-server.bat 启动API服务器
+    echo Warning: API server may not be running
+    echo Please run start-server.bat first
     echo.
 )
 
-echo [2/2] 启动前端Web服务...
+echo [2/2] Starting Web server...
 echo.
 echo ==========================================
-echo   Web访问地址：
-echo   - 本机: http://localhost:5173
-echo   - 局域网: http://192.168.71.21:5173
+echo   Web Access URLs:
+echo   - Local: http://localhost:5173
+echo   - LAN: http://192.168.71.21:5173
 echo ==========================================
 echo.
-echo 📝 提示：
-echo   1. 确保API服务器已启动（运行start-server.bat）
-echo   2. 局域网内其他设备可通过IP访问
-echo   3. 按 Ctrl+C 可停止Web服务器
-echo   4. 详细说明请查看 START-GUIDE.md
+echo Tips:
+echo   1. Make sure API server is running (start-server.bat)
+echo   2. Other devices on LAN can access via IP address
+echo   3. Press Ctrl+C to stop the server
+echo   4. See START-GUIDE.md for details
 echo.
-echo 正在启动Web服务器...
+echo Starting Web server...
 echo.
 
 cd apps\web

@@ -80,7 +80,7 @@ export class LocationService {
             professionalField: expert.professionalField,
             yearsOfExperience: expert.yearsOfExperience,
             workStatus: expert.workStatus,
-            passportCode: expert.passportCode,
+            expertCode: expert.expertCode,
           },
         };
       })
@@ -131,9 +131,9 @@ export class LocationService {
           metadata: {
             serviceType: request.serviceType,
             urgency: request.urgency,
-            publishedAt: request.publishedAt,
+            createdAt: request.createdAt,
             requiredSkills: request.requiredSkills,
-            budget: request.budget,
+            budgetRange: `${request.budgetMin || 0}-${request.budgetMax || 0} ${request.budgetCurrency}`,
           },
         };
       })
@@ -167,27 +167,27 @@ export class LocationService {
     // Calculate distances and filter
     const nearbyDevices = devices
       .map((device) => {
-        if (!device.currentLocation) return null;
+        if (!device.locationLat || !device.locationLng) return null;
 
         const distance = this.calculateDistance(
           latitude,
           longitude,
-          device.currentLocation.latitude,
-          device.currentLocation.longitude,
+          device.locationLat,
+          device.locationLng,
         );
 
         return {
           id: device.id,
-          name: device.productName || device.passportCode,
+          name: device.deviceName || device.passportCode,
           distance,
-          latitude: device.currentLocation.latitude,
-          longitude: device.currentLocation.longitude,
+          latitude: device.locationLat,
+          longitude: device.locationLng,
           type: 'device',
           metadata: {
             passportCode: device.passportCode,
             status: device.status,
             productLine: device.productLine,
-            productName: device.productName,
+            deviceName: device.deviceName,
           },
         };
       })
@@ -215,15 +215,15 @@ export class LocationService {
         throw new Error('Geocoding failed');
       }
 
-      const data = await response.json();
+      const data = await response.json() as any;
 
       return {
-        address: data.display_name,
-        city: data.address?.city || data.address?.town || data.address?.village,
-        state: data.address?.state,
-        country: data.address?.country,
-        countryCode: data.address?.country_code?.toUpperCase(),
-        postalCode: data.address?.postcode,
+        address: data.display_name || null,
+        city: data.address?.city || data.address?.town || data.address?.village || null,
+        state: data.address?.state || null,
+        country: data.address?.country || null,
+        countryCode: data.address?.country_code?.toUpperCase() || null,
+        postalCode: data.address?.postcode || null,
       };
     } catch (error) {
       return {

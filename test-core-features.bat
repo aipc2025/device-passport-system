@@ -7,7 +7,7 @@ echo.
 
 REM Check if services are running
 echo [1/7] Checking if backend API is running...
-curl -s http://localhost:3000/api/health >nul 2>&1
+curl -s http://localhost:3000/api/v1/health >nul 2>&1
 if %errorlevel% neq 0 (
     echo FAILED: Backend API is not running on port 3000
     echo Please start services first: start-all.bat
@@ -20,7 +20,7 @@ echo.
 
 REM Test 1: Health Check
 echo [2/7] Testing Health Check Endpoint...
-curl -s http://localhost:3000/api/health > nul
+curl -s http://localhost:3000/api/v1/health > nul
 if %errorlevel% equ 0 (
     echo PASSED: Health check endpoint responding
 ) else (
@@ -75,7 +75,7 @@ echo.
 
 REM Test 6: Database Connectivity
 echo [7/7] Testing Database Connectivity (via health check)...
-curl -s http://localhost:3000/api/health -H "Accept: application/json" | findstr /C:"database" >nul 2>&1
+curl -s http://localhost:3000/api/v1/health -H "Accept: application/json" | findstr /C:"database" >nul 2>&1
 if %errorlevel% equ 0 (
     echo PASSED: Database health check responding
 ) else (
@@ -99,7 +99,7 @@ echo   - System is ready for use
 echo   - You can access:
 echo     * Frontend: http://localhost:5173
 echo     * API Docs: http://localhost:3000/api/docs
-echo     * Health: http://localhost:3000/api/health
+echo     * Health: http://localhost:3000/api/v1/health
 echo.
 echo If any tests failed:
 echo   1. Ensure all services are running (start-all.bat)

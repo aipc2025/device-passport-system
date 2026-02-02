@@ -70,13 +70,13 @@ function Test-Endpoint {
 
 # Test 1: Backend API Availability
 Write-Host "[1/9] Checking Backend API..." -ForegroundColor Yellow
-$result = Test-Endpoint -Name "Backend API Availability" -Url "http://localhost:3000/api/health"
+$result = Test-Endpoint -Name "Backend API Availability" -Url "http://localhost:3000/api/v1/health"
 $testResults += $result
 Write-Host ""
 
 # Test 2: Health Check Endpoint
 Write-Host "[2/9] Testing Health Check..." -ForegroundColor Yellow
-$result = Test-Endpoint -Name "Health Check Endpoint" -Url "http://localhost:3000/api/health"
+$result = Test-Endpoint -Name "Health Check Endpoint" -Url "http://localhost:3000/api/v1/health"
 if ($result.Status -eq "PASSED") {
     $healthData = $result.Response | ConvertFrom-Json
     Write-Host "  Database: $($healthData.details.database.status)" -ForegroundColor Gray
@@ -201,7 +201,7 @@ if ($failCount -eq 0) {
     Write-Host "Access Points:" -ForegroundColor White
     Write-Host "  Frontend:  http://localhost:5173" -ForegroundColor Cyan
     Write-Host "  API Docs:  http://localhost:3000/api/docs" -ForegroundColor Cyan
-    Write-Host "  Health:    http://localhost:3000/api/health" -ForegroundColor Cyan
+    Write-Host "  Health:    http://localhost:3000/api/v1/health" -ForegroundColor Cyan
     Write-Host "  WebSocket: ws://localhost:3001" -ForegroundColor Cyan
 } else {
     Write-Host "WARNING: Some tests failed!" -ForegroundColor Yellow

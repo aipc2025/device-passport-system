@@ -30,6 +30,7 @@ import { WebSocketModule } from './modules/websocket/websocket.module';
 import { ExportModule } from './modules/export/export.module';
 import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { PermissionModule } from './modules/permission/permission.module';
+import { HealthModule } from './health/health.module';
 import databaseConfig from './config/database.config';
 import jwtConfig from './config/jwt.config';
 
@@ -85,6 +86,7 @@ import jwtConfig from './config/jwt.config';
     }),
 
     // Feature modules
+    HealthModule,
     AuthModule,
     UserModule,
     PermissionModule,

@@ -20,6 +20,7 @@ import { format } from 'date-fns';
 import { QRCodeSVG } from 'qrcode.react';
 import clsx from 'clsx';
 import toast from 'react-hot-toast';
+import { Helmet } from 'react-helmet-async';
 
 export default function PassportDetail() {
   const { id } = useParams<{ id: string }>();
@@ -83,11 +84,15 @@ export default function PassportDetail() {
     : false;
 
   return (
-    <div className="space-y-6">
-      <Link
-        to="/passports"
-        className="inline-flex items-center text-gray-600 hover:text-gray-900"
-      >
+    <>
+      <Helmet>
+        <title>{`${passport.passportCode} - ${passport.deviceName} - Device Passport System`}</title>
+      </Helmet>
+      <div className="space-y-6">
+        <Link
+          to="/passports"
+          className="inline-flex items-center text-gray-600 hover:text-gray-900"
+        >
         <ArrowLeft className="h-4 w-4 mr-1" />
         Back to Passports
       </Link>
@@ -309,5 +314,6 @@ export default function PassportDetail() {
         </div>
       )}
     </div>
+    </>
   );
 }

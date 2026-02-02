@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Plus, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import { passportApi } from '../../services/api';
 import { useAuthStore } from '../../store/auth.store';
 import { UserRole, DeviceStatus, ProductLine, PassportListItem } from '@device-passport/shared';
@@ -61,9 +62,13 @@ export default function PassportList() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
+    <>
+      <Helmet>
+        <title>{t('passport.pageTitle', 'Device Passports - Device Passport System')}</title>
+      </Helmet>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{t('passport.title')}</h1>
           <p className="text-gray-600">{t('passport.description')}</p>
@@ -238,5 +243,6 @@ export default function PassportList() {
         )}
       </div>
     </div>
+    </>
   );
 }

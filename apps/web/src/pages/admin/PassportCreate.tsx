@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { ArrowLeft, Package, ChevronDown, ChevronUp } from 'lucide-react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import { passportApi, organizationApi } from '../../services/api';
 import { ProductLine, OriginCode } from '@device-passport/shared';
 import toast from 'react-hot-toast';
@@ -144,11 +145,15 @@ export default function PassportCreate() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <Link
-        to="/passports"
-        className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-6"
-      >
+    <>
+      <Helmet>
+        <title>{t('passport.createPageTitle', 'Create Device Passport - Device Passport System')}</title>
+      </Helmet>
+      <div className="max-w-3xl mx-auto">
+        <Link
+          to="/passports"
+          className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-6"
+        >
         <ArrowLeft className="h-4 w-4 mr-1" />
         {t('passport.backToPassports')}
       </Link>
@@ -448,5 +453,6 @@ export default function PassportCreate() {
         </form>
       </div>
     </div>
+    </>
   );
 }

@@ -7,6 +7,7 @@ import {
   OneToOne,
   JoinColumn,
   OneToMany,
+  Index,
 } from 'typeorm';
 import {
   ExpertType,
@@ -113,6 +114,7 @@ export class IndividualExpert {
   expertCodeGeneratedAt: Date;
 
   // Service Availability
+  @Index('idx_individual_expert_is_available')
   @Column({ name: 'is_available', default: true })
   isAvailable: boolean;
 
@@ -149,6 +151,7 @@ export class IndividualExpert {
   @Column({ name: 'personal_notes', type: 'text', nullable: true })
   personalNotes: string;
 
+  @Index('idx_individual_expert_registration_status')
   @Column({
     name: 'registration_status',
     type: 'enum',
@@ -183,6 +186,7 @@ export class IndividualExpert {
   // ============================================
 
   // Work status for service matching
+  @Index('idx_individual_expert_work_status')
   @Column({
     name: 'work_status',
     type: 'varchar',

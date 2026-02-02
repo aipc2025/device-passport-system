@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   ManyToOne,
   JoinColumn,
+  Index,
 } from 'typeorm';
 import { DeviceStatus, LifecycleEventType } from '@device-passport/shared';
 import { DevicePassport } from './device-passport.entity';
@@ -15,6 +16,7 @@ export class LifecycleEvent {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Index('idx_lifecycle_event_passport_id')
   @Column({ name: 'passport_id' })
   passportId: string;
 
@@ -73,6 +75,7 @@ export class LifecycleEvent {
   @Column({ name: 'performed_by_role' })
   performedByRole: string;
 
+  @Index('idx_lifecycle_event_occurred_at')
   @Column({ name: 'occurred_at', type: 'timestamp with time zone' })
   occurredAt: Date;
 

@@ -7,6 +7,7 @@ import {
   ManyToOne,
   JoinColumn,
   OneToMany,
+  Index,
 } from 'typeorm';
 import {
   ServiceOrderStatus,
@@ -26,6 +27,7 @@ export class ServiceOrder {
   @Column({ name: 'order_number', unique: true })
   orderNumber: string;
 
+  @Index('idx_service_order_passport_id')
   @Column({ name: 'passport_id', type: 'uuid', nullable: true })
   passportId: string | null;
 
@@ -43,6 +45,7 @@ export class ServiceOrder {
   })
   serviceType: ServiceType;
 
+  @Index('idx_service_order_status')
   @Column({
     type: 'enum',
     enum: ServiceOrderStatus,
@@ -63,6 +66,7 @@ export class ServiceOrder {
   @Column({ type: 'text' })
   description: string;
 
+  @Index('idx_service_order_customer_id')
   @Column({ name: 'customer_id', type: 'uuid', nullable: true })
   customerId: string | null;
 
@@ -91,6 +95,7 @@ export class ServiceOrder {
   @Column({ name: 'service_country', nullable: true })
   serviceCountry: string;
 
+  @Index('idx_service_order_assigned_engineer')
   @Column({ name: 'assigned_engineer_id', nullable: true })
   assignedEngineerId: string;
 

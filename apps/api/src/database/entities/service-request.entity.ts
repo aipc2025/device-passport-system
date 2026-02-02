@@ -7,6 +7,7 @@ import {
   ManyToOne,
   OneToMany,
   JoinColumn,
+  Index,
 } from 'typeorm';
 import {
   ServiceType,
@@ -55,6 +56,7 @@ export class ServiceRequest {
   @JoinColumn({ name: 'organization_id' })
   organization: Organization;
 
+  @Index('idx_service_request_organization_id')
   @Column({ name: 'organization_id', nullable: true })
   organizationId: string;
 
@@ -116,6 +118,7 @@ export class ServiceRequest {
   @Column({ name: 'labor_details', type: 'jsonb', nullable: true })
   laborDetails: LaborDetails;
 
+  @Index('idx_service_request_status')
   @Column({
     type: 'varchar',
     length: 50,
@@ -178,6 +181,7 @@ export class ServiceRequest {
   showCompanyInfo: boolean;
 
   // Assigned expert (when accepted)
+  @Index('idx_service_request_assigned_expert')
   @Column({ name: 'assigned_expert_id', nullable: true })
   assignedExpertId: string;
 

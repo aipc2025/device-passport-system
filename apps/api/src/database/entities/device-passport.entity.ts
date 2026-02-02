@@ -7,6 +7,7 @@ import {
   ManyToOne,
   JoinColumn,
   OneToMany,
+  Index,
 } from 'typeorm';
 import { DeviceStatus, ProductLine, OriginCode } from '@device-passport/shared';
 import { Organization } from './organization.entity';
@@ -38,6 +39,7 @@ export class DevicePassport {
   @Column({ name: 'custom_origin_code', length: 2, nullable: true })
   customOriginCode: string;
 
+  @Index('idx_device_passport_status')
   @Column({
     type: 'enum',
     enum: DeviceStatus,
@@ -69,6 +71,7 @@ export class DevicePassport {
   @Column({ name: 'warranty_expiry_date', type: 'date', nullable: true })
   warrantyExpiryDate: Date;
 
+  @Index('idx_device_passport_supplier_id')
   @Column({ name: 'supplier_id', nullable: true })
   supplierId: string;
 
@@ -76,6 +79,7 @@ export class DevicePassport {
   @JoinColumn({ name: 'supplier_id' })
   supplier: Organization;
 
+  @Index('idx_device_passport_customer_id')
   @Column({ name: 'customer_id', nullable: true })
   customerId: string;
 

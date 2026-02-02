@@ -8,6 +8,7 @@ import {
   OneToOne,
   JoinColumn,
   Unique,
+  Index,
 } from 'typeorm';
 import {
   ServiceRecordStatus,
@@ -44,6 +45,7 @@ export class ExpertServiceRecord {
   @JoinColumn({ name: 'expert_id' })
   expert: IndividualExpert;
 
+  @Index('idx_expert_service_record_expert_id')
   @Column({ name: 'expert_id' })
   expertId: string;
 
@@ -106,6 +108,7 @@ export class ExpertServiceRecord {
   maintenanceType: MaintenanceType;
 
   // Status
+  @Index('idx_expert_service_record_status')
   @Column({
     type: 'varchar',
     length: 50,

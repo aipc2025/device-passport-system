@@ -2,9 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { LocationService } from './location.service';
-import { IndividualExpert } from '../entities/individual-expert.entity';
-import { ServiceRequest } from '../entities/service-request.entity';
-import { DevicePassport } from '../entities/device-passport.entity';
+import { IndividualExpert, ServiceRequest, DevicePassport } from '../../database/entities';
 
 describe('LocationService', () => {
   let service: LocationService;

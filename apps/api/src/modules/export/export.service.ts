@@ -170,7 +170,7 @@ export class ExportService {
     const events = await this.lifecycleRepository.find({
       where: { passportId },
       relations: ['performedBy', 'location'],
-      order: { eventDate: 'DESC' },
+      order: { occurredAt: 'DESC' },
     });
 
     const workbook = new ExcelJS.Workbook();
@@ -178,7 +178,7 @@ export class ExportService {
 
     worksheet.columns = [
       { header: '事件类型', key: 'eventType', width: 20 },
-      { header: '事件日期', key: 'eventDate', width: 20 },
+      { header: '事件日期', key: 'occurredAt', width: 20 },
       { header: '描述', key: 'description', width: 40 },
       { header: '执行人', key: 'performedBy', width: 20 },
       { header: '位置', key: 'location', width: 30 },
@@ -197,10 +197,10 @@ export class ExportService {
     events.forEach((event) => {
       worksheet.addRow({
         eventType: event.eventType,
-        eventDate: event.eventDate,
+        occurredAt: event.occurredAt,
         description: event.description || '',
-        performedBy: event.performedBy?.email || '',
-        location: event.location?.address || '',
+        performedBy: event.performedByName || '',
+        location: event.newLocation || event.previousLocation || '',
         metadata: event.metadata ? JSON.stringify(event.metadata) : '',
       });
     });
@@ -220,7 +220,7 @@ export class ExportService {
   async exportQRCodesBatchPDF(ids: string[]): Promise<Buffer> {
     const passports = await this.passportRepository.find({
       where: { id: In(ids) },
-      select: ['id', 'passportCode', 'productName', 'model'],
+      select: ['id', 'passportCode', 'deviceName', 'deviceModel'],
     });
 
     // Generate QR codes
@@ -329,10 +329,10 @@ export class ExportService {
         passportCode: order.passport?.passportCode || '',
         status: order.status,
         priority: order.priority || '',
-        assignedTo: order.assignedTo?.email || '',
-        createdBy: order.createdBy?.email || '',
+        assignedTo: order.assignedEngineerName || '',
+        createdBy: order.createdBy || '',
         scheduledDate: order.scheduledDate || '',
-        completedAt: order.completedAt || '',
+        completedAt: order.completedDate || '',
         createdAt: order.createdAt,
       });
     });

@@ -10,10 +10,10 @@ test.describe('Device Passport Management', () => {
   test.beforeEach(async ({ page }) => {
     // Login before each test
     await page.goto('/login');
-    await page.fill('input[type="email"]', 'admin@luna.medical');
-    await page.fill('input[type="password"]', 'Password123!');
+    await page.fill('input[type="email"]', 'admin@luna.top');
+    await page.fill('input[type="password"]', 'password123');
     await page.click('button[type="submit"]');
-    await page.waitForURL(/\/(home|dashboard|passports)/i);
+    await page.waitForURL(/\/(dashboard|passports|home)/i);
   });
 
   test('should display passport list', async ({ page }) => {

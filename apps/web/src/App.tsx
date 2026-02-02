@@ -76,7 +76,13 @@ import { MyPoints } from './pages/points';
 import { MyInvitations } from './pages/invitation';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const { isAuthenticated, _hasHydrated } = useAuthStore();
+
+  // Wait for store to hydrate from localStorage
+  // This prevents redirect flicker on page refresh
+  if (!_hasHydrated) {
+    return null;
+  }
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;

@@ -7,10 +7,12 @@ interface AuthState {
   accessToken: string | null;
   refreshToken: string | null;
   isAuthenticated: boolean;
+  _hasHydrated: boolean;
   setAuth: (user: Omit<User, 'password'>, accessToken: string, refreshToken: string) => void;
   logout: () => void;
   hasRole: (roles: UserRole[]) => boolean;
   isExpert: () => boolean;
+  setHasHydrated: (hydrated: boolean) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -20,6 +22,7 @@ export const useAuthStore = create<AuthState>()(
       accessToken: null,
       refreshToken: null,
       isAuthenticated: false,
+      _hasHydrated: false,
 
       setAuth: (user, accessToken, refreshToken) => {
         set({
@@ -28,6 +31,10 @@ export const useAuthStore = create<AuthState>()(
           refreshToken,
           isAuthenticated: true,
         });
+      },
+
+      setHasHydrated: (hydrated) => {
+        set({ _hasHydrated: hydrated });
       },
 
       logout: () => {
@@ -71,6 +78,11 @@ export const useAuthStore = create<AuthState>()(
         refreshToken: state.refreshToken,
         isAuthenticated: state.isAuthenticated,
       }),
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          state._hasHydrated = true;
+        }
+      },
     }
   )
 );

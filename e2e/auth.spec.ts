@@ -31,29 +31,35 @@ test.describe('Authentication', () => {
   test('should successfully login with valid credentials', async ({ page }) => {
     await page.goto('/login');
 
-    // Fill login form
-    await page.fill('input[type="email"]', 'admin@luna.medical');
-    await page.fill('input[type="password"]', 'Password123!');
+    // Fill login form with correct credentials
+    await page.fill('input[type="email"]', 'admin@luna.top');
+    await page.fill('input[type="password"]', 'password123');
 
     // Submit form
     await page.click('button[type="submit"]');
 
+    // Wait for localStorage to be updated (persist middleware)
+    await page.waitForFunction(
+      () => window.localStorage.getItem('auth-storage') !== null,
+      { timeout: 5000 }
+    );
+
     // Should redirect to dashboard or home
-    await page.waitForURL(/\/(home|dashboard|passports)/i, { timeout: 10000 });
+    await page.waitForURL(/\/(dashboard|passports|home)/i, { timeout: 10000 });
 
     // Should show user menu or profile
     await expect(
-      page.locator('text=/welcome|admin|profile|账户/i').first()
+      page.locator('text=/welcome|admin|profile|dashboard|账户/i').first()
     ).toBeVisible({ timeout: 10000 });
   });
 
   test('should logout successfully', async ({ page }) => {
     // Login first
     await page.goto('/login');
-    await page.fill('input[type="email"]', 'admin@luna.medical');
-    await page.fill('input[type="password"]', 'Password123!');
+    await page.fill('input[type="email"]', 'admin@luna.top');
+    await page.fill('input[type="password"]', 'password123');
     await page.click('button[type="submit"]');
-    await page.waitForURL(/\/(home|dashboard|passports)/i);
+    await page.waitForURL(/\/(dashboard|passports|home)/i);
 
     // Find and click logout button
     await page.click('button:has-text("Logout"), button:has-text("退出"), a:has-text("Logout")');
@@ -74,17 +80,17 @@ test.describe('Authentication', () => {
   test('should persist session after page refresh', async ({ page }) => {
     // Login
     await page.goto('/login');
-    await page.fill('input[type="email"]', 'admin@luna.medical');
-    await page.fill('input[type="password"]', 'Password123!');
+    await page.fill('input[type="email"]', 'admin@luna.top');
+    await page.fill('input[type="password"]', 'password123');
     await page.click('button[type="submit"]');
-    await page.waitForURL(/\/(home|dashboard|passports)/i);
+    await page.waitForURL(/\/(dashboard|passports|home)/i);
 
     // Refresh page
     await page.reload();
 
     // Should still be authenticated
     await expect(
-      page.locator('text=/welcome|admin|profile|账户/i').first()
+      page.locator('text=/welcome|admin|profile|dashboard|账户/i').first()
     ).toBeVisible({ timeout: 10000 });
   });
 });

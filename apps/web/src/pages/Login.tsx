@@ -31,6 +31,11 @@ export default function Login() {
     try {
       const response = await authApi.login(data.email, data.password);
       setAuth(response.user, response.accessToken, response.refreshToken);
+
+      // Yield to event loop to allow persist middleware to write to localStorage
+      // This ensures state is synced before navigation
+      await new Promise(resolve => setTimeout(resolve, 0));
+
       toast.success('Login successful!');
       navigate('/dashboard');
     } catch (err: unknown) {

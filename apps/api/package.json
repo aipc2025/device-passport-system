@@ -1,6 +1,6 @@
 {
   "name": "@device-passport/api",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Device Passport System - Backend API",
   "private": true,
   "scripts": {

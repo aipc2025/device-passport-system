@@ -82,8 +82,18 @@ async function seed() {
   }
 
   console.log('Seeding users...');
+
+  // ⚠️ SECURITY WARNING: This seed script is for DEVELOPMENT/TESTING ONLY
+  // NEVER use these default credentials in production environments
+  // In production, set SEED_PASSWORD environment variable with a strong password
+  const defaultPassword = process.env.SEED_PASSWORD || 'DevTest2026!@#$';
+
+  if (process.env.NODE_ENV === 'production' && !process.env.SEED_PASSWORD) {
+    throw new Error('CRITICAL: SEED_PASSWORD environment variable must be set in production');
+  }
+
   // Create or update users with fresh password
-  const hashedPassword = await bcrypt.hash('password123', 10);
+  const hashedPassword = await bcrypt.hash(defaultPassword, 10);
 
   // Admin user
   let adminUser = await userRepo.findOne({ where: { email: 'admin@luna.top' } });
@@ -301,13 +311,20 @@ async function seed() {
 
   console.log('Seed completed successfully!');
   console.log('');
-  console.log('Test accounts:');
-  console.log('  Admin: admin@luna.top / password123');
-  console.log('  Operator: operator@luna.top / password123');
-  console.log('  Engineer: engineer@luna.top / password123');
-  console.log('  QC Inspector: qc@luna.top / password123');
-  console.log('  Customer: customer@luna.top / password123');
-  console.log('  Expert: expert@luna.top / password123');
+  console.log('============================================');
+  console.log('⚠️  DEVELOPMENT TEST ACCOUNTS');
+  console.log('============================================');
+  console.log('All accounts use password:', defaultPassword);
+  console.log('');
+  console.log('  Admin:        admin@luna.top');
+  console.log('  Operator:     operator@luna.top');
+  console.log('  Engineer:     engineer@luna.top');
+  console.log('  QC Inspector: qc@luna.top');
+  console.log('  Customer:     customer@luna.top');
+  console.log('  Expert:       expert@luna.top');
+  console.log('');
+  console.log('⚠️  CHANGE THESE PASSWORDS IMMEDIATELY IN PRODUCTION!');
+  console.log('============================================');
 
   await AppDataSource.destroy();
 }

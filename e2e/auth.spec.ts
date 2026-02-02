@@ -32,8 +32,8 @@ test.describe('Authentication', () => {
     await page.goto('/login');
 
     // Fill login form with correct credentials
-    await page.fill('input[type="email"]', 'admin@luna.top');
-    await page.fill('input[type="password"]', 'password123');
+    await page.fill('input[type="email"]', 'admin@luna.medical');
+    await page.fill('input[type="password"]', 'Password123!');
 
     // Submit form
     await page.click('button[type="submit"]');
@@ -56,8 +56,8 @@ test.describe('Authentication', () => {
   test('should logout successfully', async ({ page }) => {
     // Login first
     await page.goto('/login');
-    await page.fill('input[type="email"]', 'admin@luna.top');
-    await page.fill('input[type="password"]', 'password123');
+    await page.fill('input[type="email"]', 'admin@luna.medical');
+    await page.fill('input[type="password"]', 'Password123!');
     await page.click('button[type="submit"]');
     await page.waitForURL(/\/(dashboard|passports|home)/i);
 
@@ -80,8 +80,8 @@ test.describe('Authentication', () => {
   test('should persist session after page refresh', async ({ page }) => {
     // Login
     await page.goto('/login');
-    await page.fill('input[type="email"]', 'admin@luna.top');
-    await page.fill('input[type="password"]', 'password123');
+    await page.fill('input[type="email"]', 'admin@luna.medical');
+    await page.fill('input[type="password"]', 'Password123!');
     await page.click('button[type="submit"]');
     await page.waitForURL(/\/(dashboard|passports|home)/i);
 

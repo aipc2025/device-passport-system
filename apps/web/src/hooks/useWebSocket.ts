@@ -33,10 +33,10 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
   const socketRef = useRef<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const { token } = useAuthStore();
+  const { accessToken } = useAuthStore();
 
   const connect = useCallback(() => {
-    if (!token) {
+    if (!accessToken) {
       console.warn('Cannot connect to WebSocket: No auth token');
       return;
     }
@@ -49,7 +49,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     const wsUrl = apiUrl.replace(/^http/, 'ws');
 
     socketRef.current = io(`${wsUrl}/notifications`, {
-      auth: { token },
+      auth: { token: accessToken },
       transports: ['websocket', 'polling'],
       reconnection: true,
       reconnectionDelay: 1000,
@@ -69,7 +69,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
       onDisconnect?.();
     });
 
-    socketRef.current.on('error', (error) => {
+    socketRef.current.on('error', (error: any) => {
       console.error('WebSocket error:', error);
       onError?.(error);
     });
@@ -80,10 +80,10 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
       onNotification?.(notification);
     });
 
-    socketRef.current.on('connected', (data) => {
+    socketRef.current.on('connected', (data: any) => {
       console.log('WebSocket welcome:', data);
     });
-  }, [token, onConnect, onDisconnect, onError, onNotification]);
+  }, [accessToken, onConnect, onDisconnect, onError, onNotification]);
 
   const disconnect = useCallback(() => {
     if (socketRef.current) {
@@ -133,14 +133,14 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
   }, []);
 
   useEffect(() => {
-    if (autoConnect && token) {
+    if (autoConnect && accessToken) {
       connect();
     }
 
     return () => {
       disconnect();
     };
-  }, [autoConnect, token, connect, disconnect]);
+  }, [autoConnect, accessToken, connect, disconnect]);
 
   return {
     isConnected,

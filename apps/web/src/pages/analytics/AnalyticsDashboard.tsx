@@ -1,49 +1,47 @@
 import { useQuery } from '@tanstack/react-query';
-import { apiClient } from '../../lib/api-client';
+import { api } from '../../services/api';
 import { LineChart, BarChart, PieChart, AreaChart, StatCard } from '../../components/Charts';
 import {
   Activity,
   Package,
   Users,
   Wrench,
-  TrendingUp,
-  Clock,
 } from 'lucide-react';
 
 export function AnalyticsDashboard() {
   const { data: overview } = useQuery({
     queryKey: ['analytics', 'overview'],
-    queryFn: () => apiClient.get('/api/v1/analytics/dashboard/overview').then(r => r.data),
+    queryFn: () => api.get('/analytics/dashboard/overview').then((r: any) => r.data.data || r.data),
   });
 
   const { data: passportsByStatus } = useQuery({
     queryKey: ['analytics', 'passports-by-status'],
-    queryFn: () => apiClient.get('/api/v1/analytics/passports/by-status').then(r => r.data),
+    queryFn: () => api.get('/analytics/passports/by-status').then((r: any) => r.data.data || r.data),
   });
 
   const { data: passportsByProductLine } = useQuery({
     queryKey: ['analytics', 'passports-by-product-line'],
-    queryFn: () => apiClient.get('/api/v1/analytics/passports/by-product-line').then(r => r.data),
+    queryFn: () => api.get('/analytics/passports/by-product-line').then((r: any) => r.data.data || r.data),
   });
 
   const { data: passportsTrend } = useQuery({
     queryKey: ['analytics', 'passports-trend'],
-    queryFn: () => apiClient.get('/api/v1/analytics/passports/trend?days=30').then(r => r.data),
+    queryFn: () => api.get('/analytics/passports/trend?days=30').then((r: any) => r.data.data || r.data),
   });
 
   const { data: serviceOrdersTrend } = useQuery({
     queryKey: ['analytics', 'service-orders-trend'],
-    queryFn: () => apiClient.get('/api/v1/analytics/service-orders/trend?days=30').then(r => r.data),
+    queryFn: () => api.get('/analytics/service-orders/trend?days=30').then((r: any) => r.data.data || r.data),
   });
 
   const { data: expertStats } = useQuery({
     queryKey: ['analytics', 'expert-statistics'],
-    queryFn: () => apiClient.get('/api/v1/analytics/experts/statistics').then(r => r.data),
+    queryFn: () => api.get('/analytics/experts/statistics').then((r: any) => r.data.data || r.data),
   });
 
   const { data: serviceRequestsByUrgency } = useQuery({
     queryKey: ['analytics', 'service-requests-by-urgency'],
-    queryFn: () => apiClient.get('/api/v1/analytics/service-requests/by-urgency').then(r => r.data),
+    queryFn: () => api.get('/analytics/service-requests/by-urgency').then((r: any) => r.data.data || r.data),
   });
 
   return (

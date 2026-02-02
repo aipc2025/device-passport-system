@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { apiClient } from '../lib/api-client';
+import { api } from '../services/api';
 
 interface NearbySearchParams {
   latitude: number;
@@ -29,8 +29,8 @@ export function useNearbySearch({
   return useQuery({
     queryKey: ['nearby', type, latitude, longitude, radius],
     queryFn: async () => {
-      const response = await apiClient.get<{ items: NearbyItem[]; total: number }>(
-        `/api/v1/location/nearby/${type}`,
+      const response = await api.get(
+        `/location/nearby/${type}`,
         {
           params: {
             lat: latitude,
@@ -39,7 +39,7 @@ export function useNearbySearch({
           },
         }
       );
-      return response.data;
+      return (response.data.data || response.data) as { items: NearbyItem[]; total: number };
     },
     enabled: enabled && !!latitude && !!longitude,
     staleTime: 5 * 60 * 1000, // 5 minutes

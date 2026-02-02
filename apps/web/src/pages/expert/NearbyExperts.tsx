@@ -18,7 +18,7 @@ export function NearbyExperts() {
     enabled: !!(latitude && longitude),
   });
 
-  const markers = data?.items.map((item) => ({
+  const markers = data?.items.map((item: any) => ({
     id: item.id,
     position: [item.latitude, item.longitude] as [number, number],
     title: item.name,
@@ -134,7 +134,7 @@ export function NearbyExperts() {
                   </div>
                 )}
 
-                {data?.items.map((expert) => (
+                {data?.items.map((expert: any) => (
                   <div
                     key={expert.id}
                     id={`expert-${expert.id}`}

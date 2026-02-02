@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { apiClient } from '../lib/api-client';
+import { api } from '../services/api';
 import toast from 'react-hot-toast';
 
 interface ExportOptions {
@@ -14,7 +14,7 @@ export function useFileExport() {
   const exportFile = async (options: ExportOptions) => {
     setIsExporting(true);
     try {
-      const response = await apiClient.get(options.endpoint, {
+      const response = await api.get(options.endpoint, {
         params: options.params,
         responseType: 'blob',
       });

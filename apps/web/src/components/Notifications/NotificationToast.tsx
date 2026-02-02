@@ -1,7 +1,6 @@
-import { useEffect } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useWebSocket } from '../../hooks/useWebSocket';
-import { Bell, AlertCircle, CheckCircle, Info } from 'lucide-react';
+import { Bell, AlertCircle, Info } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const iconMap = {

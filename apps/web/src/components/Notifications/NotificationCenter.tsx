@@ -15,17 +15,6 @@ export function NotificationCenter() {
     clearAllNotifications,
   } = useWebSocket();
 
-  const getPriorityColor = (priority: string = 'normal') => {
-    switch (priority) {
-      case 'high':
-        return 'bg-red-50 border-red-200';
-      case 'low':
-        return 'bg-gray-50 border-gray-200';
-      default:
-        return 'bg-blue-50 border-blue-200';
-    }
-  };
-
   const handleMarkAsRead = (notificationId: string) => {
     markAsRead([notificationId]);
   };

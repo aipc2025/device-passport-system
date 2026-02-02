@@ -58,7 +58,7 @@ export function PieChart({
             label={showLabels ? renderLabel : false}
             labelLine={showLabels}
           >
-            {data.map((entry, index) => (
+            {data.map((_entry, index) => (
               <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
             ))}
           </Pie>

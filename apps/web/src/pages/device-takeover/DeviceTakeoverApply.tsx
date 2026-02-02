@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { useMutation } from '@tanstack/react-query';
+import { Helmet } from 'react-helmet-async';
 import {
   Package,
   Upload,
@@ -152,7 +153,11 @@ export default function DeviceTakeoverApply() {
 
   if (isSubmitted) {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-12 text-center">
+      <>
+        <Helmet>
+          <title>Device Registration - Device Passport System</title>
+        </Helmet>
+        <div className="max-w-2xl mx-auto px-4 py-12 text-center">
         <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
         <h1 className="text-2xl font-bold text-gray-900 mb-2">
           {t('deviceTakeover.submitted', 'Registration Request Submitted!')}
@@ -171,12 +176,17 @@ export default function DeviceTakeoverApply() {
             {t('common.goToDashboard', 'Go to Dashboard')}
           </button>
         </div>
-      </div>
+        </div>
+      </>
     );
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8">
+    <>
+      <Helmet>
+        <title>Device Registration - Device Passport System</title>
+      </Helmet>
+      <div className="max-w-3xl mx-auto px-4 py-8">
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">
@@ -595,6 +605,7 @@ export default function DeviceTakeoverApply() {
           </div>
         )}
       </form>
-    </div>
+      </div>
+    </>
   );
 }

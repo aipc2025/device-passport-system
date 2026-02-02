@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import {
   Plus,
   FileText,
@@ -197,7 +198,11 @@ export default function MyRFQs() {
   );
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6">
+    <>
+      <Helmet>
+        <title>My RFQs - Device Passport System</title>
+      </Helmet>
+      <div className="max-w-7xl mx-auto px-4 py-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -329,6 +334,7 @@ export default function MyRFQs() {
           </Link>
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }

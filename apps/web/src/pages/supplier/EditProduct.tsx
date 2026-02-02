@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Save } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 import { marketplaceProductApi } from '../../services/api';
 import { ProductLine, PRODUCT_TYPE_NAMES, MarketplaceListingStatus, CurrencyCode, CURRENCY_NAMES } from '@device-passport/shared';
 import toast from 'react-hot-toast';
@@ -124,7 +125,11 @@ export default function EditProduct() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6">
+    <>
+      <Helmet>
+        <title>Edit Product - Device Passport System</title>
+      </Helmet>
+      <div className="max-w-3xl mx-auto px-4 py-6">
       {/* Header */}
       <div className="mb-6">
         <button
@@ -386,6 +391,7 @@ export default function EditProduct() {
           </button>
         </div>
       </form>
-    </div>
+      </div>
+    </>
   );
 }

@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import {
   CreditCard,
   QrCode,
@@ -91,9 +92,13 @@ export default function ExpertPassport() {
   const scanUrl = `${window.location.origin}/scan/expert/${passport.expertCode}`;
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6">
-      {/* Header */}
-      <div className="mb-6">
+    <>
+      <Helmet>
+        <title>My Passport - Device Passport System</title>
+      </Helmet>
+      <div className="max-w-3xl mx-auto px-4 py-6">
+        {/* Header */}
+        <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
           <CreditCard className="w-6 h-6" />
           {t('expert.passport', 'Expert Passport')}
@@ -289,6 +294,7 @@ export default function ExpertPassport() {
           )}
         </p>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

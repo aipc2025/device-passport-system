@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Helmet } from 'react-helmet-async';
 import {
   Users,
   Link2,
@@ -125,7 +126,11 @@ export default function MyInvitations() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
+    <>
+      <Helmet>
+        <title>My Invitations - Device Passport System</title>
+      </Helmet>
+      <div className="max-w-4xl mx-auto px-4 py-8">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
@@ -423,6 +428,7 @@ export default function MyInvitations() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }

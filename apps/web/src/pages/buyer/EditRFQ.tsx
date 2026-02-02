@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Save } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 import { marketplaceRfqApi } from '../../services/api';
 import {
   ProductLine,
@@ -150,7 +151,11 @@ export default function EditRFQ() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6">
+    <>
+      <Helmet>
+        <title>Edit RFQ - Device Passport System</title>
+      </Helmet>
+      <div className="max-w-3xl mx-auto px-4 py-6">
       {/* Header */}
       <div className="mb-6">
         <button
@@ -452,6 +457,7 @@ export default function EditRFQ() {
           </button>
         </div>
       </form>
-    </div>
+      </div>
+    </>
   );
 }

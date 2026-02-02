@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import { MessageSquare, Loader2 } from 'lucide-react';
 import { inquiryApi } from '../../services/api';
 import { InquiryCard } from '../../components/inquiry';
@@ -43,7 +44,11 @@ export default function InquiryList() {
   ];
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6">
+    <>
+      <Helmet>
+        <title>Inquiries - Device Passport System</title>
+      </Helmet>
+      <div className="max-w-4xl mx-auto px-4 py-6">
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">
@@ -105,6 +110,7 @@ export default function InquiryList() {
           </p>
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }

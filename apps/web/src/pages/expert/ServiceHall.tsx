@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { Briefcase, MapPin, Clock, Calendar, Search, Building2, Wrench } from 'lucide-react';
 import { expertApi } from '../../services/api';
@@ -59,13 +60,17 @@ export default function ServiceHall() {
   });
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-6">
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-          <Briefcase className="w-6 h-6" />
-          {t('expert.serviceHall', 'Service Hall')}
-        </h1>
+    <>
+      <Helmet>
+        <title>Service Hall - Device Passport System</title>
+      </Helmet>
+      <div className="max-w-5xl mx-auto px-4 py-6">
+        {/* Header */}
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <Briefcase className="w-6 h-6" />
+            {t('expert.serviceHall', 'Service Hall')}
+          </h1>
         <p className="text-gray-600 mt-1">
           {t('expert.serviceHallDesc', 'Browse and apply for public service requests')}
         </p>
@@ -249,5 +254,6 @@ export default function ServiceHall() {
         </div>
       )}
     </div>
+    </>
   );
 }

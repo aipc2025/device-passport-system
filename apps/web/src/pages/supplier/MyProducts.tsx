@@ -13,6 +13,7 @@ import {
   Trash2,
   Edit,
 } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 import { marketplaceProductApi } from '../../services/api';
 import { MarketplaceListingStatus, MARKETPLACE_LISTING_STATUS_NAMES } from '@device-passport/shared';
 import toast from 'react-hot-toast';
@@ -172,7 +173,11 @@ export default function MyProducts() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6">
+    <>
+      <Helmet>
+        <title>My Products - Device Passport System</title>
+      </Helmet>
+      <div className="max-w-7xl mx-auto px-4 py-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -304,6 +309,7 @@ export default function MyProducts() {
           </Link>
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }

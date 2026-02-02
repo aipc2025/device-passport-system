@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import {
   Target,
   CheckCircle,
@@ -106,9 +107,13 @@ export default function ExpertDashboard() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-6">
-      {/* Header */}
-      <div className="mb-6">
+    <>
+      <Helmet>
+        <title>Expert Dashboard - Device Passport System</title>
+      </Helmet>
+      <div className="max-w-6xl mx-auto px-4 py-6">
+        {/* Header */}
+        <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">
           {t('expert.dashboard', 'Expert Dashboard')}
         </h1>
@@ -310,6 +315,7 @@ export default function ExpertDashboard() {
           <span className="text-sm text-gray-700">{t('expert.myProfile', 'My Profile')}</span>
         </Link>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

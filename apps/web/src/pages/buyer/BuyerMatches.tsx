@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Target, X, MessageSquare, ArrowRight, Package } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 import { matchingApi } from '../../services/api';
 import { MatchScoreBar } from '../../components/marketplace';
 import { MatchStatus, MATCH_STATUS_NAMES, MatchSource, MATCH_SOURCE_NAMES, PRODUCT_TYPE_NAMES } from '@device-passport/shared';
@@ -51,7 +52,11 @@ export default function BuyerMatches() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6">
+    <>
+      <Helmet>
+        <title>My Matches - Device Passport System</title>
+      </Helmet>
+      <div className="max-w-4xl mx-auto px-4 py-6">
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">
@@ -200,6 +205,7 @@ export default function BuyerMatches() {
           </p>
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }

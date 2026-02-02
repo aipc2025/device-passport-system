@@ -1,6 +1,7 @@
 import { useParams, useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, MessageSquare, X, Package, FileText, Building2 } from 'lucide-react';
 import { matchingApi } from '../../services/api';
 import { MatchScoreBar } from '../../components/marketplace';
@@ -32,23 +33,33 @@ export default function MatchDetail() {
 
   if (isLoading) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <>
+        <Helmet>
+          <title>Match Details - Device Passport System</title>
+        </Helmet>
+        <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="animate-pulse space-y-4">
           <div className="h-8 bg-gray-200 rounded w-1/3" />
           <div className="h-64 bg-gray-200 rounded" />
         </div>
-      </div>
+        </div>
+      </>
     );
   }
 
   if (error || !match) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-8 text-center">
+      <>
+        <Helmet>
+          <title>Match Not Found - Device Passport System</title>
+        </Helmet>
+        <div className="max-w-4xl mx-auto px-4 py-8 text-center">
         <p className="text-red-600">{t('matching.notFound', 'Match not found')}</p>
         <button onClick={() => navigate(-1)} className="text-blue-600 hover:underline mt-2">
           {t('common.back', 'Back')}
         </button>
-      </div>
+        </div>
+      </>
     );
   }
 
@@ -58,7 +69,11 @@ export default function MatchDetail() {
   const counterparty = isBuyer ? match.supplierOrg : match.buyerOrg;
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6">
+    <>
+      <Helmet>
+        <title>Match Details - Device Passport System</title>
+      </Helmet>
+      <div className="max-w-4xl mx-auto px-4 py-6">
       {/* Back link */}
       <button
         onClick={() => navigate(-1)}
@@ -279,6 +294,7 @@ export default function MatchDetail() {
           )}
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

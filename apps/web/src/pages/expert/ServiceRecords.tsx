@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import {
   History,
@@ -218,13 +219,17 @@ export default function ServiceRecords() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6">
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-          <History className="w-6 h-6" />
-          {t('expert.serviceRecords', 'Service Records')}
-        </h1>
+    <>
+      <Helmet>
+        <title>Service Records - Device Passport System</title>
+      </Helmet>
+      <div className="max-w-4xl mx-auto px-4 py-6">
+        {/* Header */}
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <History className="w-6 h-6" />
+            {t('expert.serviceRecords', 'Service Records')}
+          </h1>
         <p className="text-gray-600 mt-1">
           {t('expert.serviceRecordsDesc', 'View your service history and customer reviews')}
         </p>
@@ -502,5 +507,6 @@ export default function ServiceRecords() {
         </div>
       )}
     </div>
+    </>
   );
 }

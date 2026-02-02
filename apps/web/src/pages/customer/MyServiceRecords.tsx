@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import {
   ClipboardList,
   Clock,
@@ -138,28 +139,37 @@ export default function MyServiceRecords() {
 
   if (reviewingRecord) {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-6">
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h1 className="text-xl font-bold text-gray-900 mb-6">
-            {t('rating.writeReview', 'Write a Review')}
-          </h1>
-          <ReviewForm
-            serviceRecordId={reviewingRecord.id}
-            expertName={reviewingRecord.expert?.personalName || 'Expert'}
-            serviceTitle={reviewingRecord.serviceTitle}
-            onSuccess={() => {
-              setReviewingRecord(null);
-              queryClient.invalidateQueries({ queryKey: ['my-service-records'] });
-            }}
-            onCancel={() => setReviewingRecord(null)}
-          />
+      <>
+        <Helmet>
+          <title>Write a Review - Device Passport System</title>
+        </Helmet>
+        <div className="max-w-2xl mx-auto px-4 py-6">
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <h1 className="text-xl font-bold text-gray-900 mb-6">
+              {t('rating.writeReview', 'Write a Review')}
+            </h1>
+            <ReviewForm
+              serviceRecordId={reviewingRecord.id}
+              expertName={reviewingRecord.expert?.personalName || 'Expert'}
+              serviceTitle={reviewingRecord.serviceTitle}
+              onSuccess={() => {
+                setReviewingRecord(null);
+                queryClient.invalidateQueries({ queryKey: ['my-service-records'] });
+              }}
+              onCancel={() => setReviewingRecord(null)}
+            />
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6">
+    <>
+      <Helmet>
+        <title>My Service Records - Device Passport System</title>
+      </Helmet>
+      <div className="max-w-4xl mx-auto px-4 py-6">
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
@@ -384,6 +394,7 @@ export default function MyServiceRecords() {
           </p>
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }

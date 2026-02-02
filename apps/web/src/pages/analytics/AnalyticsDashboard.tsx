@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { Helmet } from 'react-helmet-async';
 import { api } from '../../services/api';
 import { LineChart, BarChart, PieChart, AreaChart, StatCard } from '../../components/Charts';
 import {
@@ -45,7 +46,11 @@ export function AnalyticsDashboard() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <>
+      <Helmet>
+        <title>Analytics - Device Passport System</title>
+      </Helmet>
+      <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -228,6 +233,7 @@ export function AnalyticsDashboard() {
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </>
   );
 }

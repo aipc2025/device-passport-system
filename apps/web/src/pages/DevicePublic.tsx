@@ -1,5 +1,6 @@
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { Helmet } from 'react-helmet-async';
 import {
   QrCode,
   CheckCircle,
@@ -45,16 +46,25 @@ export default function DevicePublic() {
 
   if (isLoading) {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-12 text-center">
+      <>
+        <Helmet>
+          <title>Loading... - Device Passport System</title>
+        </Helmet>
+        <div className="max-w-2xl mx-auto px-4 py-12 text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
         <p className="mt-4 text-gray-600">Loading device information...</p>
-      </div>
+        </div>
+      </>
     );
   }
 
   if (error || !device) {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-12 text-center">
+      <>
+        <Helmet>
+          <title>Device Not Found - Device Passport System</title>
+        </Helmet>
+        <div className="max-w-2xl mx-auto px-4 py-12 text-center">
         <XCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
         <h1 className="text-2xl font-bold text-gray-900 mb-2">Device Not Found</h1>
         <p className="text-gray-600 mb-6">
@@ -64,12 +74,17 @@ export default function DevicePublic() {
           <ArrowLeft className="h-4 w-4 mr-2" />
           Try Another Code
         </Link>
-      </div>
+        </div>
+      </>
     );
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8">
+    <>
+      <Helmet>
+        <title>{device.deviceName} - Device Passport System</title>
+      </Helmet>
+      <div className="max-w-2xl mx-auto px-4 py-8">
       <Link
         to="/scan"
         className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-6"
@@ -191,6 +206,7 @@ export default function DevicePublic() {
           Request Service
         </Link>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

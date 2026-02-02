@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { MapContainer } from '../../components/Map';
 import { useGeolocation } from '../../hooks/useGeolocation';
 import { useNearbySearch, formatDistance } from '../../hooks/useNearbySearch';
@@ -33,14 +34,18 @@ export function NearbyExperts() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
-            <Users className="w-8 h-8 text-green-600" />
-            附近的专家
-          </h1>
+    <>
+      <Helmet>
+        <title>Nearby Experts - Device Passport System</title>
+      </Helmet>
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Header */}
+          <div className="mb-6">
+            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
+              <Users className="w-8 h-8 text-green-600" />
+              附近的专家
+            </h1>
           <p className="mt-2 text-gray-600">
             查找您附近的服务专家
           </p>
@@ -215,5 +220,6 @@ export function NearbyExperts() {
         )}
       </div>
     </div>
+    </>
   );
 }

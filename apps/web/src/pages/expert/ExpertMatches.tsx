@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import { Target, X, MessageSquare, ArrowRight, MapPin, Clock, Wrench } from 'lucide-react';
 import { useAuthStore } from '../../store/auth.store';
 import { expertApi } from '../../services/api';
@@ -117,13 +118,17 @@ export default function ExpertMatches() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6">
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-          <Target className="w-6 h-6" />
-          {t('expert.matches', 'Service Matches')}
-        </h1>
+    <>
+      <Helmet>
+        <title>My Matches - Device Passport System</title>
+      </Helmet>
+      <div className="max-w-4xl mx-auto px-4 py-6">
+        {/* Header */}
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <Target className="w-6 h-6" />
+            {t('expert.matches', 'Service Matches')}
+          </h1>
         <p className="text-gray-600 mt-1">
           {t('expert.matchesDesc', 'Service requests that match your skills and expertise')}
         </p>
@@ -284,5 +289,6 @@ export default function ExpertMatches() {
         </div>
       )}
     </div>
+    </>
   );
 }

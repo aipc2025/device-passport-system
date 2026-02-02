@@ -1,6 +1,7 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import {
   ArrowLeft,
   Building2,
@@ -36,23 +37,33 @@ export default function RFQDetail() {
 
   if (isLoading) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-gray-200 rounded w-1/3" />
-          <div className="h-64 bg-gray-200 rounded" />
+      <>
+        <Helmet>
+          <title>Loading... - RFQs - Device Passport System</title>
+        </Helmet>
+        <div className="max-w-4xl mx-auto px-4 py-8">
+          <div className="animate-pulse space-y-4">
+            <div className="h-8 bg-gray-200 rounded w-1/3" />
+            <div className="h-64 bg-gray-200 rounded" />
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   if (error || !rfq) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-8 text-center">
-        <p className="text-red-600">{t('marketplace.rfqNotFound', 'RFQ not found')}</p>
-        <Link to="/marketplace/rfqs" className="text-blue-600 hover:underline mt-2 inline-block">
-          {t('marketplace.backToRfqs', 'Back to RFQs')}
-        </Link>
-      </div>
+      <>
+        <Helmet>
+          <title>RFQ Not Found - Device Passport System</title>
+        </Helmet>
+        <div className="max-w-4xl mx-auto px-4 py-8 text-center">
+          <p className="text-red-600">{t('marketplace.rfqNotFound', 'RFQ not found')}</p>
+          <Link to="/marketplace/rfqs" className="text-blue-600 hover:underline mt-2 inline-block">
+            {t('marketplace.backToRfqs', 'Back to RFQs')}
+          </Link>
+        </div>
+      </>
     );
   }
 
@@ -85,7 +96,11 @@ export default function RFQDetail() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6">
+    <>
+      <Helmet>
+        <title>{rfq.title} - RFQs - Device Passport System</title>
+      </Helmet>
+      <div className="max-w-4xl mx-auto px-4 py-6">
       {/* Back link */}
       <Link
         to="/marketplace/rfqs"
@@ -224,6 +239,7 @@ export default function RFQDetail() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

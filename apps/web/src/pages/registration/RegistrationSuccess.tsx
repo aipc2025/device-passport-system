@@ -1,4 +1,5 @@
 import { useLocation, Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { CheckCircleIcon, EnvelopeIcon, ClockIcon } from '@heroicons/react/24/outline';
 
 export default function RegistrationSuccess() {
@@ -8,7 +9,11 @@ export default function RegistrationSuccess() {
   const isCompany = registrationType === 'company';
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
+    <>
+      <Helmet>
+        <title>Registration Successful - Device Passport System</title>
+      </Helmet>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
       <div className="max-w-md w-full">
         <div className="bg-white rounded-lg shadow-sm p-8 text-center">
           <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100">
@@ -69,6 +74,7 @@ export default function RegistrationSuccess() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

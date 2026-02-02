@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import { Grid, List, Loader2 } from 'lucide-react';
 import { marketplaceRfqApi, savedApi } from '../../services/api';
 import { useMarketplaceStore } from '../../store/marketplace.store';
@@ -56,7 +57,11 @@ export default function RFQList() {
   }, [rawRfqs, savedRfqIds, isAuthenticated]);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6">
+    <>
+      <Helmet>
+        <title>RFQs - Device Passport System</title>
+      </Helmet>
+      <div className="max-w-7xl mx-auto px-4 py-6">
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">
@@ -157,6 +162,7 @@ export default function RFQList() {
           </button>
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }

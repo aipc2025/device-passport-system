@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import { useForm } from 'react-hook-form';
 import { User, Save, Phone, MapPin, Briefcase, Award, Calendar, AlertTriangle } from 'lucide-react';
 import { useAuthStore } from '../../store/auth.store';
@@ -102,9 +103,13 @@ export default function ExpertProfile() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6">
-      {/* Header */}
-      <div className="mb-6">
+    <>
+      <Helmet>
+        <title>My Profile - Device Passport System</title>
+      </Helmet>
+      <div className="max-w-3xl mx-auto px-4 py-6">
+        {/* Header */}
+        <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
           <User className="w-6 h-6" />
           {t('expert.profile', 'Expert Profile')}
@@ -344,6 +349,7 @@ export default function ExpertProfile() {
           </button>
         </div>
       </form>
-    </div>
+      </div>
+    </>
   );
 }

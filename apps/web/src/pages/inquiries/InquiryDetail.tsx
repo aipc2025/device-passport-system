@@ -1,6 +1,7 @@
 import { useParams, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, Building2, Package, FileText } from 'lucide-react';
 import { inquiryApi } from '../../services/api';
 import { MessageThread, QuoteForm, InquiryStatusBadge } from '../../components/inquiry';
@@ -43,23 +44,33 @@ export default function InquiryDetail() {
 
   if (isLoading) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <>
+        <Helmet>
+          <title>Loading... - Inquiries - Device Passport System</title>
+        </Helmet>
+        <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="animate-pulse space-y-4">
           <div className="h-8 bg-gray-200 rounded w-1/3" />
           <div className="h-64 bg-gray-200 rounded" />
         </div>
-      </div>
+        </div>
+      </>
     );
   }
 
   if (error || !inquiry) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-8 text-center">
+      <>
+        <Helmet>
+          <title>Inquiry Not Found - Inquiries - Device Passport System</title>
+        </Helmet>
+        <div className="max-w-4xl mx-auto px-4 py-8 text-center">
         <p className="text-red-600">{t('inquiry.notFound', 'Inquiry not found')}</p>
         <Link to="/inquiries" className="text-blue-600 hover:underline mt-2 inline-block">
           {t('inquiry.backToList', 'Back to inquiries')}
         </Link>
-      </div>
+        </div>
+      </>
     );
   }
 
@@ -91,7 +102,11 @@ export default function InquiryDetail() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6">
+    <>
+      <Helmet>
+        <title>{inquiry.subject} - Inquiries - Device Passport System</title>
+      </Helmet>
+      <div className="max-w-4xl mx-auto px-4 py-6">
       {/* Back link */}
       <Link
         to="/inquiries"
@@ -274,6 +289,7 @@ export default function InquiryDetail() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

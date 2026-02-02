@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { Helmet } from 'react-helmet-async';
 import {
   Star,
   TrendingUp,
@@ -96,9 +97,14 @@ export default function MyPoints() {
 
   if (accountLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
+      <>
+        <Helmet>
+          <title>My Points - Device Passport System</title>
+        </Helmet>
+        <div className="flex items-center justify-center min-h-[400px]">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
-      </div>
+        </div>
+      </>
     );
   }
 
@@ -107,7 +113,11 @@ export default function MyPoints() {
   const levelColors = creditLevelColors[creditLevel];
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
+    <>
+      <Helmet>
+        <title>My Points - Device Passport System</title>
+      </Helmet>
+      <div className="max-w-4xl mx-auto px-4 py-8">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('points.title', 'My Points')}</h1>
@@ -310,6 +320,7 @@ export default function MyPoints() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }

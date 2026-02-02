@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import { Star, MessageSquare, ThumbsUp, ThumbsDown, Flag, Send } from 'lucide-react';
 import { useAuthStore } from '../../store/auth.store';
 import { ratingApi } from '../../services/api';
@@ -167,9 +168,13 @@ export default function ExpertReviews({ expertId, isOwnProfile = false }: Expert
   };
 
   return (
-    <div className="space-y-6">
-      {/* Rating Summary */}
-      {summary && (
+    <>
+      <Helmet>
+        <title>Reviews - Device Passport System</title>
+      </Helmet>
+      <div className="space-y-6">
+        {/* Rating Summary */}
+        {summary && (
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">
             {t('rating.summary', 'Rating Summary')}
@@ -411,5 +416,6 @@ export default function ExpertReviews({ expertId, isOwnProfile = false }: Expert
         )}
       </div>
     </div>
+    </>
   );
 }

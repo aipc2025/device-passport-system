@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import { Package, FileText, ArrowRight, Users } from 'lucide-react';
 import { marketplaceProductApi, marketplaceRfqApi } from '../../services/api';
 import { ProductCard, RFQCard } from '../../components/marketplace';
@@ -19,7 +20,11 @@ export default function MarketplaceHome() {
   });
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6">
+    <>
+      <Helmet>
+        <title>Marketplace - Device Passport System</title>
+      </Helmet>
+      <div className="max-w-7xl mx-auto px-4 py-6">
       {/* Hero section */}
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white mb-8">
         <h1 className="text-3xl font-bold mb-4">
@@ -142,6 +147,7 @@ export default function MarketplaceHome() {
           </div>
         )}
       </section>
-    </div>
+      </div>
+    </>
   );
 }

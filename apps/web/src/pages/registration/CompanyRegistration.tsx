@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { useRegistrationStore, CompanyStep } from '../../store/registration.store';
 import { registrationApi } from '../../services/api';
 import StepIndicator from '../../components/registration/StepIndicator';
@@ -188,7 +189,11 @@ export default function CompanyRegistration() {
   }));
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <>
+      <Helmet>
+        <title>Company Registration - Device Passport System</title>
+      </Helmet>
+      <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-gray-900">Company Registration</h1>
@@ -274,6 +279,7 @@ export default function CompanyRegistration() {
           </button>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

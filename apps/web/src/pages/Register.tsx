@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
+import { Helmet } from 'react-helmet-async';
 import { UserPlus, AlertCircle } from 'lucide-react';
 import { authApi } from '../services/api';
 import { useAuthStore } from '../store/auth.store';
@@ -46,7 +47,11 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
+    <>
+      <Helmet>
+        <title>Register - Device Passport System</title>
+      </Helmet>
+      <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <UserPlus className="h-12 w-12 text-primary-600 mx-auto mb-4" />
@@ -136,6 +141,7 @@ export default function Register() {
           </button>
         </form>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

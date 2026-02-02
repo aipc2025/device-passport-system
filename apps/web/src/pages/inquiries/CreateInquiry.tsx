@@ -2,6 +2,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { useMutation } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, Send } from 'lucide-react';
 import { inquiryApi } from '../../services/api';
 import toast from 'react-hot-toast';
@@ -75,7 +76,11 @@ export default function CreateInquiry() {
   const recipientName = state?.supplierName || state?.buyerName;
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6">
+    <>
+      <Helmet>
+        <title>Create Inquiry - Device Passport System</title>
+      </Helmet>
+      <div className="max-w-2xl mx-auto px-4 py-6">
       {/* Header */}
       <div className="mb-6">
         <button
@@ -217,6 +222,7 @@ export default function CreateInquiry() {
           </button>
         </div>
       </form>
-    </div>
+      </div>
+    </>
   );
 }

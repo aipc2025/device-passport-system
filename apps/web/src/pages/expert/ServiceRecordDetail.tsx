@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import {
   ArrowLeft,
   Calendar,
@@ -260,16 +261,20 @@ export default function ServiceRecordDetail() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6">
-      {/* Header */}
-      <div className="mb-6">
-        <button
-          onClick={() => navigate('/expert/service-records')}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          {t('common.back', 'Back')}
-        </button>
+    <>
+      <Helmet>
+        <title>{record.serviceTitle} - Service Records - Device Passport System</title>
+      </Helmet>
+      <div className="max-w-4xl mx-auto px-4 py-6">
+        {/* Header */}
+        <div className="mb-6">
+          <button
+            onClick={() => navigate('/expert/service-records')}
+            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            {t('common.back', 'Back')}
+          </button>
 
         <div className="flex items-start justify-between">
           <div>
@@ -729,5 +734,6 @@ export default function ServiceRecordDetail() {
         </div>
       )}
     </div>
+    </>
   );
 }

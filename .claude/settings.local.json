@@ -92,7 +92,8 @@
       "Bash(Select-Object -Last 50)",
       "Bash(pnpm run typecheck:*)",
       "Bash(pnpm test:*)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(npm test:*)"
     ]
   }
 }

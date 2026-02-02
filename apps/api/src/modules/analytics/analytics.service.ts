@@ -39,17 +39,17 @@ export class AnalyticsService {
       openServiceRequests,
     ] = await Promise.all([
       this.passportRepository.count(),
-      this.passportRepository.count({ where: { status: 'IN_SERVICE' } }),
+      this.passportRepository.count({ where: { status: 'IN_SERVICE' } as any }),
       this.serviceOrderRepository.count(),
       this.serviceOrderRepository.count({
-        where: { status: 'PENDING' },
+        where: { status: 'PENDING' } as any,
       }),
       this.expertRepository.count(),
       this.expertRepository.count({
-        where: { isAvailable: true, registrationStatus: 'APPROVED' },
+        where: { isAvailable: true, registrationStatus: 'APPROVED' } as any,
       }),
       this.serviceRequestRepository.count(),
-      this.serviceRequestRepository.count({ where: { status: 'PUBLISHED' } }),
+      this.serviceRequestRepository.count({ where: { status: 'PUBLISHED' } as any }),
     ]);
 
     return {
@@ -215,9 +215,9 @@ export class AnalyticsService {
       byType,
     ] = await Promise.all([
       this.expertRepository.count(),
-      this.expertRepository.count({ where: { registrationStatus: 'APPROVED' } }),
-      this.expertRepository.count({ where: { registrationStatus: 'PENDING' } }),
-      this.expertRepository.count({ where: { isAvailable: true } }),
+      this.expertRepository.count({ where: { registrationStatus: 'APPROVED' } as any }),
+      this.expertRepository.count({ where: { registrationStatus: 'PENDING' } as any }),
+      this.expertRepository.count({ where: { isAvailable: true } as any }),
       this.expertRepository
         .createQueryBuilder('expert')
         .select("expert.expert_types::text", 'types')

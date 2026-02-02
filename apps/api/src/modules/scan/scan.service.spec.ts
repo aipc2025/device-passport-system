@@ -4,14 +4,15 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ScanService } from './scan.service';
 import { DevicePassport, IndividualExpert } from '../../database/entities';
-import { PassportCodeService } from '../passport/passport-code.service';
+import { ExpertService } from '../expert/expert.service';
+import { ExpertCodeService } from '../expert/expert-code.service';
 import { ProductLine, OriginCode, DeviceStatus, ExpertType } from '@device-passport/shared';
 
 describe('ScanService', () => {
   let service: ScanService;
   let passportRepository: jest.Mocked<Repository<DevicePassport>>;
-  let expertRepository: jest.Mocked<Repository<IndividualExpert>>;
-  let passportCodeService: jest.Mocked<PassportCodeService>;
+  let expertService: jest.Mocked<ExpertService>;
+  let expertCodeService: jest.Mocked<ExpertCodeService>;
 
   const mockPassport = {
     id: '1',
@@ -55,13 +56,13 @@ describe('ScanService', () => {
       findOne: jest.fn(),
     } as unknown as jest.Mocked<Repository<DevicePassport>>;
 
-    expertRepository = {
-      findOne: jest.fn(),
-    } as unknown as jest.Mocked<Repository<IndividualExpert>>;
+    expertService = {
+      findByCode: jest.fn(),
+    } as unknown as jest.Mocked<ExpertService>;
 
-    passportCodeService = {
+    expertCodeService = {
       validateCode: jest.fn(),
-    } as unknown as jest.Mocked<PassportCodeService>;
+    } as unknown as jest.Mocked<ExpertCodeService>;
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -71,12 +72,12 @@ describe('ScanService', () => {
           useValue: passportRepository,
         },
         {
-          provide: getRepositoryToken(IndividualExpert),
-          useValue: expertRepository,
+          provide: ExpertService,
+          useValue: expertService,
         },
         {
-          provide: PassportCodeService,
-          useValue: passportCodeService,
+          provide: ExpertCodeService,
+          useValue: expertCodeService,
         },
       ],
     }).compile();

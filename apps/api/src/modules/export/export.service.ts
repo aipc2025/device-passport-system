@@ -89,14 +89,14 @@ export class ExportService {
       worksheet.addRow({
         passportCode: passport.passportCode,
         productLine: passport.productLine,
-        productName: passport.productName,
-        model: passport.model,
+        productName: passport.deviceName,
+        model: passport.deviceModel,
         serialNumber: passport.serialNumber,
         status: passport.status,
-        manufacturer: passport.manufacturer?.name || '',
-        supplier: passport.supplier?.name || '',
-        customer: passport.customer?.name || '',
-        currentLocation: passport.currentLocation?.address || '',
+        manufacturer: passport.manufacturer || '',
+        supplier: passport.supplierId || '',
+        customer: passport.customerId || '',
+        currentLocation: passport.currentLocation || '',
         createdAt: passport.createdAt,
       });
     });

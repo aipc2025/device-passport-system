@@ -144,11 +144,11 @@ export class ExportService {
     const rows = passports.map((p) => [
       p.passportCode,
       p.productLine,
-      p.productName || '',
-      p.model || '',
+      p.deviceName || '',
+      p.deviceModel || '',
       p.serialNumber || '',
       p.status,
-      p.manufacturer?.name || '',
+      p.manufacturer || '',
       p.supplier?.name || '',
       p.customer?.name || '',
       p.createdAt.toISOString(),
@@ -235,7 +235,7 @@ export class ExportService {
 
         return {
           code: passport.passportCode,
-          name: passport.productName || passport.model || '',
+          name: passport.deviceName || passport.deviceModel || '',
           qrDataUrl,
         };
       })

@@ -25,6 +25,8 @@ import { InvitationModule } from './modules/invitation/invitation.module';
 import { DeviceTakeoverModule } from './modules/device-takeover/device-takeover.module';
 import { LocationModule } from './modules/location/location.module';
 import { WebSocketModule } from './modules/websocket/websocket.module';
+import { ExportModule } from './modules/export/export.module';
+import { AnalyticsModule } from './modules/analytics/analytics.module';
 import databaseConfig from './config/database.config';
 import jwtConfig from './config/jwt.config';
 
@@ -83,6 +85,8 @@ import jwtConfig from './config/jwt.config';
     DeviceTakeoverModule,
     LocationModule,
     WebSocketModule,
+    ExportModule,
+    AnalyticsModule,
   ],
 })
 export class AppModule {}

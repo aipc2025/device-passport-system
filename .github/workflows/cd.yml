@@ -1,0 +1,143 @@
+name: CD - Deploy to Production
+
+on:
+  push:
+    branches: [main]
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+
+jobs:
+  # ==========================================
+  # Deploy to Production
+  # ==========================================
+  deploy:
+    name: Deploy to ${{ github.event.inputs.environment || 'production' }}
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.event.inputs.environment || 'production' }}
+      url: ${{ secrets.APP_URL }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add server to known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Create deployment package
+        run: |
+          tar -czf deploy.tar.gz \
+            docker-compose.production.yml \
+            .env.production.example \
+            apps/api/Dockerfile.production \
+            apps/web/Dockerfile.production \
+            apps/web/nginx.conf
+
+      - name: Upload deployment package
+        run: |
+          scp deploy.tar.gz ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:~/
+
+      - name: Deploy to server
+        run: |
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
+            set -e
+
+            # Extract deployment package
+            tar -xzf deploy.tar.gz
+
+            # Pull latest images
+            docker-compose -f docker-compose.production.yml pull
+
+            # Stop old containers
+            docker-compose -f docker-compose.production.yml down
+
+            # Start new containers
+            docker-compose -f docker-compose.production.yml up -d
+
+            # Run migrations
+            docker-compose -f docker-compose.production.yml exec -T api pnpm migration:run
+
+            # Clean up old images
+            docker image prune -af --filter "until=24h"
+
+            echo "Deployment completed successfully!"
+          EOF
+
+      - name: Health check
+        run: |
+          max_attempts=30
+          attempt=0
+
+          until curl -f ${{ secrets.APP_URL }}/api/v1/health || [ $attempt -eq $max_attempts ]; do
+            echo "Waiting for application to be healthy... ($attempt/$max_attempts)"
+            sleep 10
+            attempt=$((attempt + 1))
+          done
+
+          if [ $attempt -eq $max_attempts ]; then
+            echo "Health check failed!"
+            exit 1
+          fi
+
+          echo "Application is healthy!"
+
+      - name: Notify deployment
+        if: always()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: |
+            Deployment to ${{ github.event.inputs.environment || 'production' }} ${{ job.status }}
+            Commit: ${{ github.sha }}
+            Author: ${{ github.actor }}
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+
+  # ==========================================
+  # Rollback (Manual)
+  # ==========================================
+  rollback:
+    name: Rollback Deployment
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    environment:
+      name: production
+
+    steps:
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Rollback on server
+        run: |
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
+            set -e
+
+            echo "Rolling back to previous version..."
+
+            # Restore previous images
+            docker-compose -f docker-compose.production.yml down
+            docker tag device-passport-api:backup device-passport-api:latest
+            docker tag device-passport-web:backup device-passport-web:latest
+            docker-compose -f docker-compose.production.yml up -d
+
+            echo "Rollback completed!"
+          EOF

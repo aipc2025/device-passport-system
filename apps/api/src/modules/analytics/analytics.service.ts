@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between } from 'typeorm';
-import { DevicePassport } from '../entities/device-passport.entity';
-import { LifecycleEvent } from '../entities/lifecycle-event.entity';
-import { ServiceOrder } from '../entities/service-order.entity';
-import { ServiceRequest } from '../entities/service-request.entity';
-import { IndividualExpert } from '../entities/individual-expert.entity';
+import {
+  DevicePassport,
+  LifecycleEvent,
+  ServiceOrder,
+  ServiceRequest,
+  IndividualExpert,
+} from '../../database/entities';
 
 @Injectable()
 export class AnalyticsService {

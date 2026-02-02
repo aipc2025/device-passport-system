@@ -14,6 +14,15 @@ import { JwtService } from '@nestjs/jwt';
 interface AuthSocket extends Socket {
   userId?: string;
   userRole?: string;
+  id: string;
+  handshake: {
+    auth?: { token?: string };
+    headers?: { authorization?: string };
+  };
+  join(room: string | string[]): void;
+  leave(room: string): void;
+  emit(event: string, ...args: any[]): boolean;
+  disconnect(close?: boolean): void;
 }
 
 @WSGateway({
@@ -50,13 +59,15 @@ export class WebSocketGateway implements OnGatewayConnection, OnGatewayDisconnec
       client.userRole = payload.role;
 
       // Track connected user
-      if (!this.connectedUsers.has(client.userId)) {
-        this.connectedUsers.set(client.userId, new Set());
-      }
-      this.connectedUsers.get(client.userId)!.add(client.id);
+      if (client.userId) {
+        if (!this.connectedUsers.has(client.userId)) {
+          this.connectedUsers.set(client.userId, new Set());
+        }
+        this.connectedUsers.get(client.userId)!.add(client.id);
 
-      // Join user-specific room
-      client.join(`user:${client.userId}`);
+        // Join user-specific room
+        client.join(`user:${client.userId}`);
+      }
 
       // Join role-specific room
       if (client.userRole) {
@@ -73,7 +84,8 @@ export class WebSocketGateway implements OnGatewayConnection, OnGatewayDisconnec
         userId: client.userId,
       });
     } catch (error) {
-      this.logger.error(`Connection error for client ${client.id}:`, error.message);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error(`Connection error for client ${client.id}:`, errorMessage);
       client.emit('error', { message: 'Authentication failed' });
       client.disconnect();
     }

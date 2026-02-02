@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { IndividualExpert } from '../entities/individual-expert.entity';
-import { ServiceRequest } from '../entities/service-request.entity';
-import { DevicePassport } from '../entities/device-passport.entity';
+import {
+  IndividualExpert,
+  ServiceRequest,
+  DevicePassport,
+} from '../../database/entities';
 
 @Injectable()
 export class LocationService {

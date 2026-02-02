@@ -3,9 +3,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In, Between } from 'typeorm';
 import * as ExcelJS from 'exceljs';
 import * as QRCode from 'qrcode';
-import { DevicePassport } from '../entities/device-passport.entity';
-import { LifecycleEvent } from '../entities/lifecycle-event.entity';
-import { ServiceOrder } from '../entities/service-order.entity';
+import {
+  DevicePassport,
+  LifecycleEvent,
+  ServiceOrder,
+} from '../../database/entities';
 
 interface ExportPassportOptions {
   ids?: string[];

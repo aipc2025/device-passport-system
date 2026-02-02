@@ -1,7 +1,7 @@
 import { Controller, Get, Query, Res, UseGuards, ParseArrayPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { Response } from 'express';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { JwtAuthGuard } from '../../common/guards';
 import { ExportService } from './export.service';
 
 @ApiTags('Export')
@@ -30,13 +30,13 @@ export class ExportController {
       endDate: endDate ? new Date(endDate) : undefined,
     });
 
-    res.set({
+    res!.set({
       'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       'Content-Disposition': `attachment; filename=device-passports-${Date.now()}.xlsx`,
       'Content-Length': buffer.length,
     });
 
-    res.send(buffer);
+    res!.send(buffer);
   }
 
   @Get('passports/csv')
@@ -48,12 +48,12 @@ export class ExportController {
   ) {
     const csv = await this.exportService.exportPassportsToCSV({ ids });
 
-    res.set({
+    res!.set({
       'Content-Type': 'text/csv',
       'Content-Disposition': `attachment; filename=device-passports-${Date.now()}.csv`,
     });
 
-    res.send(csv);
+    res!.send(csv);
   }
 
   @Get('lifecycle/excel')
@@ -65,13 +65,13 @@ export class ExportController {
   ) {
     const buffer = await this.exportService.exportLifecycleToExcel(passportId);
 
-    res.set({
+    res!.set({
       'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       'Content-Disposition': `attachment; filename=lifecycle-events-${passportId}-${Date.now()}.xlsx`,
       'Content-Length': buffer.length,
     });
 
-    res.send(buffer);
+    res!.send(buffer);
   }
 
   @Get('qr-codes/batch')
@@ -83,13 +83,13 @@ export class ExportController {
   ) {
     const buffer = await this.exportService.exportQRCodesBatchPDF(ids);
 
-    res.set({
+    res!.set({
       'Content-Type': 'application/pdf',
       'Content-Disposition': `attachment; filename=qr-codes-batch-${Date.now()}.pdf`,
       'Content-Length': buffer.length,
     });
 
-    res.send(buffer);
+    res!.send(buffer);
   }
 
   @Get('service-orders/excel')
@@ -109,12 +109,12 @@ export class ExportController {
       status,
     });
 
-    res.set({
+    res!.set({
       'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       'Content-Disposition': `attachment; filename=service-orders-${Date.now()}.xlsx`,
       'Content-Length': buffer.length,
     });
 
-    res.send(buffer);
+    res!.send(buffer);
   }
 }

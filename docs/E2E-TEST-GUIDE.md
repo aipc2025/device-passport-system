@@ -24,6 +24,35 @@ start-all.bat
 run-e2e-tests.bat
 ```
 
+### 方法零：快速功能验证（最快）
+
+在运行完整E2E测试前，可以先用快速测试脚本验证核心功能：
+
+```bash
+# Windows 批处理版本（简单快速）
+test-core-features.bat
+
+# PowerShell 版本（详细输出 + JSON报告）
+powershell -ExecutionPolicy Bypass -File test-core-features.ps1
+```
+
+**测试内容**：
+- ✅ 后端API可用性
+- ✅ 健康检查端点（数据库、Redis、内存）
+- ✅ 公开扫描端点
+- ✅ API文档访问
+- ✅ 登录功能
+- ✅ 受保护端点（需认证）
+- ✅ 专家列表端点
+- ✅ 前端可访问性
+- ✅ WebSocket服务器
+
+**优势**：
+- ⚡ 快速（<10秒）
+- 🎯 聚焦核心功能
+- 📊 PowerShell版本生成JSON报告
+- 🔍 适合快速验证系统状态
+
 ### 方法二：手动步骤
 
 #### 第一步：启动所有服务

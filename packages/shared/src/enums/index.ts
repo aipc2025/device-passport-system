@@ -1,13 +1,24 @@
 /**
  * User roles with ascending permission levels
+ * Extended to support organization-specific roles for multi-tenant RBAC
  */
 export enum UserRole {
+  // Public and customer roles
   PUBLIC = 'PUBLIC',
   CUSTOMER = 'CUSTOMER',
+
+  // Internal platform roles
   ENGINEER = 'ENGINEER',
   QC_INSPECTOR = 'QC_INSPECTOR',
   OPERATOR = 'OPERATOR',
   ADMIN = 'ADMIN',
+
+  // Supplier organization roles (for multi-tenant)
+  SUPPLIER_VIEWER = 'SUPPLIER_VIEWER',     // View-only access to own org data
+  SUPPLIER_QC = 'SUPPLIER_QC',             // QC inspector at supplier
+  SUPPLIER_PACKER = 'SUPPLIER_PACKER',     // Packaging staff at supplier
+  SUPPLIER_SHIPPER = 'SUPPLIER_SHIPPER',   // Shipping staff at supplier
+  SUPPLIER_ADMIN = 'SUPPLIER_ADMIN',       // Admin at supplier org
 }
 
 /**
@@ -133,11 +144,52 @@ export const VALID_STATUS_TRANSITIONS: Record<DeviceStatus, DeviceStatus[]> = {
 export const ROLE_PERMISSION_LEVELS: Record<UserRole, number> = {
   [UserRole.PUBLIC]: 0,
   [UserRole.CUSTOMER]: 1,
+  [UserRole.SUPPLIER_VIEWER]: 1,
   [UserRole.ENGINEER]: 2,
+  [UserRole.SUPPLIER_QC]: 2,
   [UserRole.QC_INSPECTOR]: 3,
+  [UserRole.SUPPLIER_PACKER]: 3,
+  [UserRole.SUPPLIER_SHIPPER]: 3,
   [UserRole.OPERATOR]: 4,
+  [UserRole.SUPPLIER_ADMIN]: 4,
   [UserRole.ADMIN]: 5,
 };
+
+/**
+ * Data scope for user permissions
+ * Determines what data a user can access within their organization
+ */
+export enum DataScope {
+  ALL = 'ALL',           // Full access to all organization data
+  DEPARTMENT = 'DEPARTMENT', // Department-level access (future use)
+  OWN = 'OWN',           // Only own created data
+}
+
+/**
+ * Permission action types
+ */
+export enum PermissionAction {
+  CREATE = 'CREATE',
+  READ = 'READ',
+  UPDATE = 'UPDATE',
+  DELETE = 'DELETE',
+  APPROVE = 'APPROVE',
+  EXPORT = 'EXPORT',
+}
+
+/**
+ * Permission resource types
+ */
+export enum PermissionResource {
+  DEVICE = 'DEVICE',
+  PASSPORT = 'PASSPORT',
+  QC = 'QC',
+  PACKAGE = 'PACKAGE',
+  SHIPPING = 'SHIPPING',
+  SERVICE_ORDER = 'SERVICE_ORDER',
+  USER = 'USER',
+  ORGANIZATION = 'ORGANIZATION',
+}
 
 /**
  * Product type display names

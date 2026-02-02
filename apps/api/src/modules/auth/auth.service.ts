@@ -113,6 +113,7 @@ export class AuthService {
       email: user.email,
       role: user.role,
       organizationId: user.organizationId,
+      scopeConfig: user.scopeConfig || undefined,
     };
 
     const accessToken = this.jwtService.sign(payload);

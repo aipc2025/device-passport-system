@@ -1,4 +1,4 @@
-import { UserRole } from '../enums';
+import { UserRole, DataScope, PermissionAction, PermissionResource, ProductLine } from '../enums';
 
 /**
  * User base interface
@@ -84,6 +84,7 @@ export interface TokenPayload {
   organizationId?: string;
   isExpert?: boolean;
   expertId?: string;
+  scopeConfig?: ScopeConfig; // Permission metadata
   iat?: number;
   exp?: number;
 }
@@ -136,4 +137,50 @@ export interface UpdateOrganizationDto {
   email?: string;
   website?: string;
   isActive?: boolean;
+}
+
+/**
+ * Permission scope configuration stored in User entity scopeConfig field
+ * This is a JSONB field for flexible permission metadata
+ */
+export interface ScopeConfig {
+  dataScope?: DataScope;           // Data access scope (ALL, DEPARTMENT, OWN)
+  productLines?: ProductLine[];    // Limited product lines (e.g., only PLC)
+  departments?: string[];          // Department IDs (future use)
+  canApprove?: boolean;            // Can approve workflows
+  maxAmount?: number;              // Maximum transaction amount (future use)
+  customPermissions?: string[];    // Custom permission strings
+}
+
+/**
+ * User permission metadata with computed permissions
+ * Used by PermissionService and PermissionGuard
+ */
+export interface UserPermissions {
+  userId: string;
+  role: UserRole;
+  organizationId?: string;
+  dataScope: DataScope;
+  scopeConfig: ScopeConfig;
+  permissions: string[];           // Array of permission strings (e.g., 'device.create', 'qc.approve')
+}
+
+/**
+ * Permission definition for a specific action on a resource
+ */
+export interface Permission {
+  resource: PermissionResource;
+  action: PermissionAction;
+  toString(): string;              // Returns 'resource.action' format
+}
+
+/**
+ * Role-based permission mapping
+ * Defines what permissions each role has
+ */
+export interface RolePermissions {
+  role: UserRole;
+  permissions: string[];           // Array of permission strings
+  dataScope: DataScope;
+  description: string;
 }

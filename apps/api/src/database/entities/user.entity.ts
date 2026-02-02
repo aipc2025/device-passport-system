@@ -8,7 +8,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
-import { UserRole } from '@device-passport/shared';
+import { UserRole, ScopeConfig } from '@device-passport/shared';
 import { Organization } from './organization.entity';
 
 @Entity('users')
@@ -45,6 +45,14 @@ export class User {
 
   @Column({ name: 'last_login_at', nullable: true })
   lastLoginAt: Date;
+
+  @Column({
+    name: 'scope_config',
+    type: 'jsonb',
+    nullable: true,
+    default: null,
+  })
+  scopeConfig: ScopeConfig | null;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

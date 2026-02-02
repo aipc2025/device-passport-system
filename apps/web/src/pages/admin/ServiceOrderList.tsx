@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Search, ChevronLeft, ChevronRight, AlertTriangle } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 import { serviceOrderApi } from '../../services/api';
 import { ServiceOrderStatus, ServicePriority, ServiceOrderListItem } from '@device-passport/shared';
 import { format } from 'date-fns';
@@ -53,9 +54,13 @@ export default function ServiceOrderList() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div>
+    <>
+      <Helmet>
+        <title>Service Orders - Device Passport System</title>
+      </Helmet>
+      <div className="space-y-6">
+        {/* Header */}
+        <div>
         <h1 className="text-2xl font-bold text-gray-900">Service Orders</h1>
         <p className="text-gray-600">Manage service requests and work orders</p>
       </div>
@@ -236,5 +241,6 @@ export default function ServiceOrderList() {
         )}
       </div>
     </div>
+    </>
   );
 }

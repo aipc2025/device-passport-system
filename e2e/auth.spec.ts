@@ -6,6 +6,22 @@ import { test, expect } from '@playwright/test';
  * Tests user registration, login, logout, and session management
  */
 
+// Test credentials matching seed data
+const TEST_CREDENTIALS = {
+  admin: {
+    email: 'admin@luna.top',
+    password: 'DevTest2026!@#$',
+  },
+  operator: {
+    email: 'operator@luna.top',
+    password: 'DevTest2026!@#$',
+  },
+  customer: {
+    email: 'customer@luna.top',
+    password: 'DevTest2026!@#$',
+  },
+};
+
 test.describe('Authentication', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
@@ -24,16 +40,16 @@ test.describe('Authentication', () => {
     // Try to login without filling fields
     await page.click('button[type="submit"]');
 
-    // Should show validation errors
-    await expect(page.locator('text=/required|必填/i')).toBeVisible();
+    // Should show validation errors - check for first error message
+    await expect(page.locator('text=/required|必填/i').first()).toBeVisible();
   });
 
   test('should successfully login with valid credentials', async ({ page }) => {
     await page.goto('/login');
 
-    // Fill login form with correct credentials
-    await page.fill('input[type="email"]', 'admin@luna.medical');
-    await page.fill('input[type="password"]', 'Password123!');
+    // Fill login form with correct credentials from seed data
+    await page.fill('input[type="email"]', TEST_CREDENTIALS.admin.email);
+    await page.fill('input[type="password"]', TEST_CREDENTIALS.admin.password);
 
     // Submit form
     await page.click('button[type="submit"]');
@@ -56,8 +72,8 @@ test.describe('Authentication', () => {
   test('should logout successfully', async ({ page }) => {
     // Login first
     await page.goto('/login');
-    await page.fill('input[type="email"]', 'admin@luna.medical');
-    await page.fill('input[type="password"]', 'Password123!');
+    await page.fill('input[type="email"]', TEST_CREDENTIALS.admin.email);
+    await page.fill('input[type="password"]', TEST_CREDENTIALS.admin.password);
     await page.click('button[type="submit"]');
     await page.waitForURL(/\/(dashboard|passports|home)/i);
 
@@ -80,8 +96,8 @@ test.describe('Authentication', () => {
   test('should persist session after page refresh', async ({ page }) => {
     // Login
     await page.goto('/login');
-    await page.fill('input[type="email"]', 'admin@luna.medical');
-    await page.fill('input[type="password"]', 'Password123!');
+    await page.fill('input[type="email"]', TEST_CREDENTIALS.admin.email);
+    await page.fill('input[type="password"]', TEST_CREDENTIALS.admin.password);
     await page.click('button[type="submit"]');
     await page.waitForURL(/\/(dashboard|passports|home)/i);
 

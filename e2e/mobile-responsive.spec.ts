@@ -23,8 +23,8 @@ test.describe('Mobile Responsiveness', () => {
     await page.goto('/login');
 
     // Fill and submit login form
-    await page.fill('input[type="email"]', 'admin@luna.medical');
-    await page.fill('input[type="password"]', 'Password123!');
+    await page.fill('input[type="email"]', 'admin@luna.top');
+    await page.fill('input[type="password"]', 'DevTest2026!@#$');
     await page.click('button[type="submit"]');
 
     // Should successfully login
@@ -48,8 +48,8 @@ test.describe('Mobile Responsiveness', () => {
   test('should display passport list in mobile view', async ({ page }) => {
     // Login first
     await page.goto('/login');
-    await page.fill('input[type="email"]', 'admin@luna.medical');
-    await page.fill('input[type="password"]', 'Password123!');
+    await page.fill('input[type="email"]', 'admin@luna.top');
+    await page.fill('input[type="password"]', 'DevTest2026!@#$');
     await page.click('button[type="submit"]');
     await page.waitForURL(/\/(dashboard|passports|home)/i);
 
@@ -102,8 +102,8 @@ test.describe('Tablet Responsiveness', () => {
   test('should display passport grid on tablet', async ({ page }) => {
     // Login
     await page.goto('/login');
-    await page.fill('input[type="email"]', 'admin@luna.medical');
-    await page.fill('input[type="password"]', 'Password123!');
+    await page.fill('input[type="email"]', 'admin@luna.top');
+    await page.fill('input[type="password"]', 'DevTest2026!@#$');
     await page.click('button[type="submit"]');
     await page.waitForURL(/\/(dashboard|passports|home)/i);
 

@@ -9,16 +9,17 @@ import { PointType } from '@device-passport/shared';
 
 // Rule trigger conditions
 export interface RuleConditions {
-  minOrderAmount?: number;        // Minimum order amount to trigger
-  minRating?: number;             // Minimum rating to trigger
-  userLevels?: string[];          // Applicable user credit levels
-  membershipLevels?: string[];    // Applicable membership levels
-  timeRange?: {                   // Time window for the rule
-    startTime?: string;           // Start time (ISO format)
-    endTime?: string;             // End time (ISO format)
+  minOrderAmount?: number; // Minimum order amount to trigger
+  minRating?: number; // Minimum rating to trigger
+  userLevels?: string[]; // Applicable user credit levels
+  membershipLevels?: string[]; // Applicable membership levels
+  timeRange?: {
+    // Time window for the rule
+    startTime?: string; // Start time (ISO format)
+    endTime?: string; // End time (ISO format)
   };
-  isFirstTime?: boolean;          // Only applies to first-time actions
-  requiredDays?: number;          // Required consecutive days (for streaks)
+  isFirstTime?: boolean; // Only applies to first-time actions
+  requiredDays?: number; // Required consecutive days (for streaks)
 }
 
 @Entity('point_rules')

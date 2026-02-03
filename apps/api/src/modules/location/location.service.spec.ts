@@ -83,9 +83,7 @@ describe('LocationService', () => {
         getMany: jest.fn().mockResolvedValue(mockExperts),
       };
 
-      jest
-        .spyOn(expertRepository, 'createQueryBuilder')
-        .mockReturnValue(mockQueryBuilder as any);
+      jest.spyOn(expertRepository, 'createQueryBuilder').mockReturnValue(mockQueryBuilder as any);
 
       const result = await service.findNearbyExperts(39.9, 116.4, 50);
 
@@ -104,9 +102,7 @@ describe('LocationService', () => {
         getMany: jest.fn().mockResolvedValue(mockExperts),
       };
 
-      jest
-        .spyOn(expertRepository, 'createQueryBuilder')
-        .mockReturnValue(mockQueryBuilder as any);
+      jest.spyOn(expertRepository, 'createQueryBuilder').mockReturnValue(mockQueryBuilder as any);
 
       const result = await service.findNearbyExperts(39.9, 116.4, 1);
 
@@ -122,17 +118,13 @@ describe('LocationService', () => {
         getMany: jest.fn().mockResolvedValue(mockExperts),
       };
 
-      jest
-        .spyOn(expertRepository, 'createQueryBuilder')
-        .mockReturnValue(mockQueryBuilder as any);
+      jest.spyOn(expertRepository, 'createQueryBuilder').mockReturnValue(mockQueryBuilder as any);
 
       const result = await service.findNearbyExperts(39.9, 116.4, 50);
 
       // Check that results are sorted by distance
       for (let i = 0; i < result.items.length - 1; i++) {
-        expect(result.items[i].distance).toBeLessThanOrEqual(
-          result.items[i + 1].distance,
-        );
+        expect(result.items[i].distance).toBeLessThanOrEqual(result.items[i + 1].distance);
       }
     });
   });
@@ -145,12 +137,7 @@ describe('LocationService', () => {
       const lat2 = 31.2304; // Shanghai
       const lng2 = 121.4737;
 
-      const distance = (service as any).calculateDistance(
-        lat1,
-        lng1,
-        lat2,
-        lng2,
-      );
+      const distance = (service as any).calculateDistance(lat1, lng1, lat2, lng2);
 
       // Allow 5% margin of error
       expect(distance).toBeGreaterThan(1000);
@@ -158,12 +145,7 @@ describe('LocationService', () => {
     });
 
     it('should return 0 for same coordinates', () => {
-      const distance = (service as any).calculateDistance(
-        39.9042,
-        116.4074,
-        39.9042,
-        116.4074,
-      );
+      const distance = (service as any).calculateDistance(39.9042, 116.4074, 39.9042, 116.4074);
 
       expect(distance).toBe(0);
     });
@@ -196,9 +178,7 @@ describe('LocationService', () => {
     });
 
     it('should handle geocoding errors gracefully', async () => {
-      global.fetch = jest
-        .fn()
-        .mockRejectedValue(new Error('Network error'));
+      global.fetch = jest.fn().mockRejectedValue(new Error('Network error'));
 
       const result = await service.reverseGeocode(39.9042, 116.4074);
 

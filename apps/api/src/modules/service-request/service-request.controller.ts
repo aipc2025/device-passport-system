@@ -10,14 +10,7 @@ import {
   UseGuards,
   ParseUUIDPipe,
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiBearerAuth,
-  ApiParam,
-  ApiQuery,
-  ApiBody,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiParam, ApiQuery, ApiBody } from '@nestjs/swagger';
 import { ServiceRequestService } from './service-request.service';
 import { JwtAuthGuard, RolesGuard } from '../../common/guards';
 import { CurrentUser, Roles, Public } from '../../common/decorators';
@@ -45,7 +38,7 @@ export class ServiceRequestController {
     @Query('serviceType') serviceType?: string,
     @Query('urgency') urgency?: string,
     @Query('limit') limit?: number,
-    @Query('offset') offset?: number,
+    @Query('offset') offset?: number
   ) {
     return this.serviceRequestService.findPublic({
       search,
@@ -69,7 +62,14 @@ export class ServiceRequestController {
   @ApiBody({
     schema: {
       type: 'object',
-      required: ['title', 'description', 'serviceType', 'contactName', 'contactPhone', 'contactEmail'],
+      required: [
+        'title',
+        'description',
+        'serviceType',
+        'contactName',
+        'contactPhone',
+        'contactEmail',
+      ],
       properties: {
         title: { type: 'string' },
         description: { type: 'string' },
@@ -179,15 +179,8 @@ export class ServiceRequestController {
       },
     },
   })
-  async create(
-    @CurrentUser() user: TokenPayload,
-    @Body() data: Record<string, unknown>,
-  ) {
-    return this.serviceRequestService.create(
-      user.sub,
-      user.organizationId || null,
-      data as any,
-    );
+  async create(@CurrentUser() user: TokenPayload, @Body() data: Record<string, unknown>) {
+    return this.serviceRequestService.create(user.sub, user.organizationId || null, data as any);
   }
 
   @Get('my')
@@ -205,7 +198,7 @@ export class ServiceRequestController {
   @ApiParam({ name: 'id', description: 'Service request ID' })
   async getRequestDetail(
     @CurrentUser() user: TokenPayload,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id', ParseUUIDPipe) id: string
   ) {
     const request = await this.serviceRequestService.findOne(id);
     await this.serviceRequestService.incrementViewCount(id);
@@ -221,7 +214,7 @@ export class ServiceRequestController {
   async update(
     @CurrentUser() user: TokenPayload,
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() data: Record<string, unknown>,
+    @Body() data: Record<string, unknown>
   ) {
     return this.serviceRequestService.update(id, user.sub, data as any);
   }
@@ -232,10 +225,7 @@ export class ServiceRequestController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Publish service request (make it public)' })
   @ApiParam({ name: 'id', description: 'Service request ID' })
-  async publish(
-    @CurrentUser() user: TokenPayload,
-    @Param('id', ParseUUIDPipe) id: string,
-  ) {
+  async publish(@CurrentUser() user: TokenPayload, @Param('id', ParseUUIDPipe) id: string) {
     return this.serviceRequestService.publish(id, user.sub);
   }
 
@@ -256,7 +246,7 @@ export class ServiceRequestController {
   async cancel(
     @CurrentUser() user: TokenPayload,
     @Param('id', ParseUUIDPipe) id: string,
-    @Body('reason') reason?: string,
+    @Body('reason') reason?: string
   ) {
     return this.serviceRequestService.cancel(id, user.sub, reason);
   }
@@ -267,10 +257,7 @@ export class ServiceRequestController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Mark service request as completed' })
   @ApiParam({ name: 'id', description: 'Service request ID' })
-  async complete(
-    @CurrentUser() user: TokenPayload,
-    @Param('id', ParseUUIDPipe) id: string,
-  ) {
+  async complete(@CurrentUser() user: TokenPayload, @Param('id', ParseUUIDPipe) id: string) {
     return this.serviceRequestService.completeRequest(id, user.sub);
   }
 
@@ -300,7 +287,7 @@ export class ServiceRequestController {
   async apply(
     @CurrentUser() user: TokenPayload,
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() data: Record<string, unknown>,
+    @Body() data: Record<string, unknown>
   ) {
     if (!user.expertId) {
       throw new Error('Only experts can apply to service requests');
@@ -314,10 +301,7 @@ export class ServiceRequestController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get applications for a service request (as owner)' })
   @ApiParam({ name: 'id', description: 'Service request ID' })
-  async getApplications(
-    @CurrentUser() user: TokenPayload,
-    @Param('id', ParseUUIDPipe) id: string,
-  ) {
+  async getApplications(@CurrentUser() user: TokenPayload, @Param('id', ParseUUIDPipe) id: string) {
     return this.serviceRequestService.getApplicationsForRequest(id, user.sub);
   }
 
@@ -340,7 +324,7 @@ export class ServiceRequestController {
   @ApiParam({ name: 'applicationId', description: 'Application ID' })
   async acceptApplication(
     @CurrentUser() user: TokenPayload,
-    @Param('applicationId', ParseUUIDPipe) applicationId: string,
+    @Param('applicationId', ParseUUIDPipe) applicationId: string
   ) {
     return this.serviceRequestService.acceptApplication(applicationId, user.sub);
   }
@@ -362,7 +346,7 @@ export class ServiceRequestController {
   async rejectApplication(
     @CurrentUser() user: TokenPayload,
     @Param('applicationId', ParseUUIDPipe) applicationId: string,
-    @Body('reason') reason?: string,
+    @Body('reason') reason?: string
   ) {
     return this.serviceRequestService.rejectApplication(applicationId, user.sub, reason);
   }
@@ -374,7 +358,7 @@ export class ServiceRequestController {
   @ApiParam({ name: 'applicationId', description: 'Application ID' })
   async withdrawApplication(
     @CurrentUser() user: TokenPayload,
-    @Param('applicationId', ParseUUIDPipe) applicationId: string,
+    @Param('applicationId', ParseUUIDPipe) applicationId: string
   ) {
     if (!user.expertId) {
       throw new Error('Only experts can withdraw applications');

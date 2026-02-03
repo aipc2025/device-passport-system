@@ -11,13 +11,7 @@ import {
   ParseUUIDPipe,
   BadRequestException,
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiBearerAuth,
-  ApiParam,
-  ApiQuery,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { MarketplaceService } from './marketplace.service';
 import {
   CreateMarketplaceProductDto,
@@ -96,7 +90,9 @@ export class MarketplaceController {
   @ApiOperation({ summary: 'Get my published products' })
   async getMyProducts(@CurrentUser() user: TokenPayload) {
     if (!user.organizationId) {
-      throw new BadRequestException('Organization is required to view products. Please complete your company registration.');
+      throw new BadRequestException(
+        'Organization is required to view products. Please complete your company registration.'
+      );
     }
     return this.marketplaceService.getMyProducts(user.organizationId);
   }
@@ -106,12 +102,11 @@ export class MarketplaceController {
   @Roles(UserRole.CUSTOMER, UserRole.OPERATOR, UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Publish a product to marketplace' })
-  async createProduct(
-    @CurrentUser() user: TokenPayload,
-    @Body() dto: CreateMarketplaceProductDto,
-  ) {
+  async createProduct(@CurrentUser() user: TokenPayload, @Body() dto: CreateMarketplaceProductDto) {
     if (!user.organizationId) {
-      throw new BadRequestException('Organization is required to publish products. Please complete your company registration.');
+      throw new BadRequestException(
+        'Organization is required to publish products. Please complete your company registration.'
+      );
     }
     return this.marketplaceService.createProduct(user.organizationId, dto);
   }
@@ -125,7 +120,7 @@ export class MarketplaceController {
   async updateProduct(
     @CurrentUser() user: TokenPayload,
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() dto: UpdateMarketplaceProductDto,
+    @Body() dto: UpdateMarketplaceProductDto
   ) {
     if (!user.organizationId) {
       throw new BadRequestException('Organization is required');
@@ -139,10 +134,7 @@ export class MarketplaceController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Remove a product from marketplace' })
   @ApiParam({ name: 'id', description: 'Marketplace product ID' })
-  async deleteProduct(
-    @CurrentUser() user: TokenPayload,
-    @Param('id', ParseUUIDPipe) id: string,
-  ) {
+  async deleteProduct(@CurrentUser() user: TokenPayload, @Param('id', ParseUUIDPipe) id: string) {
     if (!user.organizationId) {
       throw new BadRequestException('Organization is required');
     }
@@ -156,10 +148,7 @@ export class MarketplaceController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Pause a product listing' })
   @ApiParam({ name: 'id', description: 'Marketplace product ID' })
-  async pauseProduct(
-    @CurrentUser() user: TokenPayload,
-    @Param('id', ParseUUIDPipe) id: string,
-  ) {
+  async pauseProduct(@CurrentUser() user: TokenPayload, @Param('id', ParseUUIDPipe) id: string) {
     if (!user.organizationId) {
       throw new BadRequestException('Organization is required');
     }
@@ -172,10 +161,7 @@ export class MarketplaceController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Activate a product listing' })
   @ApiParam({ name: 'id', description: 'Marketplace product ID' })
-  async activateProduct(
-    @CurrentUser() user: TokenPayload,
-    @Param('id', ParseUUIDPipe) id: string,
-  ) {
+  async activateProduct(@CurrentUser() user: TokenPayload, @Param('id', ParseUUIDPipe) id: string) {
     if (!user.organizationId) {
       throw new BadRequestException('Organization is required');
     }
@@ -193,7 +179,9 @@ export class MarketplaceController {
   @ApiOperation({ summary: 'Get my RFQs' })
   async getMyRequirements(@CurrentUser() user: TokenPayload) {
     if (!user.organizationId) {
-      throw new BadRequestException('Organization is required to view RFQs. Please complete your company registration.');
+      throw new BadRequestException(
+        'Organization is required to view RFQs. Please complete your company registration.'
+      );
     }
     return this.marketplaceService.getMyRequirements(user.organizationId);
   }
@@ -205,16 +193,14 @@ export class MarketplaceController {
   @ApiOperation({ summary: 'Create a new RFQ' })
   async createRequirement(
     @CurrentUser() user: TokenPayload,
-    @Body() dto: CreateBuyerRequirementDto,
+    @Body() dto: CreateBuyerRequirementDto
   ) {
     if (!user.organizationId) {
-      throw new BadRequestException('Organization is required to create RFQs. Please complete your company registration.');
+      throw new BadRequestException(
+        'Organization is required to create RFQs. Please complete your company registration.'
+      );
     }
-    return this.marketplaceService.createRequirement(
-      user.organizationId,
-      user.sub,
-      dto,
-    );
+    return this.marketplaceService.createRequirement(user.organizationId, user.sub, dto);
   }
 
   @Patch('requirements/:id')
@@ -226,16 +212,12 @@ export class MarketplaceController {
   async updateRequirement(
     @CurrentUser() user: TokenPayload,
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() dto: UpdateBuyerRequirementDto,
+    @Body() dto: UpdateBuyerRequirementDto
   ) {
     if (!user.organizationId) {
       throw new BadRequestException('Organization is required');
     }
-    return this.marketplaceService.updateRequirement(
-      user.organizationId,
-      id,
-      dto,
-    );
+    return this.marketplaceService.updateRequirement(user.organizationId, id, dto);
   }
 
   @Delete('requirements/:id')
@@ -246,7 +228,7 @@ export class MarketplaceController {
   @ApiParam({ name: 'id', description: 'Buyer requirement ID' })
   async deleteRequirement(
     @CurrentUser() user: TokenPayload,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id', ParseUUIDPipe) id: string
   ) {
     if (!user.organizationId) {
       throw new BadRequestException('Organization is required');

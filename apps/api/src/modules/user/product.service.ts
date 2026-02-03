@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SupplierProduct, Organization } from '../../database/entities';
@@ -13,7 +10,7 @@ export class ProductService {
     @InjectRepository(SupplierProduct)
     private readonly productRepository: Repository<SupplierProduct>,
     @InjectRepository(Organization)
-    private readonly organizationRepository: Repository<Organization>,
+    private readonly organizationRepository: Repository<Organization>
   ) {}
 
   private async validateOrganization(orgId: string): Promise<void> {
@@ -25,10 +22,7 @@ export class ProductService {
     }
   }
 
-  async findAll(
-    organizationId: string,
-    includeInactive = false,
-  ): Promise<SupplierProduct[]> {
+  async findAll(organizationId: string, includeInactive = false): Promise<SupplierProduct[]> {
     await this.validateOrganization(organizationId);
 
     const where: Record<string, unknown> = { organizationId };
@@ -55,10 +49,7 @@ export class ProductService {
     return product;
   }
 
-  async create(
-    organizationId: string,
-    dto: CreateProductDto,
-  ): Promise<SupplierProduct> {
+  async create(organizationId: string, dto: CreateProductDto): Promise<SupplierProduct> {
     await this.validateOrganization(organizationId);
 
     const product = this.productRepository.create({
@@ -73,7 +64,7 @@ export class ProductService {
   async update(
     organizationId: string,
     id: string,
-    dto: UpdateProductDto,
+    dto: UpdateProductDto
   ): Promise<SupplierProduct> {
     const product = await this.findById(organizationId, id);
 

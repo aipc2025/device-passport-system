@@ -14,13 +14,7 @@ import { LifecycleModule } from '../lifecycle/lifecycle.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      ServiceOrder,
-      ServiceRecord,
-      DevicePassport,
-      Organization,
-      User,
-    ]),
+    TypeOrmModule.forFeature([ServiceOrder, ServiceRecord, DevicePassport, Organization, User]),
     LifecycleModule,
   ],
   controllers: [ServiceOrderController],

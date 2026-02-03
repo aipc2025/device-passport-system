@@ -13,7 +13,10 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ServiceType } from '@device-passport/shared';
 
 export class PublicServiceRequestDto {
-  @ApiPropertyOptional({ example: 'DP-MED-2025-PLC-DE-000001-A7', description: 'Optional - can be empty if no passport code' })
+  @ApiPropertyOptional({
+    example: 'DP-MED-2025-PLC-DE-000001-A7',
+    description: 'Optional - can be empty if no passport code',
+  })
   @IsOptional()
   @IsString()
   passportCode?: string;

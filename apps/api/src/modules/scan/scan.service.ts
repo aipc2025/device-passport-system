@@ -12,7 +12,7 @@ export class ScanService {
     @InjectRepository(DevicePassport)
     private passportRepository: Repository<DevicePassport>,
     private readonly expertService: ExpertService,
-    private readonly expertCodeService: ExpertCodeService,
+    private readonly expertCodeService: ExpertCodeService
   ) {}
 
   async getPublicInfo(code: string): Promise<PublicDeviceInfo> {
@@ -95,9 +95,7 @@ export class ScanService {
 
     // Parse code components
     const parsed = this.expertCodeService.parseCode(code);
-    const typeName = parsed
-      ? this.expertCodeService.getTypeDisplayName(parsed.type)
-      : 'Expert';
+    const typeName = parsed ? this.expertCodeService.getTypeDisplayName(parsed.type) : 'Expert';
 
     return {
       expertCode: profile.expertCode!,

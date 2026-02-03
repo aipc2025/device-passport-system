@@ -8,14 +8,7 @@ import {
   UseGuards,
   ParseUUIDPipe,
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiBearerAuth,
-  ApiParam,
-  ApiQuery,
-  ApiBody,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiParam, ApiQuery, ApiBody } from '@nestjs/swagger';
 import { MatchingService } from './matching.service';
 import { JwtAuthGuard, RolesGuard } from '../../common/guards';
 import { CurrentUser, Roles } from '../../common/decorators';
@@ -38,13 +31,13 @@ export class MatchingController {
     @CurrentUser() user: TokenPayload,
     @Query('role') role: 'supplier' | 'buyer',
     @Query('limit') limit?: number,
-    @Query('includeViewed') includeViewed?: boolean,
+    @Query('includeViewed') includeViewed?: boolean
   ) {
     return this.matchingService.getRecommendations(
       user.organizationId!,
       role,
       limit || 20,
-      includeViewed || false,
+      includeViewed || false
     );
   }
 
@@ -56,7 +49,7 @@ export class MatchingController {
   async getMatch(
     @CurrentUser() user: TokenPayload,
     @Param('id', ParseUUIDPipe) id: string,
-    @Query('role') role: 'supplier' | 'buyer',
+    @Query('role') role: 'supplier' | 'buyer'
   ) {
     const match = await this.matchingService.getMatchById(id);
     // Mark as viewed when accessed
@@ -68,10 +61,7 @@ export class MatchingController {
   @Roles(UserRole.CUSTOMER, UserRole.OPERATOR, UserRole.ADMIN)
   @ApiOperation({ summary: 'Dismiss a match recommendation' })
   @ApiParam({ name: 'id', description: 'Match result ID' })
-  async dismissMatch(
-    @CurrentUser() user: TokenPayload,
-    @Param('id', ParseUUIDPipe) id: string,
-  ) {
+  async dismissMatch(@CurrentUser() user: TokenPayload, @Param('id', ParseUUIDPipe) id: string) {
     return this.matchingService.dismissMatch(id, user.organizationId!);
   }
 
@@ -114,12 +104,12 @@ export class MatchingController {
   async forwardRequirement(
     @Param('id', ParseUUIDPipe) requirementId: string,
     @Body('supplierOrgIds') supplierOrgIds: string[],
-    @Body('matchSource') matchSource?: MatchSource,
+    @Body('matchSource') matchSource?: MatchSource
   ) {
     return this.matchingService.forwardRequirementToSuppliers(
       requirementId,
       supplierOrgIds,
-      matchSource || MatchSource.PLATFORM_RECOMMENDED,
+      matchSource || MatchSource.PLATFORM_RECOMMENDED
     );
   }
 }

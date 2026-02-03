@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  ForbiddenException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { OrganizationContact, Organization } from '../../database/entities';
@@ -14,7 +10,7 @@ export class ContactService {
     @InjectRepository(OrganizationContact)
     private readonly contactRepository: Repository<OrganizationContact>,
     @InjectRepository(Organization)
-    private readonly organizationRepository: Repository<Organization>,
+    private readonly organizationRepository: Repository<Organization>
   ) {}
 
   private async validateOrganization(orgId: string): Promise<void> {
@@ -47,17 +43,14 @@ export class ContactService {
     return contact;
   }
 
-  async create(
-    organizationId: string,
-    dto: CreateContactDto,
-  ): Promise<OrganizationContact> {
+  async create(organizationId: string, dto: CreateContactDto): Promise<OrganizationContact> {
     await this.validateOrganization(organizationId);
 
     // If setting as primary, unset other primaries of same type
     if (dto.isPrimary) {
       await this.contactRepository.update(
         { organizationId, contactType: dto.contactType },
-        { isPrimary: false },
+        { isPrimary: false }
       );
     }
 
@@ -72,7 +65,7 @@ export class ContactService {
   async update(
     organizationId: string,
     id: string,
-    dto: UpdateContactDto,
+    dto: UpdateContactDto
   ): Promise<OrganizationContact> {
     const contact = await this.findById(organizationId, id);
 
@@ -80,7 +73,7 @@ export class ContactService {
     if (dto.isPrimary && !contact.isPrimary) {
       await this.contactRepository.update(
         { organizationId, contactType: contact.contactType },
-        { isPrimary: false },
+        { isPrimary: false }
       );
     }
 
@@ -91,7 +84,7 @@ export class ContactService {
   async updateNotes(
     organizationId: string,
     id: string,
-    personalNotes: string,
+    personalNotes: string
   ): Promise<OrganizationContact> {
     const contact = await this.findById(organizationId, id);
     contact.personalNotes = personalNotes;

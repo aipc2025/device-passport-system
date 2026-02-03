@@ -13,20 +13,14 @@ import { CreateLifecycleEventDto } from './dto';
 export class LifecycleService {
   constructor(
     @InjectRepository(LifecycleEvent)
-    private lifecycleRepository: Repository<LifecycleEvent>,
+    private lifecycleRepository: Repository<LifecycleEvent>
   ) {}
 
   async findByPassportId(
     passportId: string,
-    filters: LifecycleEventFilters = {},
+    filters: LifecycleEventFilters = {}
   ): Promise<PaginatedResponse<LifecycleTimelineItem>> {
-    const {
-      eventType,
-      fromDate,
-      toDate,
-      page = 1,
-      limit = 50,
-    } = filters;
+    const { eventType, fromDate, toDate, page = 1, limit = 50 } = filters;
 
     const queryBuilder = this.lifecycleRepository
       .createQueryBuilder('event')
@@ -88,7 +82,7 @@ export class LifecycleService {
     createDto: CreateLifecycleEventDto,
     performedBy: string,
     performedByName: string,
-    performedByRole: string,
+    performedByRole: string
   ): Promise<LifecycleEvent> {
     const event = this.lifecycleRepository.create({
       ...createDto,

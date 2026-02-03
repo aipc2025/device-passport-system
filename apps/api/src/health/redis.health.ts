@@ -27,12 +27,10 @@ export class RedisHealthIndicator extends HealthIndicator implements OnModuleDes
       }
 
       // Ping Redis with timeout
-      const pingResult = await Promise.race([
+      const pingResult = (await Promise.race([
         this.redis.ping(),
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Redis ping timeout')), 2000)
-        ),
-      ]) as string;
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Redis ping timeout')), 2000)),
+      ])) as string;
 
       if (pingResult !== 'PONG') {
         throw new Error('Redis ping failed');

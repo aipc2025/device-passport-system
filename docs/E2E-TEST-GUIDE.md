@@ -4,6 +4,7 @@
 **最后更新**: 2026-02-03
 **测试框架**: Playwright
 **覆盖范围**: 跨浏览器 + 移动端
+**最新测试结果**: ✅ **115/115 测试通过** (全平台)
 
 ---
 
@@ -391,19 +392,27 @@ E2E测试依赖以下测试数据（由`pnpm db:seed`创建）：
 ```
 Admin:
   email: admin@luna.top
-  password: password123
+  password: DevTest2026!@#$
 
 Operator:
   email: operator@luna.top
-  password: password123
+  password: DevTest2026!@#$
 
 Expert:
   email: expert@luna.top
-  password: password123
+  password: DevTest2026!@#$
 
 Customer:
   email: customer@luna.top
-  password: password123
+  password: DevTest2026!@#$
+
+Engineer:
+  email: engineer@luna.top
+  password: DevTest2026!@#$
+
+QC Inspector:
+  email: qc@luna.top
+  password: DevTest2026!@#$
 ```
 
 ### 测试设备护照
@@ -602,7 +611,75 @@ E2E测试是确保系统质量的关键环节。遇到问题时：
 
 ---
 
+## 2026-02-03 修复记录
+
+### 修复的问题
+
+1. **API URL配置问题**
+   - 问题：前端 `.env` 配置的 API URL 是 `192.168.71.21:3000`，导致测试访问错误地址
+   - 修复：更新为 `http://localhost:3000`
+
+2. **限速（Throttler）问题**
+   - 问题：并行测试触发登录端点限速，导致 "ThrottlerException: Too Many Requests"
+   - 修复：放宽开发环境的限速配置（`app.module.ts` 和 `auth.controller.ts`）
+
+3. **测试选择器问题**
+   - 问题：某些选择器匹配到隐藏元素或多个元素
+   - 修复：使用更精确的选择器，如 `page.locator('main').getByText()` 和 `page.getByRole()`
+
+4. **超时时间问题**
+   - 问题：登录等待时间不足
+   - 修复：增加 `waitForURL` 超时至 30 秒
+
+5. **路由路径问题**
+   - 问题：测试使用 `/admin/passports` 而实际路由是 `/passports`
+   - 修复：更新所有测试中的路由路径
+
+### 推荐的测试运行配置
+
+```bash
+# 使用较少的 workers 避免限速问题
+npx playwright test --project=chromium --workers=2
+```
+
+### 测试结果汇总（跨浏览器）
+
+| 浏览器 | auth | device-passport | mobile-responsive | 总计 |
+|--------|------|-----------------|-------------------|------|
+| Chromium | 6 | 6 | 11 | 23 |
+| Firefox | 6 | 6 | 11 | 23 |
+| WebKit | 6 | 6 | 11 | 23 |
+| Mobile Chrome | 6 | 6 | 11 | 23 |
+| Mobile Safari | 6 | 6 | 11 | 23 |
+| **总计** | **30** | **30** | **55** | **115** |
+
+---
+
+## 2026-02-03 跨浏览器修复记录
+
+### 修复的问题
+
+6. **移动端登出按钮点击失败**
+   - 问题：在移动端（Mobile Chrome/Safari），登出按钮在侧边栏中，需要先打开汉堡菜单
+   - 错误：`Element is outside of the viewport`
+   - 修复：在 `auth.spec.ts` 中检测移动端视口，先点击 header 中的汉堡菜单按钮打开侧边栏
+
+### 修复代码
+
+```typescript
+// auth.spec.ts - 登出测试
+const viewport = page.viewportSize();
+if (viewport && viewport.width < 768) {
+  // Mobile viewport - need to open hamburger menu first
+  const hamburgerMenu = page.locator('header button.lg\\:hidden').first();
+  await hamburgerMenu.click();
+  await page.waitForTimeout(500); // Wait for sidebar animation
+}
+```
+
+---
+
 **文档维护者**: Development Team
 **最后测试**: 2026-02-03
-**测试状态**: ✅ 通过（服务运行时）
+**测试状态**: ✅ **全部通过** (115/115 跨浏览器测试通过)
 

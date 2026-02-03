@@ -236,7 +236,12 @@ async function seed() {
   const yearMonth = `${(now.getFullYear() % 100).toString().padStart(2, '0')}${(now.getMonth() + 1).toString().padStart(2, '0')}`;
 
   const existingSequence = await sequenceRepo.findOne({
-    where: { companyCode: 'MED', yearMonth, productLine: ProductLine.PF, originCode: OriginCode.CN },
+    where: {
+      companyCode: 'MED',
+      yearMonth,
+      productLine: ProductLine.PF,
+      originCode: OriginCode.CN,
+    },
   });
   if (!existingSequence) {
     await sequenceRepo.save({

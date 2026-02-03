@@ -116,7 +116,7 @@ export default function ServiceRecords() {
   const { data: records, isLoading } = useQuery({
     queryKey: ['expert-service-records', user?.expertId, statusFilter],
     queryFn: () => expertRatingApi.getExpertServiceRecords(
-      user?.expertId!,
+      user?.expertId as string,
       statusFilter === 'ALL' ? undefined : statusFilter
     ),
     enabled: !!user?.expertId,

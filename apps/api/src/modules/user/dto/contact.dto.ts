@@ -1,11 +1,5 @@
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
-import {
-  IsString,
-  IsOptional,
-  IsEmail,
-  IsBoolean,
-  IsEnum,
-} from 'class-validator';
+import { IsString, IsOptional, IsEmail, IsBoolean, IsEnum } from 'class-validator';
 import { ContactType, Gender } from '@device-passport/shared';
 
 export class CreateContactDto {

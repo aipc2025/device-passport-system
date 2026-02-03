@@ -21,7 +21,7 @@ export class PointService {
     private pointRuleRepo: Repository<PointRule>,
     @InjectRepository(User)
     private userRepo: Repository<User>,
-    private dataSource: DataSource,
+    private dataSource: DataSource
   ) {}
 
   // ============================================
@@ -120,7 +120,7 @@ export class PointService {
       relatedReviewId?: string;
       metadata?: Record<string, any>;
       description?: string;
-    },
+    }
   ): Promise<PointTransaction | null> {
     const rule = await this.getRuleByActionCode(actionCode);
     if (!rule || !rule.isActive) {
@@ -199,11 +199,7 @@ export class PointService {
     }
   }
 
-  async checkLimits(
-    userId: string,
-    actionCode: string,
-    rule: PointRule,
-  ): Promise<boolean> {
+  async checkLimits(userId: string, actionCode: string, rule: PointRule): Promise<boolean> {
     const now = new Date();
 
     // Check total limit
@@ -279,7 +275,7 @@ export class PointService {
       page?: number;
       limit?: number;
       pointType?: PointType;
-    },
+    }
   ): Promise<{ transactions: PointTransaction[]; total: number }> {
     const page = options?.page || 1;
     const limit = options?.limit || 20;
@@ -349,7 +345,7 @@ export class PointService {
       totalPointsConsumed: totalConsumed,
       totalPenaltyPoints: totalPenalty,
       netCirculation: totalIssued - totalConsumed,
-      byAction: byActionStats.map(s => ({
+      byAction: byActionStats.map((s) => ({
         actionCode: s.actionCode,
         actionName: s.actionName,
         count: parseInt(s.count, 10),

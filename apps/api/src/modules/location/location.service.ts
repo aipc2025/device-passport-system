@@ -1,11 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import {
-  IndividualExpert,
-  ServiceRequest,
-  DevicePassport,
-} from '../../database/entities';
+import { IndividualExpert, ServiceRequest, DevicePassport } from '../../database/entities';
 
 @Injectable()
 export class LocationService {
@@ -15,18 +11,13 @@ export class LocationService {
     @InjectRepository(ServiceRequest)
     private readonly serviceRequestRepository: Repository<ServiceRequest>,
     @InjectRepository(DevicePassport)
-    private readonly devicePassportRepository: Repository<DevicePassport>,
+    private readonly devicePassportRepository: Repository<DevicePassport>
   ) {}
 
   /**
    * Calculate distance between two coordinates using Haversine formula
    */
-  private calculateDistance(
-    lat1: number,
-    lon1: number,
-    lat2: number,
-    lon2: number,
-  ): number {
+  private calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
     const R = 6371; // Earth's radius in kilometers
     const dLat = this.toRad(lat2 - lat1);
     const dLon = this.toRad(lon2 - lon1);
@@ -65,7 +56,7 @@ export class LocationService {
           latitude,
           longitude,
           expert.locationLat!,
-          expert.locationLng!,
+          expert.locationLng!
         );
 
         return {
@@ -98,11 +89,7 @@ export class LocationService {
   /**
    * Find nearby service requests within radius
    */
-  async findNearbyServiceRequests(
-    latitude: number,
-    longitude: number,
-    radius: number,
-  ) {
+  async findNearbyServiceRequests(latitude: number, longitude: number, radius: number) {
     // Find all service requests with location data
     const requests = await this.serviceRequestRepository
       .createQueryBuilder('request')
@@ -118,7 +105,7 @@ export class LocationService {
           latitude,
           longitude,
           request.locationLat!,
-          request.locationLng!,
+          request.locationLng!
         );
 
         return {
@@ -151,11 +138,7 @@ export class LocationService {
   /**
    * Find nearby devices within radius
    */
-  async findNearbyDevices(
-    latitude: number,
-    longitude: number,
-    radius: number,
-  ) {
+  async findNearbyDevices(latitude: number, longitude: number, radius: number) {
     // Find all devices with location data
     const devices = await this.devicePassportRepository
       .createQueryBuilder('device')
@@ -173,7 +156,7 @@ export class LocationService {
           latitude,
           longitude,
           device.locationLat,
-          device.locationLng,
+          device.locationLng
         );
 
         return {
@@ -208,14 +191,14 @@ export class LocationService {
   async reverseGeocode(latitude: number, longitude: number) {
     try {
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&accept-language=zh-CN`,
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&accept-language=zh-CN`
       );
 
       if (!response.ok) {
         throw new Error('Geocoding failed');
       }
 
-      const data = await response.json() as any;
+      const data = (await response.json()) as any;
 
       return {
         address: data.display_name || null,

@@ -65,8 +65,8 @@ export class PermissionService {
     // Operator - create and manage devices (platform internal)
     [UserRole.OPERATOR]: [
       'scan.read',
-      'device.*',  // All device operations
-      'passport.*',  // All passport operations
+      'device.*', // All device operations
+      'passport.*', // All passport operations
       'qc.view.all',
       'service-order.view.all',
       'service-order.update',
@@ -75,7 +75,7 @@ export class PermissionService {
     ],
 
     // Admin - full platform access
-    [UserRole.ADMIN]: ['*'],  // All permissions
+    [UserRole.ADMIN]: ['*'], // All permissions
 
     // Supplier Viewer - read-only access to own org
     [UserRole.SUPPLIER_VIEWER]: [
@@ -150,16 +150,16 @@ export class PermissionService {
     [UserRole.QC_INSPECTOR]: DataScope.ALL,
     [UserRole.OPERATOR]: DataScope.ALL,
     [UserRole.ADMIN]: DataScope.ALL,
-    [UserRole.SUPPLIER_VIEWER]: DataScope.ALL,  // All within org
-    [UserRole.SUPPLIER_QC]: DataScope.ALL,  // All within org
-    [UserRole.SUPPLIER_PACKER]: DataScope.ALL,  // All within org
-    [UserRole.SUPPLIER_SHIPPER]: DataScope.ALL,  // All within org
-    [UserRole.SUPPLIER_ADMIN]: DataScope.ALL,  // All within org
+    [UserRole.SUPPLIER_VIEWER]: DataScope.ALL, // All within org
+    [UserRole.SUPPLIER_QC]: DataScope.ALL, // All within org
+    [UserRole.SUPPLIER_PACKER]: DataScope.ALL, // All within org
+    [UserRole.SUPPLIER_SHIPPER]: DataScope.ALL, // All within org
+    [UserRole.SUPPLIER_ADMIN]: DataScope.ALL, // All within org
   };
 
   constructor(
     @InjectRepository(User)
-    private userRepository: Repository<User>,
+    private userRepository: Repository<User>
   ) {}
 
   /**
@@ -199,10 +199,7 @@ export class PermissionService {
   /**
    * Check if user has a specific permission
    */
-  async checkPermission(
-    userId: string,
-    requiredPermission: string,
-  ): Promise<boolean> {
+  async checkPermission(userId: string, requiredPermission: string): Promise<boolean> {
     const userPerms = await this.getUserPermissions(userId);
 
     if (!userPerms) {
@@ -243,7 +240,7 @@ export class PermissionService {
   applyDataScope<T extends Record<string, any>>(
     qb: SelectQueryBuilder<T>,
     userPerms: UserPermissions,
-    alias: string,
+    alias: string
   ): SelectQueryBuilder<T> {
     // Admin has access to all data
     if (userPerms.role === UserRole.ADMIN) {

@@ -15,7 +15,7 @@ export class ServiceRecordService {
     private serviceOrderRepository: Repository<ServiceOrder>,
     @InjectRepository(User)
     private userRepository: Repository<User>,
-    private lifecycleService: LifecycleService,
+    private lifecycleService: LifecycleService
   ) {}
 
   async findByServiceOrderId(serviceOrderId: string): Promise<ServiceRecord[]> {
@@ -38,10 +38,7 @@ export class ServiceRecordService {
     return record;
   }
 
-  async create(
-    createDto: CreateServiceRecordDto,
-    userId: string,
-  ): Promise<ServiceRecord> {
+  async create(createDto: CreateServiceRecordDto, userId: string): Promise<ServiceRecord> {
     const serviceOrder = await this.serviceOrderRepository.findOne({
       where: { id: createDto.serviceOrderId },
     });
@@ -95,7 +92,7 @@ export class ServiceRecordService {
         },
         userId,
         user?.name || 'System',
-        user?.role || 'SYSTEM',
+        user?.role || 'SYSTEM'
       );
     }
 

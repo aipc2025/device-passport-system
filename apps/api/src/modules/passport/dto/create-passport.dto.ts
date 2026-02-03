@@ -20,7 +20,10 @@ export class CreatePassportDto {
   @IsEnum(OriginCode)
   originCode: OriginCode;
 
-  @ApiPropertyOptional({ example: 'TH', description: 'Custom origin code when originCode is OTHER' })
+  @ApiPropertyOptional({
+    example: 'TH',
+    description: 'Custom origin code when originCode is OTHER',
+  })
   @IsOptional()
   @IsString()
   customOriginCode?: string;
@@ -116,7 +119,7 @@ export class CreatePassportDto {
   @IsNumber()
   buyerAddressLat?: number;
 
-  @ApiPropertyOptional({ example: -74.0060, description: 'Buyer address longitude' })
+  @ApiPropertyOptional({ example: -74.006, description: 'Buyer address longitude' })
   @IsOptional()
   @IsNumber()
   buyerAddressLng?: number;

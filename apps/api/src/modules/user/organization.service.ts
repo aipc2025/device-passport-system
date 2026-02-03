@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  ConflictException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Organization } from '../../database/entities';
@@ -13,7 +9,7 @@ import { OrganizationType } from '@device-passport/shared';
 export class OrganizationService {
   constructor(
     @InjectRepository(Organization)
-    private organizationRepository: Repository<Organization>,
+    private organizationRepository: Repository<Organization>
   ) {}
 
   async findAll(type?: OrganizationType): Promise<Organization[]> {

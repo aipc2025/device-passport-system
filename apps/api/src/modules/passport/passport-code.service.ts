@@ -19,12 +19,16 @@ export class PassportCodeService {
     @InjectRepository(SequenceCounter)
     private sequenceRepository: Repository<SequenceCounter>,
     private dataSource: DataSource,
-    private configService: ConfigService,
+    private configService: ConfigService
   ) {
     this.companyCode = this.configService.get('COMPANY_CODE') || 'MED';
   }
 
-  async generateCode(productLine: ProductLine, originCode: OriginCode | string, supplierCode?: string): Promise<string> {
+  async generateCode(
+    productLine: ProductLine,
+    originCode: OriginCode | string,
+    supplierCode?: string
+  ): Promise<string> {
     const now = new Date();
     const year = now.getFullYear();
     const month = now.getMonth() + 1; // JavaScript months are 0-indexed
@@ -78,7 +82,7 @@ export class PassportCodeService {
         month,
         productLine,
         effectiveOriginCode,
-        counter.currentSequence,
+        counter.currentSequence
       );
     } catch (error) {
       await queryRunner.rollbackTransaction();

@@ -50,10 +50,7 @@ export class ProductTypeController {
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update a product type (Admin only)' })
-  async update(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() dto: UpdateProductTypeDto,
-  ) {
+  async update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateProductTypeDto) {
     return this.productTypeService.update(id, dto);
   }
 

@@ -47,3 +47,6 @@ export * from './point-rule.entity';
 // Invitation/Referral System entities
 export * from './invitation-code.entity';
 export * from './invitation-record.entity';
+
+// Notification entities
+export * from './notification.entity';

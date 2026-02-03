@@ -11,12 +11,7 @@ import {
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      MarketplaceProduct,
-      BuyerRequirement,
-      Organization,
-      SupplierProduct,
-    ]),
+    TypeOrmModule.forFeature([MarketplaceProduct, BuyerRequirement, Organization, SupplierProduct]),
   ],
   controllers: [MarketplaceController],
   providers: [MarketplaceService],

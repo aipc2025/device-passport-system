@@ -1,11 +1,4 @@
-import {
-  IsEmail,
-  IsString,
-  MinLength,
-  IsOptional,
-  IsUUID,
-  IsEnum,
-} from 'class-validator';
+import { IsEmail, IsString, MinLength, IsOptional, IsUUID, IsEnum } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { UserRole } from '@device-passport/shared';
 

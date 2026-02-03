@@ -1,4 +1,13 @@
-import { IsString, IsEnum, IsOptional, IsUUID, IsDateString, IsInt, Min, Max } from 'class-validator';
+import {
+  IsString,
+  IsEnum,
+  IsOptional,
+  IsUUID,
+  IsDateString,
+  IsInt,
+  Min,
+  Max,
+} from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { ProductLine, DeviceStatus } from '@device-passport/shared';

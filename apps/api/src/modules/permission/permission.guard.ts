@@ -28,15 +28,15 @@ export const PERMISSION_KEY = 'permissions';
 export class PermissionGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
-    private permissionService: PermissionService,
+    private permissionService: PermissionService
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     // Get required permissions from metadata
-    const requiredPermissions = this.reflector.getAllAndOverride<string[]>(
-      PERMISSION_KEY,
-      [context.getHandler(), context.getClass()],
-    );
+    const requiredPermissions = this.reflector.getAllAndOverride<string[]>(PERMISSION_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
 
     // If no permissions required, allow access
     if (!requiredPermissions || requiredPermissions.length === 0) {
@@ -52,9 +52,7 @@ export class PermissionGuard implements CanActivate {
     }
 
     // Get user permissions
-    const userPerms = await this.permissionService.getUserPermissions(
-      user.userId,
-    );
+    const userPerms = await this.permissionService.getUserPermissions(user.userId);
 
     if (!userPerms) {
       throw new ForbiddenException('User permissions not found');
@@ -62,15 +60,10 @@ export class PermissionGuard implements CanActivate {
 
     // Check if user has all required permissions
     for (const required of requiredPermissions) {
-      const hasPermission = this.hasPermission(
-        userPerms.permissions,
-        required,
-      );
+      const hasPermission = this.hasPermission(userPerms.permissions, required);
 
       if (!hasPermission) {
-        throw new ForbiddenException(
-          `Missing required permission: ${required}`,
-        );
+        throw new ForbiddenException(`Missing required permission: ${required}`);
       }
     }
 

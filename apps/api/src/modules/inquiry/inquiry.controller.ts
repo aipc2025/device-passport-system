@@ -8,12 +8,7 @@ import {
   UseGuards,
   ParseUUIDPipe,
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiBearerAuth,
-  ApiParam,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
 import { InquiryService } from './inquiry.service';
 import { CreateInquiryDto, CreateMessageDto, UpdateInquiryStatusDto } from './dto';
 import { JwtAuthGuard, RolesGuard } from '../../common/guards';
@@ -60,10 +55,7 @@ export class InquiryController {
   @Roles(UserRole.CUSTOMER, UserRole.OPERATOR, UserRole.ADMIN)
   @ApiOperation({ summary: 'Get inquiry details with messages' })
   @ApiParam({ name: 'id', description: 'Inquiry ID' })
-  async getInquiry(
-    @CurrentUser() user: TokenPayload,
-    @Param('id', ParseUUIDPipe) id: string,
-  ) {
+  async getInquiry(@CurrentUser() user: TokenPayload, @Param('id', ParseUUIDPipe) id: string) {
     const inquiry = await this.inquiryService.getInquiryWithAccess(id, user.organizationId!);
     // Mark messages as read when viewing
     await this.inquiryService.markMessagesAsRead(id, user.organizationId!);
@@ -73,15 +65,8 @@ export class InquiryController {
   @Post()
   @Roles(UserRole.CUSTOMER, UserRole.OPERATOR, UserRole.ADMIN)
   @ApiOperation({ summary: 'Create a new inquiry' })
-  async createInquiry(
-    @CurrentUser() user: TokenPayload,
-    @Body() dto: CreateInquiryDto,
-  ) {
-    return this.inquiryService.createInquiry(
-      user.organizationId!,
-      user.sub,
-      dto,
-    );
+  async createInquiry(@CurrentUser() user: TokenPayload, @Body() dto: CreateInquiryDto) {
+    return this.inquiryService.createInquiry(user.organizationId!, user.sub, dto);
   }
 
   @Patch(':id/status')
@@ -91,7 +76,7 @@ export class InquiryController {
   async updateStatus(
     @CurrentUser() user: TokenPayload,
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() dto: UpdateInquiryStatusDto,
+    @Body() dto: UpdateInquiryStatusDto
   ) {
     return this.inquiryService.updateStatus(id, user.organizationId!, dto);
   }
@@ -100,10 +85,7 @@ export class InquiryController {
   @Roles(UserRole.CUSTOMER, UserRole.OPERATOR, UserRole.ADMIN)
   @ApiOperation({ summary: 'Get messages for an inquiry' })
   @ApiParam({ name: 'id', description: 'Inquiry ID' })
-  async getMessages(
-    @CurrentUser() user: TokenPayload,
-    @Param('id', ParseUUIDPipe) id: string,
-  ) {
+  async getMessages(@CurrentUser() user: TokenPayload, @Param('id', ParseUUIDPipe) id: string) {
     return this.inquiryService.getMessages(id, user.organizationId!);
   }
 
@@ -114,24 +96,16 @@ export class InquiryController {
   async sendMessage(
     @CurrentUser() user: TokenPayload,
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() dto: CreateMessageDto,
+    @Body() dto: CreateMessageDto
   ) {
-    return this.inquiryService.sendMessage(
-      id,
-      user.sub,
-      user.organizationId!,
-      dto,
-    );
+    return this.inquiryService.sendMessage(id, user.sub, user.organizationId!, dto);
   }
 
   @Patch(':id/messages/read')
   @Roles(UserRole.CUSTOMER, UserRole.OPERATOR, UserRole.ADMIN)
   @ApiOperation({ summary: 'Mark all messages in inquiry as read' })
   @ApiParam({ name: 'id', description: 'Inquiry ID' })
-  async markAsRead(
-    @CurrentUser() user: TokenPayload,
-    @Param('id', ParseUUIDPipe) id: string,
-  ) {
+  async markAsRead(@CurrentUser() user: TokenPayload, @Param('id', ParseUUIDPipe) id: string) {
     await this.inquiryService.markMessagesAsRead(id, user.organizationId!);
     return { success: true };
   }

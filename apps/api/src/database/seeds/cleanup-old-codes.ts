@@ -1,9 +1,6 @@
 import { DataSource } from 'typeorm';
 import * as dotenv from 'dotenv';
-import {
-  parsePassportCode,
-  validateExpertPassportCode,
-} from '@device-passport/shared';
+import { parsePassportCode, validateExpertPassportCode } from '@device-passport/shared';
 
 dotenv.config({ path: '.env.local' });
 dotenv.config({ path: '.env' });
@@ -108,7 +105,9 @@ async function cleanup() {
     const validation = validateExpertPassportCode(expert.expertCode);
 
     if (!validation.valid) {
-      console.log(`  [INVALID] ${expert.expertCode} - ${expert.personalName} (${expert.email}) - ${validation.error}`);
+      console.log(
+        `  [INVALID] ${expert.expertCode} - ${expert.personalName} (${expert.email}) - ${validation.error}`
+      );
       invalidExperts.push(expert);
     } else {
       console.log(`  [OK] ${expert.expertCode} - ${expert.personalName}`);
@@ -165,7 +164,9 @@ async function cleanup() {
   const totalExperts = await expertRepo.count();
 
   console.log(`\nRemaining valid device passports: ${remainingDevicePassports}`);
-  console.log(`Experts with passport codes: ${totalExperts - remainingExpertCodes}/${totalExperts}`);
+  console.log(
+    `Experts with passport codes: ${totalExperts - remainingExpertCodes}/${totalExperts}`
+  );
   console.log('========================================\n');
 
   await AppDataSource.destroy();

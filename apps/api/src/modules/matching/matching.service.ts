@@ -18,7 +18,7 @@ import {
 
 // Scoring weights (total 100)
 const SCORING_WEIGHTS = {
-  locationProximity: 25,   // Highest priority for B2B local trading
+  locationProximity: 25, // Highest priority for B2B local trading
   categoryMatch: 20,
   hsCodeMatch: 20,
   priceRangeMatch: 15,
@@ -57,7 +57,7 @@ export class MatchingService {
     @InjectRepository(BuyerRequirement)
     private readonly requirementRepository: Repository<BuyerRequirement>,
     @InjectRepository(Organization)
-    private readonly organizationRepository: Repository<Organization>,
+    private readonly organizationRepository: Repository<Organization>
   ) {}
 
   /**
@@ -192,7 +192,7 @@ export class MatchingService {
   async forwardRequirementToSuppliers(
     requirementId: string,
     supplierOrgIds: string[],
-    matchSource: MatchSource = MatchSource.PLATFORM_RECOMMENDED,
+    matchSource: MatchSource = MatchSource.PLATFORM_RECOMMENDED
   ): Promise<MatchResult[]> {
     const requirement = await this.requirementRepository.findOne({
       where: { id: requirementId },
@@ -261,7 +261,7 @@ export class MatchingService {
    */
   private calculateMatchScore(
     product: MarketplaceProduct,
-    requirement: BuyerRequirement,
+    requirement: BuyerRequirement
   ): { totalScore: number; breakdown: ScoreBreakdown; distanceKm: number | null } {
     const breakdown: ScoreBreakdown = {
       categoryMatch: 0,
@@ -311,14 +311,16 @@ export class MatchingService {
 
     // 4. Location Proximity (25 points - highest weight)
     if (
-      product.locationLat && product.locationLng &&
-      requirement.buyerLocationLat && requirement.buyerLocationLng
+      product.locationLat &&
+      product.locationLng &&
+      requirement.buyerLocationLat &&
+      requirement.buyerLocationLng
     ) {
       distanceKm = this.calculateDistance(
         Number(product.locationLat),
         Number(product.locationLng),
         Number(requirement.buyerLocationLat),
-        Number(requirement.buyerLocationLng),
+        Number(requirement.buyerLocationLng)
       );
 
       for (const tier of DISTANCE_SCORES) {
@@ -327,13 +329,10 @@ export class MatchingService {
           break;
         }
       }
-    } else if (
-      product.supplyRegion &&
-      requirement.preferredRegions?.length
-    ) {
+    } else if (product.supplyRegion && requirement.preferredRegions?.length) {
       // Fallback to region matching
       const regionMatch = requirement.preferredRegions.some(
-        (r) => r.toLowerCase() === product.supplyRegion?.toLowerCase(),
+        (r) => r.toLowerCase() === product.supplyRegion?.toLowerCase()
       );
       if (regionMatch) {
         breakdown.locationProximity = 15; // Partial score for region match
@@ -368,12 +367,7 @@ export class MatchingService {
   /**
    * Haversine formula to calculate distance between two points
    */
-  private calculateDistance(
-    lat1: number,
-    lng1: number,
-    lat2: number,
-    lng2: number,
-  ): number {
+  private calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
     const R = 6371; // Earth radius in km
     const dLat = this.toRad(lat2 - lat1);
     const dLng = this.toRad(lng2 - lng1);
@@ -396,7 +390,22 @@ export class MatchingService {
    */
   private extractKeywords(text: string): string[] {
     // Simple word extraction, remove common words
-    const stopWords = ['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by'];
+    const stopWords = [
+      'the',
+      'a',
+      'an',
+      'and',
+      'or',
+      'but',
+      'in',
+      'on',
+      'at',
+      'to',
+      'for',
+      'of',
+      'with',
+      'by',
+    ];
     return text
       .toLowerCase()
       .replace(/[^a-z0-9\s]/g, '')
@@ -411,7 +420,7 @@ export class MatchingService {
     organizationId: string,
     role: 'supplier' | 'buyer',
     limit = 20,
-    includeViewed = false,
+    includeViewed = false
   ): Promise<MatchResult[]> {
     const where: any = {};
 
@@ -466,7 +475,11 @@ export class MatchingService {
   /**
    * Mark match as viewed
    */
-  async markAsViewed(id: string, organizationId: string, role: 'supplier' | 'buyer'): Promise<MatchResult> {
+  async markAsViewed(
+    id: string,
+    organizationId: string,
+    role: 'supplier' | 'buyer'
+  ): Promise<MatchResult> {
     const match = await this.getMatchById(id);
 
     // Verify ownership
@@ -572,7 +585,9 @@ export class MatchingService {
       if (matches.length > 0) requirementsMatched++;
     }
 
-    this.logger.log(`Full matching complete: ${productsMatched} products, ${requirementsMatched} requirements`);
+    this.logger.log(
+      `Full matching complete: ${productsMatched} products, ${requirementsMatched} requirements`
+    );
     return { productsMatched, requirementsMatched };
   }
 }

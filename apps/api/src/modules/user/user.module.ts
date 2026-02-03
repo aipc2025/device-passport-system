@@ -8,39 +8,12 @@ import { ContactService } from './contact.service';
 import { ContactController } from './contact.controller';
 import { ProductService } from './product.service';
 import { ProductController } from './product.controller';
-import {
-  User,
-  Organization,
-  OrganizationContact,
-  SupplierProduct,
-} from '../../database/entities';
+import { User, Organization, OrganizationContact, SupplierProduct } from '../../database/entities';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([
-      User,
-      Organization,
-      OrganizationContact,
-      SupplierProduct,
-    ]),
-  ],
-  controllers: [
-    UserController,
-    OrganizationController,
-    ContactController,
-    ProductController,
-  ],
-  providers: [
-    UserService,
-    OrganizationService,
-    ContactService,
-    ProductService,
-  ],
-  exports: [
-    UserService,
-    OrganizationService,
-    ContactService,
-    ProductService,
-  ],
+  imports: [TypeOrmModule.forFeature([User, Organization, OrganizationContact, SupplierProduct])],
+  controllers: [UserController, OrganizationController, ContactController, ProductController],
+  providers: [UserService, OrganizationService, ContactService, ProductService],
+  exports: [UserService, OrganizationService, ContactService, ProductService],
 })
 export class UserModule {}

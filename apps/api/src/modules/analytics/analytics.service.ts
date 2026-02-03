@@ -21,7 +21,7 @@ export class AnalyticsService {
     @InjectRepository(ServiceRequest)
     private readonly serviceRequestRepository: Repository<ServiceRequest>,
     @InjectRepository(IndividualExpert)
-    private readonly expertRepository: Repository<IndividualExpert>,
+    private readonly expertRepository: Repository<IndividualExpert>
   ) {}
 
   /**
@@ -56,23 +56,24 @@ export class AnalyticsService {
       passports: {
         total: totalPassports,
         active: activePassports,
-        inactiveRate: totalPassports > 0
-          ? ((totalPassports - activePassports) / totalPassports * 100).toFixed(1)
-          : 0,
+        inactiveRate:
+          totalPassports > 0
+            ? (((totalPassports - activePassports) / totalPassports) * 100).toFixed(1)
+            : 0,
       },
       serviceOrders: {
         total: totalServiceOrders,
         pending: pendingServiceOrders,
-        completionRate: totalServiceOrders > 0
-          ? (((totalServiceOrders - pendingServiceOrders) / totalServiceOrders) * 100).toFixed(1)
-          : 0,
+        completionRate:
+          totalServiceOrders > 0
+            ? (((totalServiceOrders - pendingServiceOrders) / totalServiceOrders) * 100).toFixed(1)
+            : 0,
       },
       experts: {
         total: totalExperts,
         available: availableExperts,
-        availabilityRate: totalExperts > 0
-          ? ((availableExperts / totalExperts) * 100).toFixed(1)
-          : 0,
+        availabilityRate:
+          totalExperts > 0 ? ((availableExperts / totalExperts) * 100).toFixed(1) : 0,
       },
       serviceRequests: {
         total: totalServiceRequests,
@@ -124,7 +125,7 @@ export class AnalyticsService {
 
     const results = await this.passportRepository
       .createQueryBuilder('passport')
-      .select("DATE(passport.created_at)", 'date')
+      .select('DATE(passport.created_at)', 'date')
       .addSelect('COUNT(*)', 'count')
       .where('passport.created_at >= :startDate', { startDate })
       .groupBy('DATE(passport.created_at)')
@@ -180,16 +181,10 @@ export class AnalyticsService {
 
     const results = await this.serviceOrderRepository
       .createQueryBuilder('order')
-      .select("DATE(order.created_at)", 'date')
+      .select('DATE(order.created_at)', 'date')
       .addSelect('COUNT(*)', 'total')
-      .addSelect(
-        "COUNT(CASE WHEN order.status = 'COMPLETED' THEN 1 END)",
-        'completed',
-      )
-      .addSelect(
-        "COUNT(CASE WHEN order.status = 'PENDING' THEN 1 END)",
-        'pending',
-      )
+      .addSelect("COUNT(CASE WHEN order.status = 'COMPLETED' THEN 1 END)", 'completed')
+      .addSelect("COUNT(CASE WHEN order.status = 'PENDING' THEN 1 END)", 'pending')
       .where('order.created_at >= :startDate', { startDate })
       .groupBy('DATE(order.created_at)')
       .orderBy('DATE(order.created_at)', 'ASC')
@@ -207,20 +202,14 @@ export class AnalyticsService {
    * Get expert statistics
    */
   async getExpertStatistics() {
-    const [
-      total,
-      approved,
-      pending,
-      available,
-      byType,
-    ] = await Promise.all([
+    const [total, approved, pending, available, byType] = await Promise.all([
       this.expertRepository.count(),
       this.expertRepository.count({ where: { registrationStatus: 'APPROVED' } as any }),
       this.expertRepository.count({ where: { registrationStatus: 'PENDING' } as any }),
       this.expertRepository.count({ where: { isAvailable: true } as any }),
       this.expertRepository
         .createQueryBuilder('expert')
-        .select("expert.expert_types::text", 'types')
+        .select('expert.expert_types::text', 'types')
         .getRawMany(),
     ]);
 
@@ -279,7 +268,7 @@ export class AnalyticsService {
       .select('request.service_type', 'serviceType')
       .addSelect(
         'AVG(EXTRACT(EPOCH FROM (request.accepted_at - request.published_at)) / 3600)',
-        'avgResponseHours',
+        'avgResponseHours'
       )
       .where('request.accepted_at IS NOT NULL')
       .andWhere('request.published_at IS NOT NULL')

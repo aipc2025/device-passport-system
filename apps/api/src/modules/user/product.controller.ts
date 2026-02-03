@@ -31,7 +31,7 @@ export class ProductController {
   @ApiQuery({ name: 'includeInactive', required: false, type: Boolean })
   async findAll(
     @Param('orgId', ParseUUIDPipe) orgId: string,
-    @Query('includeInactive') includeInactive?: boolean,
+    @Query('includeInactive') includeInactive?: boolean
   ) {
     return this.productService.findAll(orgId, includeInactive);
   }
@@ -43,7 +43,7 @@ export class ProductController {
   @ApiParam({ name: 'id', description: 'Product ID' })
   async findById(
     @Param('orgId', ParseUUIDPipe) orgId: string,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id', ParseUUIDPipe) id: string
   ) {
     return this.productService.findById(orgId, id);
   }
@@ -52,10 +52,7 @@ export class ProductController {
   @Roles(UserRole.OPERATOR)
   @ApiOperation({ summary: 'Create a new product' })
   @ApiParam({ name: 'orgId', description: 'Organization ID' })
-  async create(
-    @Param('orgId', ParseUUIDPipe) orgId: string,
-    @Body() dto: CreateProductDto,
-  ) {
+  async create(@Param('orgId', ParseUUIDPipe) orgId: string, @Body() dto: CreateProductDto) {
     return this.productService.create(orgId, dto);
   }
 
@@ -67,7 +64,7 @@ export class ProductController {
   async update(
     @Param('orgId', ParseUUIDPipe) orgId: string,
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() dto: UpdateProductDto,
+    @Body() dto: UpdateProductDto
   ) {
     return this.productService.update(orgId, id, dto);
   }
@@ -79,7 +76,7 @@ export class ProductController {
   @ApiParam({ name: 'id', description: 'Product ID' })
   async toggleActive(
     @Param('orgId', ParseUUIDPipe) orgId: string,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id', ParseUUIDPipe) id: string
   ) {
     return this.productService.toggleActive(orgId, id);
   }
@@ -91,7 +88,7 @@ export class ProductController {
   @ApiParam({ name: 'id', description: 'Product ID' })
   async delete(
     @Param('orgId', ParseUUIDPipe) orgId: string,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id', ParseUUIDPipe) id: string
   ) {
     await this.productService.delete(orgId, id);
     return { success: true };

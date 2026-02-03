@@ -1,13 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Patch,
-  Body,
-  Param,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Param, Query, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { ServiceOrderService } from './service-order.service';
 import { ServiceRecordService } from './service-record.service';
@@ -27,7 +18,7 @@ import { UserRole, TokenPayload } from '@device-passport/shared';
 export class ServiceOrderController {
   constructor(
     private readonly serviceOrderService: ServiceOrderService,
-    private readonly serviceRecordService: ServiceRecordService,
+    private readonly serviceRecordService: ServiceRecordService
   ) {}
 
   @Get()
@@ -35,10 +26,7 @@ export class ServiceOrderController {
   @Roles(UserRole.CUSTOMER)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get all service orders' })
-  async findAll(
-    @Query() query: ServiceOrderQueryDto,
-    @CurrentUser() user: TokenPayload,
-  ) {
+  async findAll(@Query() query: ServiceOrderQueryDto, @CurrentUser() user: TokenPayload) {
     return this.serviceOrderService.findAll(query, user.sub);
   }
 
@@ -56,10 +44,7 @@ export class ServiceOrderController {
   @Roles(UserRole.CUSTOMER)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create new service order' })
-  async create(
-    @Body() createDto: CreateServiceOrderDto,
-    @CurrentUser() user: TokenPayload,
-  ) {
+  async create(@Body() createDto: CreateServiceOrderDto, @CurrentUser() user: TokenPayload) {
     return this.serviceOrderService.create(createDto, user.sub);
   }
 
@@ -78,7 +63,7 @@ export class ServiceOrderController {
   async update(
     @Param('id') id: string,
     @Body() updateDto: UpdateServiceOrderDto,
-    @CurrentUser() user: TokenPayload,
+    @CurrentUser() user: TokenPayload
   ) {
     return this.serviceOrderService.update(id, updateDto, user.sub);
   }
@@ -97,10 +82,7 @@ export class ServiceOrderController {
   @Roles(UserRole.OPERATOR, UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Assign engineer to service order' })
-  async assignEngineer(
-    @Param('id') id: string,
-    @Param('engineerId') engineerId: string,
-  ) {
+  async assignEngineer(@Param('id') id: string, @Param('engineerId') engineerId: string) {
     return this.serviceOrderService.assignEngineer(id, engineerId);
   }
 
@@ -121,7 +103,7 @@ export class ServiceOrderController {
   async addRecord(
     @Param('id') id: string,
     @Body() createDto: CreateServiceRecordDto,
-    @CurrentUser() user: TokenPayload,
+    @CurrentUser() user: TokenPayload
   ) {
     createDto.serviceOrderId = id;
     return this.serviceRecordService.create(createDto, user.sub);

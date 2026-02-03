@@ -86,7 +86,9 @@ export class ScanController {
   @Public()
   @Throttle({ short: { limit: 5, ttl: 1000 } }) // Max 5 requests per second
   @Throttle({ medium: { limit: 20, ttl: 60000 } }) // Max 20 requests per minute
-  @ApiOperation({ summary: 'Get public device info by scanning passport code (legacy, no auth required)' })
+  @ApiOperation({
+    summary: 'Get public device info by scanning passport code (legacy, no auth required)',
+  })
   @ApiParam({
     name: 'code',
     description: 'Device passport code',

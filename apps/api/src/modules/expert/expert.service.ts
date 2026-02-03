@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In, DataSource } from 'typeorm';
 import {
@@ -42,7 +47,7 @@ export class ExpertService {
     private passportSequenceRepository: Repository<ExpertPassportSequence>,
     @InjectRepository(ExpertWorkHistory)
     private workHistoryRepository: Repository<ExpertWorkHistory>,
-    private dataSource: DataSource,
+    private dataSource: DataSource
   ) {}
 
   async getProfile(expertId: string, userId: string): Promise<IndividualExpert> {
@@ -66,12 +71,22 @@ export class ExpertService {
   async updateProfile(
     expertId: string,
     userId: string,
-    data: Partial<IndividualExpert>,
+    data: Partial<IndividualExpert>
   ): Promise<IndividualExpert> {
     const expert = await this.getProfile(expertId, userId);
 
     // Don't allow updating certain fields
-    const { id, userId: _, registrationStatus, adminNotes, reviewedBy, reviewedAt, createdAt, updatedAt, ...updateData } = data as any;
+    const {
+      id,
+      userId: _,
+      registrationStatus,
+      adminNotes,
+      reviewedBy,
+      reviewedAt,
+      createdAt,
+      updatedAt,
+      ...updateData
+    } = data as any;
 
     Object.assign(expert, updateData);
     return this.expertRepository.save(expert);
@@ -79,7 +94,7 @@ export class ExpertService {
 
   async adminUpdateProfile(
     expertId: string,
-    data: Partial<IndividualExpert>,
+    data: Partial<IndividualExpert>
   ): Promise<IndividualExpert> {
     const expert = await this.expertRepository.findOne({
       where: { id: expertId },
@@ -127,18 +142,154 @@ export class ExpertService {
     }));
   }
 
-  async getMatches(expertId: string, userId: string, limit = 50): Promise<any[]> {
+  async getMatches(
+    expertId: string,
+    userId: string,
+    options?: {
+      status?: ExpertMatchStatus;
+      limit?: number;
+      offset?: number;
+    }
+  ): Promise<{
+    matches: any[];
+    total: number;
+  }> {
     // Verify the expert profile belongs to the user
     await this.getProfile(expertId, userId);
 
-    // For now, return empty array - this would be implemented with a proper matching system
-    // Similar to the buyer/supplier matching but for service requests to experts
-    return [];
+    const query = this.matchResultRepository
+      .createQueryBuilder('match')
+      .leftJoinAndSelect('match.serviceRequest', 'serviceRequest')
+      .leftJoinAndSelect('serviceRequest.requester', 'requester')
+      .where('match.expertId = :expertId', { expertId })
+      .orderBy('match.createdAt', 'DESC');
+
+    // Filter by status if provided
+    if (options?.status) {
+      query.andWhere('match.status = :status', { status: options.status });
+    } else {
+      // By default, exclude dismissed matches
+      query.andWhere('match.status != :dismissedStatus', {
+        dismissedStatus: ExpertMatchStatus.DISMISSED,
+      });
+    }
+
+    const total = await query.getCount();
+
+    if (options?.limit) {
+      query.take(options.limit);
+    } else {
+      query.take(50); // Default limit
+    }
+
+    if (options?.offset) {
+      query.skip(options.offset);
+    }
+
+    const matches = await query.getMany();
+
+    // Mark matches as viewed if they are new
+    const newMatchIds = matches
+      .filter((m) => m.status === ExpertMatchStatus.NEW)
+      .map((m) => m.id);
+
+    if (newMatchIds.length > 0) {
+      await this.matchResultRepository.update(
+        { id: In(newMatchIds) },
+        {
+          status: ExpertMatchStatus.VIEWED,
+          expertViewedAt: new Date(),
+        }
+      );
+    }
+
+    return {
+      matches: matches.map((match) => ({
+        id: match.id,
+        matchType: match.matchType,
+        matchSource: match.matchSource,
+        totalScore: match.totalScore,
+        scoreBreakdown: match.scoreBreakdown,
+        distanceKm: match.distanceKm,
+        status: match.status,
+        serviceRequest: match.serviceRequest
+          ? {
+              id: match.serviceRequest.id,
+              requestCode: match.serviceRequest.requestCode,
+              title: match.serviceRequest.title,
+              description: match.serviceRequest.description,
+              urgency: match.serviceRequest.urgency,
+              serviceLocation: match.serviceRequest.serviceLocation,
+              requiredSkills: match.serviceRequest.requiredSkills,
+              budgetMin: match.serviceRequest.budgetMin,
+              budgetMax: match.serviceRequest.budgetMax,
+              budgetCurrency: match.serviceRequest.budgetCurrency,
+              preferredDate: match.serviceRequest.preferredDate,
+              status: match.serviceRequest.status,
+              createdAt: match.serviceRequest.createdAt,
+              contactName: match.serviceRequest.contactName,
+            }
+          : null,
+        expertNotified: match.expertNotified,
+        expertViewedAt: match.expertViewedAt,
+        createdAt: match.createdAt,
+        updatedAt: match.updatedAt,
+      })),
+      total,
+    };
   }
 
   async dismissMatch(matchId: string, userId: string): Promise<void> {
-    // Implementation for dismissing an expert match
-    // This would update the match status to DISMISSED
+    const match = await this.matchResultRepository.findOne({
+      where: { id: matchId },
+      relations: ['expert'],
+    });
+
+    if (!match) {
+      throw new NotFoundException('Match not found');
+    }
+
+    // Verify the user owns this expert profile
+    if (match.expert.userId !== userId) {
+      throw new ForbiddenException('Not authorized to dismiss this match');
+    }
+
+    // Cannot dismiss already applied matches
+    if (match.status === ExpertMatchStatus.APPLIED) {
+      throw new BadRequestException('Cannot dismiss an already applied match');
+    }
+
+    match.status = ExpertMatchStatus.DISMISSED;
+    await this.matchResultRepository.save(match);
+  }
+
+  async acceptMatch(matchId: string, userId: string): Promise<ExpertMatchResult> {
+    const match = await this.matchResultRepository.findOne({
+      where: { id: matchId },
+      relations: ['expert', 'serviceRequest'],
+    });
+
+    if (!match) {
+      throw new NotFoundException('Match not found');
+    }
+
+    // Verify the user owns this expert profile
+    if (match.expert.userId !== userId) {
+      throw new ForbiddenException('Not authorized to accept this match');
+    }
+
+    // Can only accept if status is NEW or VIEWED
+    if (
+      match.status !== ExpertMatchStatus.NEW &&
+      match.status !== ExpertMatchStatus.VIEWED
+    ) {
+      throw new BadRequestException(
+        `Cannot accept match with status ${match.status}`
+      );
+    }
+
+    match.status = ExpertMatchStatus.APPLIED;
+    return this.matchResultRepository.save(match);
   }
 
   // ==========================================
@@ -148,7 +299,7 @@ export class ExpertService {
   async updateLocation(
     expertId: string,
     userId: string,
-    data: { latitude?: number; longitude?: number; currentLocation?: string },
+    data: { latitude?: number; longitude?: number; currentLocation?: string }
   ): Promise<IndividualExpert> {
     const expert = await this.getProfile(expertId, userId);
 
@@ -169,7 +320,7 @@ export class ExpertService {
   async updateAvailability(
     expertId: string,
     userId: string,
-    data: { isAvailable?: boolean; serviceRadius?: number },
+    data: { isAvailable?: boolean; serviceRadius?: number }
   ): Promise<IndividualExpert> {
     const expert = await this.getProfile(expertId, userId);
 
@@ -186,7 +337,7 @@ export class ExpertService {
   async updateSkills(
     expertId: string,
     userId: string,
-    skillTags: string[],
+    skillTags: string[]
   ): Promise<IndividualExpert> {
     const expert = await this.getProfile(expertId, userId);
     expert.skillTags = skillTags;
@@ -197,7 +348,10 @@ export class ExpertService {
   // Dashboard Stats
   // ==========================================
 
-  async getDashboardStats(expertId: string, userId: string): Promise<{
+  async getDashboardStats(
+    expertId: string,
+    userId: string
+  ): Promise<{
     candidateOrders: number;
     acceptedOrders: number;
     inProgressOrders: number;
@@ -275,19 +429,22 @@ export class ExpertService {
     }
 
     // Only include public work histories or verified ones
-    const publicWorkHistories = expert.workHistories?.filter(
-      (wh) => wh.isPublic || wh.verificationStatus === WorkHistoryVerificationStatus.VERIFIED
-    ).map((wh) => ({
-      id: wh.id,
-      companyName: wh.companyName,
-      position: wh.position,
-      description: wh.description,
-      startDate: wh.startDate,
-      endDate: wh.endDate,
-      isCurrent: wh.isCurrent,
-      isVerified: wh.verificationStatus === WorkHistoryVerificationStatus.VERIFIED,
-      verifiedAt: wh.verifiedAt,
-    })) || [];
+    const publicWorkHistories =
+      expert.workHistories
+        ?.filter(
+          (wh) => wh.isPublic || wh.verificationStatus === WorkHistoryVerificationStatus.VERIFIED
+        )
+        .map((wh) => ({
+          id: wh.id,
+          companyName: wh.companyName,
+          position: wh.position,
+          description: wh.description,
+          startDate: wh.startDate,
+          endDate: wh.endDate,
+          isCurrent: wh.isCurrent,
+          isVerified: wh.verificationStatus === WorkHistoryVerificationStatus.VERIFIED,
+          verifiedAt: wh.verifiedAt,
+        })) || [];
 
     // Return only public information
     return {
@@ -382,9 +539,8 @@ export class ExpertService {
 
       // Generate passport code
       // Ensure dateOfBirth is a Date object
-      const dateOfBirth = expert.dateOfBirth instanceof Date
-        ? expert.dateOfBirth
-        : new Date(expert.dateOfBirth);
+      const dateOfBirth =
+        expert.dateOfBirth instanceof Date ? expert.dateOfBirth : new Date(expert.dateOfBirth);
 
       const passportCode = generateExpertPassportCode(
         expertTypeCode,
@@ -392,7 +548,7 @@ export class ExpertService {
         primarySkill,
         dateOfBirth,
         nationality,
-        sequenceCounter.currentSequence,
+        sequenceCounter.currentSequence
       );
 
       // Update expert with passport code
@@ -428,7 +584,7 @@ export class ExpertService {
   async addWorkHistory(
     expertId: string,
     userId: string,
-    data: Partial<ExpertWorkHistory>,
+    data: Partial<ExpertWorkHistory>
   ): Promise<ExpertWorkHistory> {
     await this.getProfile(expertId, userId);
 
@@ -444,7 +600,7 @@ export class ExpertService {
   async updateWorkHistory(
     workHistoryId: string,
     userId: string,
-    data: Partial<ExpertWorkHistory>,
+    data: Partial<ExpertWorkHistory>
   ): Promise<ExpertWorkHistory> {
     const workHistory = await this.workHistoryRepository.findOne({
       where: { id: workHistoryId },
@@ -461,9 +617,17 @@ export class ExpertService {
 
     // Don't allow updating verification-related fields
     const {
-      id, expertId, verificationStatus, verificationRequestedAt,
-      verifiedBy, verifiedAt, proofDocumentId, verificationNotes,
-      rejectionReason, createdAt, updatedAt,
+      id,
+      expertId,
+      verificationStatus,
+      verificationRequestedAt,
+      verifiedBy,
+      verifiedAt,
+      proofDocumentId,
+      verificationNotes,
+      rejectionReason,
+      createdAt,
+      updatedAt,
       ...updateData
     } = data as any;
 
@@ -512,7 +676,9 @@ export class ExpertService {
 
     // Require company contact info for verification
     if (!workHistory.companyContactEmail && !workHistory.companyContactPhone) {
-      throw new BadRequestException('Please provide company contact email or phone for verification');
+      throw new BadRequestException(
+        'Please provide company contact email or phone for verification'
+      );
     }
 
     workHistory.verificationStatus = WorkHistoryVerificationStatus.PENDING_VERIFICATION;
@@ -528,7 +694,7 @@ export class ExpertService {
     approved: boolean,
     notes?: string,
     rejectionReason?: string,
-    proofDocumentId?: string,
+    proofDocumentId?: string
   ): Promise<ExpertWorkHistory> {
     const workHistory = await this.workHistoryRepository.findOne({
       where: { id: workHistoryId },
@@ -584,7 +750,7 @@ export class ExpertService {
   async updateWorkStatus(
     expertId: string,
     userId: string,
-    status: ExpertWorkStatus,
+    status: ExpertWorkStatus
   ): Promise<IndividualExpert> {
     const expert = await this.getProfile(expertId, userId);
 
@@ -597,21 +763,21 @@ export class ExpertService {
 
     if (!allowedManualStatuses.includes(status)) {
       throw new BadRequestException(
-        `Cannot manually set status to ${status}. This status is set automatically by the system.`,
+        `Cannot manually set status to ${status}. This status is set automatically by the system.`
       );
     }
 
     // Cannot change status if currently in service
     if (expert.workStatus === ExpertWorkStatus.IN_SERVICE) {
       throw new BadRequestException(
-        'Cannot change status while currently in service. Complete the current service first.',
+        'Cannot change status while currently in service. Complete the current service first.'
       );
     }
 
     // Cannot change status if booked (has pending services)
     if (expert.workStatus === ExpertWorkStatus.BOOKED && status === ExpertWorkStatus.OFF_DUTY) {
       throw new BadRequestException(
-        'Cannot go off duty while having booked services. Cancel or complete pending services first.',
+        'Cannot go off duty while having booked services. Cancel or complete pending services first.'
       );
     }
 
@@ -646,7 +812,7 @@ export class ExpertService {
     if (!hasValidMembership) {
       throw new BadRequestException(
         'Rushing mode requires an active paid membership (Silver, Gold, or Diamond). ' +
-        'Please upgrade your membership to access this feature.'
+          'Please upgrade your membership to access this feature.'
       );
     }
 
@@ -708,7 +874,10 @@ export class ExpertService {
   /**
    * Get work summary for expert dashboard
    */
-  async getWorkSummary(expertId: string, userId: string): Promise<{
+  async getWorkSummary(
+    expertId: string,
+    userId: string
+  ): Promise<{
     workStatus: ExpertWorkStatus;
     membershipLevel: ExpertMembershipLevel;
     membershipExpiresAt: Date | null;
@@ -773,8 +942,10 @@ export class ExpertService {
     const expert = await this.expertRepository.findOne({ where: { id: expertId } });
     if (!expert) return;
 
-    if (expert.workStatus === ExpertWorkStatus.RUSHING ||
-        expert.workStatus === ExpertWorkStatus.IDLE) {
+    if (
+      expert.workStatus === ExpertWorkStatus.RUSHING ||
+      expert.workStatus === ExpertWorkStatus.IDLE
+    ) {
       expert.workStatus = ExpertWorkStatus.BOOKED;
       expert.rushingStartedAt = null;
       expert.activeServiceCount += 1;
@@ -825,18 +996,25 @@ export class ExpertService {
 
   async getAllExperts(options?: {
     status?: string;
+    workStatus?: ExpertWorkStatus;
     hasPassport?: boolean;
     search?: string;
     limit?: number;
     offset?: number;
   }): Promise<{ experts: any[]; total: number }> {
-    const query = this.expertRepository.createQueryBuilder('expert')
+    const query = this.expertRepository
+      .createQueryBuilder('expert')
       .leftJoinAndSelect('expert.user', 'user')
       .orderBy('expert.createdAt', 'DESC');
 
     // Filter by registration status
     if (options?.status) {
       query.andWhere('expert.registrationStatus = :status', { status: options.status });
+    }
+
+    // Filter by work status
+    if (options?.workStatus) {
+      query.andWhere('expert.workStatus = :workStatus', { workStatus: options.workStatus });
     }
 
     // Filter by passport existence
@@ -852,7 +1030,7 @@ export class ExpertService {
     if (options?.search) {
       query.andWhere(
         '(expert.personalName ILIKE :search OR user.email ILIKE :search OR expert.expertCode ILIKE :search)',
-        { search: `%${options.search}%` },
+        { search: `%${options.search}%` }
       );
     }
 

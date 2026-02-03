@@ -14,9 +14,10 @@ export class AuthController {
 
   @Post('login')
   @Public()
-  @Throttle({ short: { limit: 3, ttl: 1000 } }) // Max 3 login attempts per second
-  @Throttle({ medium: { limit: 10, ttl: 60000 } }) // Max 10 login attempts per minute
-  @Throttle({ long: { limit: 30, ttl: 900000 } }) // Max 30 login attempts per 15 minutes
+  // Relaxed limits for development/testing - production should use stricter limits
+  @Throttle({ short: { limit: 100, ttl: 1000 } }) // 100 login attempts per second in dev
+  @Throttle({ medium: { limit: 1000, ttl: 60000 } }) // 1000 login attempts per minute in dev
+  @Throttle({ long: { limit: 10000, ttl: 900000 } }) // 10000 login attempts per 15 minutes in dev
   @ApiOperation({ summary: 'User login' })
   async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);

@@ -1,13 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Delete,
-  Param,
-  Body,
-  UseGuards,
-  Request,
-} from '@nestjs/common';
+import { Controller, Get, Post, Delete, Param, Body, UseGuards, Request } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { InvitationService } from './invitation.service';
@@ -41,16 +32,12 @@ export class InvitationController {
       expiresInDays?: number;
       campaign?: string;
       channel?: string;
-    },
+    }
   ) {
     // Determine user type
     const userType: InviterType = req.user.expertId ? 'EXPERT' : 'CUSTOMER';
 
-    return this.invitationService.generateInvitationCode(
-      req.user.sub,
-      userType,
-      body,
-    );
+    return this.invitationService.generateInvitationCode(req.user.sub, userType, body);
   }
 
   @Get('codes')

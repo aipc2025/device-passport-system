@@ -86,7 +86,7 @@ describe('AuthService', () => {
     service = module.get<AuthService>(AuthService);
     userRepository = module.get<Repository<User>>(getRepositoryToken(User));
     expertRepository = module.get<Repository<IndividualExpert>>(
-      getRepositoryToken(IndividualExpert),
+      getRepositoryToken(IndividualExpert)
     );
     jwtService = module.get<JwtService>(JwtService);
 
@@ -128,7 +128,7 @@ describe('AuthService', () => {
       expect(result.user).not.toHaveProperty('password');
       expect(mockUserRepository.update).toHaveBeenCalledWith(
         mockUser.id,
-        expect.objectContaining({ lastLoginAt: expect.any(Date) }),
+        expect.objectContaining({ lastLoginAt: expect.any(Date) })
       );
     });
 
@@ -166,10 +166,9 @@ describe('AuthService', () => {
 
       await service.login(loginDto);
 
-      expect(queryBuilder.where).toHaveBeenCalledWith(
-        'user.email = :email',
-        { email: 'test@example.com' },
-      );
+      expect(queryBuilder.where).toHaveBeenCalledWith('user.email = :email', {
+        email: 'test@example.com',
+      });
     });
 
     it('should throw UnauthorizedException for non-existent user', async () => {
@@ -231,7 +230,7 @@ describe('AuthService', () => {
 
       expect(mockUserRepository.update).toHaveBeenCalledWith(
         mockUser.id,
-        expect.objectContaining({ lastLoginAt: expect.any(Date) }),
+        expect.objectContaining({ lastLoginAt: expect.any(Date) })
       );
     });
   });
@@ -297,7 +296,7 @@ describe('AuthService', () => {
         where: { email: 'newuser@example.com' },
       });
       expect(mockUserRepository.create).toHaveBeenCalledWith(
-        expect.objectContaining({ email: 'newuser@example.com' }),
+        expect.objectContaining({ email: 'newuser@example.com' })
       );
     });
 
@@ -320,7 +319,7 @@ describe('AuthService', () => {
 
       expect(bcrypt.hash).toHaveBeenCalledWith('PlainTextPassword', 10);
       expect(mockUserRepository.create).toHaveBeenCalledWith(
-        expect.objectContaining({ password: '$2b$10$hashedPassword' }),
+        expect.objectContaining({ password: '$2b$10$hashedPassword' })
       );
     });
 
@@ -342,7 +341,7 @@ describe('AuthService', () => {
       await service.register(registerDto);
 
       expect(mockUserRepository.create).toHaveBeenCalledWith(
-        expect.objectContaining({ role: UserRole.CUSTOMER }),
+        expect.objectContaining({ role: UserRole.CUSTOMER })
       );
     });
 
@@ -357,7 +356,7 @@ describe('AuthService', () => {
 
       await expect(service.register(registerDto)).rejects.toThrow(ConflictException);
       await expect(service.register(registerDto)).rejects.toThrow(
-        'User with this email already exists',
+        'User with this email already exists'
       );
       expect(mockUserRepository.create).not.toHaveBeenCalled();
       expect(mockUserRepository.save).not.toHaveBeenCalled();
@@ -494,20 +493,21 @@ describe('AuthService', () => {
       const queryBuilder = mockUserRepository.createQueryBuilder();
       queryBuilder.getOne.mockResolvedValue(mockUser);
       mockExpertRepository.findOne.mockResolvedValue(null);
-      mockJwtService.sign
-        .mockReturnValueOnce('access-token')
-        .mockReturnValueOnce('refresh-token');
+      mockJwtService.sign.mockReturnValueOnce('access-token').mockReturnValueOnce('refresh-token');
 
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
 
       await service.login(loginDto);
 
       // First call is for access token (default expiry)
-      expect(mockJwtService.sign).toHaveBeenNthCalledWith(1, expect.objectContaining({
-        sub: mockUser.id,
-        email: mockUser.email,
-        role: mockUser.role,
-      }));
+      expect(mockJwtService.sign).toHaveBeenNthCalledWith(
+        1,
+        expect.objectContaining({
+          sub: mockUser.id,
+          email: mockUser.email,
+          role: mockUser.role,
+        })
+      );
 
       // Second call is for refresh token (30 days)
       expect(mockJwtService.sign).toHaveBeenNthCalledWith(
@@ -517,7 +517,7 @@ describe('AuthService', () => {
           email: mockUser.email,
           role: mockUser.role,
         }),
-        { expiresIn: '30d' },
+        { expiresIn: '30d' }
       );
     });
 
@@ -540,7 +540,7 @@ describe('AuthService', () => {
         expect.objectContaining({
           organizationId: mockUser.organizationId,
         }),
-        expect.anything(),
+        expect.anything()
       );
     });
 

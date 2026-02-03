@@ -11,14 +11,7 @@ import {
   ParseUUIDPipe,
   NotFoundException,
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiBearerAuth,
-  ApiParam,
-  ApiQuery,
-  ApiBody,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiParam, ApiQuery, ApiBody } from '@nestjs/swagger';
 import { ExpertService } from './expert.service';
 import { ExpertCodeService } from './expert-code.service';
 import { JwtAuthGuard, RolesGuard } from '../../common/guards';
@@ -40,7 +33,7 @@ import {
 export class ExpertController {
   constructor(
     private readonly expertService: ExpertService,
-    private readonly expertCodeService: ExpertCodeService,
+    private readonly expertCodeService: ExpertCodeService
   ) {}
 
   @Get(':id/dashboard')
@@ -49,7 +42,7 @@ export class ExpertController {
   @ApiParam({ name: 'id', description: 'Expert ID' })
   async getDashboardStats(
     @CurrentUser() user: TokenPayload,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id', ParseUUIDPipe) id: string
   ) {
     return this.expertService.getDashboardStats(id, user.sub);
   }
@@ -58,10 +51,7 @@ export class ExpertController {
   @Roles(UserRole.CUSTOMER, UserRole.ENGINEER, UserRole.ADMIN)
   @ApiOperation({ summary: 'Get expert profile' })
   @ApiParam({ name: 'id', description: 'Expert ID' })
-  async getProfile(
-    @CurrentUser() user: TokenPayload,
-    @Param('id', ParseUUIDPipe) id: string,
-  ) {
+  async getProfile(@CurrentUser() user: TokenPayload, @Param('id', ParseUUIDPipe) id: string) {
     return this.expertService.getProfile(id, user.sub);
   }
 
@@ -72,7 +62,7 @@ export class ExpertController {
   async updateProfile(
     @CurrentUser() user: TokenPayload,
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() data: Record<string, unknown>,
+    @Body() data: Record<string, unknown>
   ) {
     return this.expertService.updateProfile(id, user.sub, data);
   }
@@ -83,7 +73,7 @@ export class ExpertController {
   @ApiParam({ name: 'id', description: 'Expert ID' })
   async getServiceRecords(
     @CurrentUser() user: TokenPayload,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id', ParseUUIDPipe) id: string
   ) {
     return this.expertService.getServiceRecords(id, user.sub);
   }
@@ -93,12 +83,20 @@ export class ExpertController {
   @ApiOperation({ summary: 'Get expert match recommendations' })
   @ApiParam({ name: 'id', description: 'Expert ID' })
   @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiQuery({ name: 'offset', required: false, type: Number })
+  @ApiQuery({ name: 'status', required: false, type: String })
   async getMatches(
     @CurrentUser() user: TokenPayload,
     @Param('id', ParseUUIDPipe) id: string,
     @Query('limit') limit?: number,
+    @Query('offset') offset?: number,
+    @Query('status') status?: string
   ) {
-    return this.expertService.getMatches(id, user.sub, limit || 50);
+    return this.expertService.getMatches(id, user.sub, {
+      limit: limit || 50,
+      offset: offset || 0,
+      status: status as any,
+    });
   }
 
   @Post('matches/:matchId/dismiss')
@@ -107,9 +105,22 @@ export class ExpertController {
   @ApiParam({ name: 'matchId', description: 'Match ID' })
   async dismissMatch(
     @CurrentUser() user: TokenPayload,
-    @Param('matchId', ParseUUIDPipe) matchId: string,
+    @Param('matchId', ParseUUIDPipe) matchId: string
   ) {
-    return this.expertService.dismissMatch(matchId, user.sub);
+    await this.expertService.dismissMatch(matchId, user.sub);
+    return { success: true, message: 'Match dismissed successfully' };
+  }
+
+  @Post('matches/:matchId/accept')
+  @Roles(UserRole.CUSTOMER, UserRole.ENGINEER, UserRole.ADMIN)
+  @ApiOperation({ summary: 'Accept/apply to an expert match' })
+  @ApiParam({ name: 'matchId', description: 'Match ID' })
+  async acceptMatch(
+    @CurrentUser() user: TokenPayload,
+    @Param('matchId', ParseUUIDPipe) matchId: string
+  ) {
+    const match = await this.expertService.acceptMatch(matchId, user.sub);
+    return { success: true, match };
   }
 
   // ==========================================
@@ -120,14 +131,9 @@ export class ExpertController {
   @Roles(UserRole.CUSTOMER, UserRole.ENGINEER, UserRole.ADMIN)
   @ApiOperation({ summary: 'Get expert passport information' })
   @ApiParam({ name: 'id', description: 'Expert ID' })
-  async getPassport(
-    @CurrentUser() user: TokenPayload,
-    @Param('id', ParseUUIDPipe) id: string,
-  ) {
+  async getPassport(@CurrentUser() user: TokenPayload, @Param('id', ParseUUIDPipe) id: string) {
     const expert = await this.expertService.getProfile(id, user.sub);
-    const parsed = expert.expertCode
-      ? this.expertCodeService.parseCode(expert.expertCode)
-      : null;
+    const parsed = expert.expertCode ? this.expertCodeService.parseCode(expert.expertCode) : null;
 
     return {
       expertCode: expert.expertCode,
@@ -178,7 +184,7 @@ export class ExpertController {
   async updateLocation(
     @CurrentUser() user: TokenPayload,
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() data: { latitude?: number; longitude?: number; currentLocation?: string },
+    @Body() data: { latitude?: number; longitude?: number; currentLocation?: string }
   ) {
     return this.expertService.updateLocation(id, user.sub, data);
   }
@@ -199,7 +205,7 @@ export class ExpertController {
   async updateAvailability(
     @CurrentUser() user: TokenPayload,
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() data: { isAvailable?: boolean; serviceRadius?: number },
+    @Body() data: { isAvailable?: boolean; serviceRadius?: number }
   ) {
     return this.expertService.updateAvailability(id, user.sub, data);
   }
@@ -223,7 +229,7 @@ export class ExpertController {
   async updateSkills(
     @CurrentUser() user: TokenPayload,
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() data: { skillTags: string[] },
+    @Body() data: { skillTags: string[] }
   ) {
     return this.expertService.updateSkills(id, user.sub, data.skillTags);
   }
@@ -238,7 +244,7 @@ export class ExpertController {
   @ApiParam({ name: 'id', description: 'Expert ID' })
   async getWorkHistories(
     @CurrentUser() user: TokenPayload,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id', ParseUUIDPipe) id: string
   ) {
     return this.expertService.getWorkHistories(id, user.sub);
   }
@@ -250,7 +256,8 @@ export class ExpertController {
   async addWorkHistory(
     @CurrentUser() user: TokenPayload,
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() data: {
+    @Body()
+    data: {
       companyName: string;
       companyContactEmail?: string;
       companyContactPhone?: string;
@@ -261,7 +268,7 @@ export class ExpertController {
       endDate?: string;
       isCurrent?: boolean;
       isPublic?: boolean;
-    },
+    }
   ) {
     return this.expertService.addWorkHistory(id, user.sub, {
       ...data,
@@ -277,7 +284,7 @@ export class ExpertController {
   async updateWorkHistory(
     @CurrentUser() user: TokenPayload,
     @Param('workHistoryId', ParseUUIDPipe) workHistoryId: string,
-    @Body() data: Record<string, unknown>,
+    @Body() data: Record<string, unknown>
   ) {
     // Handle date conversion
     if (data.startDate) {
@@ -295,7 +302,7 @@ export class ExpertController {
   @ApiParam({ name: 'workHistoryId', description: 'Work History ID' })
   async deleteWorkHistory(
     @CurrentUser() user: TokenPayload,
-    @Param('workHistoryId', ParseUUIDPipe) workHistoryId: string,
+    @Param('workHistoryId', ParseUUIDPipe) workHistoryId: string
   ) {
     await this.expertService.deleteWorkHistory(workHistoryId, user.sub);
     return { success: true };
@@ -307,7 +314,7 @@ export class ExpertController {
   @ApiParam({ name: 'workHistoryId', description: 'Work History ID' })
   async requestVerification(
     @CurrentUser() user: TokenPayload,
-    @Param('workHistoryId', ParseUUIDPipe) workHistoryId: string,
+    @Param('workHistoryId', ParseUUIDPipe) workHistoryId: string
   ) {
     return this.expertService.requestVerification(workHistoryId, user.sub);
   }
@@ -322,7 +329,7 @@ export class ExpertController {
   @ApiParam({ name: 'id', description: 'Expert ID' })
   async adminUpdateProfile(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() data: Record<string, unknown>,
+    @Body() data: Record<string, unknown>
   ) {
     return this.expertService.adminUpdateProfile(id, data as any);
   }
@@ -331,19 +338,35 @@ export class ExpertController {
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Get all experts with passport info (Admin only)' })
   @ApiQuery({ name: 'status', required: false, description: 'Filter by registration status' })
-  @ApiQuery({ name: 'hasPassport', required: false, type: Boolean, description: 'Filter by passport existence' })
-  @ApiQuery({ name: 'search', required: false, description: 'Search by name, email, or passport code' })
+  @ApiQuery({
+    name: 'workStatus',
+    required: false,
+    description: 'Filter by work status (RUSHING, IDLE, BOOKED, IN_SERVICE, OFF_DUTY)',
+  })
+  @ApiQuery({
+    name: 'hasPassport',
+    required: false,
+    type: Boolean,
+    description: 'Filter by passport existence',
+  })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    description: 'Search by name, email, or passport code',
+  })
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiQuery({ name: 'offset', required: false, type: Number })
   async getAllExperts(
     @Query('status') status?: string,
+    @Query('workStatus') workStatus?: string,
     @Query('hasPassport') hasPassport?: string,
     @Query('search') search?: string,
     @Query('limit') limit?: number,
-    @Query('offset') offset?: number,
+    @Query('offset') offset?: number
   ) {
     return this.expertService.getAllExperts({
       status,
+      workStatus: workStatus as any,
       hasPassport: hasPassport === 'true' ? true : hasPassport === 'false' ? false : undefined,
       search,
       limit: limit ? Number(limit) : undefined,
@@ -365,12 +388,13 @@ export class ExpertController {
   async processVerification(
     @CurrentUser() user: TokenPayload,
     @Param('workHistoryId', ParseUUIDPipe) workHistoryId: string,
-    @Body() data: {
+    @Body()
+    data: {
       approved: boolean;
       notes?: string;
       rejectionReason?: string;
       proofDocumentId?: string;
-    },
+    }
   ) {
     return this.expertService.processVerification(
       workHistoryId,
@@ -378,7 +402,7 @@ export class ExpertController {
       data.approved,
       data.notes,
       data.rejectionReason,
-      data.proofDocumentId,
+      data.proofDocumentId
     );
   }
 
@@ -419,7 +443,7 @@ export class ExpertController {
   async updateWorkStatus(
     @CurrentUser() user: TokenPayload,
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() data: { status: ExpertWorkStatus },
+    @Body() data: { status: ExpertWorkStatus }
   ) {
     return this.expertService.updateWorkStatus(id, user.sub, data.status);
   }
@@ -428,10 +452,7 @@ export class ExpertController {
   @Roles(UserRole.CUSTOMER, UserRole.ENGINEER, UserRole.ADMIN)
   @ApiOperation({ summary: 'Get expert work summary (status, membership, active services)' })
   @ApiParam({ name: 'id', description: 'Expert ID' })
-  async getWorkSummary(
-    @CurrentUser() user: TokenPayload,
-    @Param('id', ParseUUIDPipe) id: string,
-  ) {
+  async getWorkSummary(@CurrentUser() user: TokenPayload, @Param('id', ParseUUIDPipe) id: string) {
     return this.expertService.getWorkSummary(id, user.sub);
   }
 
@@ -439,10 +460,7 @@ export class ExpertController {
   @Roles(UserRole.CUSTOMER, UserRole.ENGINEER, UserRole.ADMIN)
   @ApiOperation({ summary: 'Start rushing mode (priority order matching)' })
   @ApiParam({ name: 'id', description: 'Expert ID' })
-  async startRushing(
-    @CurrentUser() user: TokenPayload,
-    @Param('id', ParseUUIDPipe) id: string,
-  ) {
+  async startRushing(@CurrentUser() user: TokenPayload, @Param('id', ParseUUIDPipe) id: string) {
     return this.expertService.startRushing(id, user.sub);
   }
 
@@ -450,10 +468,7 @@ export class ExpertController {
   @Roles(UserRole.CUSTOMER, UserRole.ENGINEER, UserRole.ADMIN)
   @ApiOperation({ summary: 'Stop rushing mode' })
   @ApiParam({ name: 'id', description: 'Expert ID' })
-  async stopRushing(
-    @CurrentUser() user: TokenPayload,
-    @Param('id', ParseUUIDPipe) id: string,
-  ) {
+  async stopRushing(@CurrentUser() user: TokenPayload, @Param('id', ParseUUIDPipe) id: string) {
     return this.expertService.stopRushing(id, user.sub);
   }
 }
@@ -490,7 +505,12 @@ export class ExpertPassportPublicController {
       passportInfo: {
         code: code.toUpperCase(),
         expertType: parts.expertType,
-        expertTypeName: parts.expertType === 'T' ? 'Technical' : parts.expertType === 'B' ? 'Business' : 'Technical & Business',
+        expertTypeName:
+          parts.expertType === 'T'
+            ? 'Technical'
+            : parts.expertType === 'B'
+              ? 'Business'
+              : 'Technical & Business',
         industry: parts.industry,
         industryName: INDUSTRY_CODE_NAMES[parts.industry],
         skill: parts.skill,

@@ -105,9 +105,7 @@ describe('AuthController', () => {
         password: 'wrongpassword',
       };
 
-      mockAuthService.login.mockRejectedValue(
-        new UnauthorizedException('Invalid credentials'),
-      );
+      mockAuthService.login.mockRejectedValue(new UnauthorizedException('Invalid credentials'));
 
       await expect(controller.login(loginDto)).rejects.toThrow(UnauthorizedException);
       await expect(controller.login(loginDto)).rejects.toThrow('Invalid credentials');
@@ -170,12 +168,12 @@ describe('AuthController', () => {
       };
 
       mockAuthService.register.mockRejectedValue(
-        new ConflictException('User with this email already exists'),
+        new ConflictException('User with this email already exists')
       );
 
       await expect(controller.register(registerDto)).rejects.toThrow(ConflictException);
       await expect(controller.register(registerDto)).rejects.toThrow(
-        'User with this email already exists',
+        'User with this email already exists'
       );
     });
 
@@ -192,7 +190,7 @@ describe('AuthController', () => {
       await controller.register(registerDto);
 
       expect(service.register).toHaveBeenCalledWith(
-        expect.objectContaining({ organizationId: 'org-789' }),
+        expect.objectContaining({ organizationId: 'org-789' })
       );
     });
   });
@@ -240,9 +238,7 @@ describe('AuthController', () => {
         refreshToken: 'invalid-token',
       };
 
-      mockAuthService.refreshToken.mockRejectedValue(
-        new UnauthorizedException('Invalid token'),
-      );
+      mockAuthService.refreshToken.mockRejectedValue(new UnauthorizedException('Invalid token'));
 
       await expect(controller.refresh(refreshDto)).rejects.toThrow(UnauthorizedException);
       await expect(controller.refresh(refreshDto)).rejects.toThrow('Invalid token');
@@ -253,9 +249,7 @@ describe('AuthController', () => {
         refreshToken: 'expired-token',
       };
 
-      mockAuthService.refreshToken.mockRejectedValue(
-        new UnauthorizedException('Invalid token'),
-      );
+      mockAuthService.refreshToken.mockRejectedValue(new UnauthorizedException('Invalid token'));
 
       await expect(controller.refresh(refreshDto)).rejects.toThrow(UnauthorizedException);
     });

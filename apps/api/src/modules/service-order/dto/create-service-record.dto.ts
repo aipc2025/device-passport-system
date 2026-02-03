@@ -27,7 +27,7 @@ export class ServicePartDto implements ServicePart {
   @Min(1)
   quantity: number;
 
-  @ApiPropertyOptional({ example: 250.00 })
+  @ApiPropertyOptional({ example: 250.0 })
   @IsOptional()
   @IsInt()
   @Min(0)

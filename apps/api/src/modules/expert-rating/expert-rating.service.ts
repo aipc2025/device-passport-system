@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource, In } from 'typeorm';
 import {
@@ -67,7 +72,7 @@ export class ExpertRatingService {
     private expertRepository: Repository<IndividualExpert>,
     @InjectRepository(ServiceRequest)
     private serviceRequestRepository: Repository<ServiceRequest>,
-    private dataSource: DataSource,
+    private dataSource: DataSource
   ) {}
 
   /**
@@ -91,7 +96,7 @@ export class ExpertRatingService {
    */
   async createServiceRecord(
     dto: CreateServiceRecordDto,
-    customerUserId: string,
+    customerUserId: string
   ): Promise<ExpertServiceRecord> {
     // Verify service request exists
     const serviceRequest = await this.serviceRequestRepository.findOne({
@@ -180,7 +185,7 @@ export class ExpertRatingService {
   async getExpertServiceRecords(
     expertId: string,
     status?: ServiceRecordStatus,
-    limit = 50,
+    limit = 50
   ): Promise<ExpertServiceRecord[]> {
     const where: any = { expertId };
     if (status) {
@@ -201,7 +206,7 @@ export class ExpertRatingService {
   async getCustomerServiceRecords(
     customerUserId: string,
     status?: ServiceRecordStatus,
-    limit = 50,
+    limit = 50
   ): Promise<ExpertServiceRecord[]> {
     const where: any = { customerUserId };
     if (status) {
@@ -223,7 +228,7 @@ export class ExpertRatingService {
     id: string,
     dto: UpdateServiceRecordDto,
     userId: string,
-    isExpert: boolean,
+    isExpert: boolean
   ): Promise<ExpertServiceRecord> {
     const record = await this.getServiceRecord(id);
 
@@ -263,22 +268,32 @@ export class ExpertRatingService {
    */
   private async handleStatusTransition(
     record: ExpertServiceRecord,
-    newStatus: ServiceRecordStatus,
+    newStatus: ServiceRecordStatus
   ): Promise<void> {
     const currentStatus = record.status;
 
     // Validate transition
     const validTransitions: Record<ServiceRecordStatus, ServiceRecordStatus[]> = {
-      [ServiceRecordStatus.PENDING]: [ServiceRecordStatus.IN_PROGRESS, ServiceRecordStatus.CANCELLED],
-      [ServiceRecordStatus.IN_PROGRESS]: [ServiceRecordStatus.COMPLETED, ServiceRecordStatus.CANCELLED, ServiceRecordStatus.DISPUTED],
+      [ServiceRecordStatus.PENDING]: [
+        ServiceRecordStatus.IN_PROGRESS,
+        ServiceRecordStatus.CANCELLED,
+      ],
+      [ServiceRecordStatus.IN_PROGRESS]: [
+        ServiceRecordStatus.COMPLETED,
+        ServiceRecordStatus.CANCELLED,
+        ServiceRecordStatus.DISPUTED,
+      ],
       [ServiceRecordStatus.COMPLETED]: [ServiceRecordStatus.DISPUTED],
       [ServiceRecordStatus.CANCELLED]: [],
-      [ServiceRecordStatus.DISPUTED]: [ServiceRecordStatus.COMPLETED, ServiceRecordStatus.CANCELLED],
+      [ServiceRecordStatus.DISPUTED]: [
+        ServiceRecordStatus.COMPLETED,
+        ServiceRecordStatus.CANCELLED,
+      ],
     };
 
     if (!validTransitions[currentStatus].includes(newStatus)) {
       throw new BadRequestException(
-        `Invalid status transition from ${currentStatus} to ${newStatus}`,
+        `Invalid status transition from ${currentStatus} to ${newStatus}`
       );
     }
 
@@ -296,11 +311,7 @@ export class ExpertRatingService {
       record.actualEnd = record.actualEnd || new Date();
 
       // Update expert's completed services count
-      await this.expertRepository.increment(
-        { id: record.expertId },
-        'completedServices',
-        1,
-      );
+      await this.expertRepository.increment({ id: record.expertId }, 'completedServices', 1);
 
       // Update service request status
       await this.serviceRequestRepository.update(record.serviceRequestId, {
@@ -363,8 +374,10 @@ export class ExpertRatingService {
     const expert = await this.expertRepository.findOne({ where: { id: expertId } });
     if (!expert) return;
 
-    if (expert.workStatus === ExpertWorkStatus.RUSHING ||
-        expert.workStatus === ExpertWorkStatus.IDLE) {
+    if (
+      expert.workStatus === ExpertWorkStatus.RUSHING ||
+      expert.workStatus === ExpertWorkStatus.IDLE
+    ) {
       expert.workStatus = ExpertWorkStatus.BOOKED;
       expert.rushingStartedAt = null;
       expert.activeServiceCount += 1;
@@ -375,10 +388,7 @@ export class ExpertRatingService {
   /**
    * Customer confirms service completion
    */
-  async confirmCompletion(
-    recordId: string,
-    customerUserId: string,
-  ): Promise<ExpertServiceRecord> {
+  async confirmCompletion(recordId: string, customerUserId: string): Promise<ExpertServiceRecord> {
     const record = await this.getServiceRecord(recordId);
 
     if (record.customerUserId !== customerUserId) {
@@ -399,10 +409,7 @@ export class ExpertRatingService {
   /**
    * Create a review for completed service
    */
-  async createReview(
-    dto: CreateReviewDto,
-    reviewerId: string,
-  ): Promise<ExpertReview> {
+  async createReview(dto: CreateReviewDto, reviewerId: string): Promise<ExpertReview> {
     // Validate rating values
     if (dto.overallRating < 1 || dto.overallRating > 5) {
       throw new BadRequestException('Overall rating must be between 1 and 5');
@@ -464,7 +471,7 @@ export class ExpertRatingService {
   async getExpertReviews(
     expertId: string,
     status: ReviewStatus = ReviewStatus.PUBLISHED,
-    limit = 50,
+    limit = 50
   ): Promise<ExpertReview[]> {
     return this.reviewRepository.find({
       where: { expertId, status },
@@ -496,7 +503,7 @@ export class ExpertRatingService {
   async respondToReview(
     reviewId: string,
     expertId: string,
-    dto: ExpertResponseDto,
+    dto: ExpertResponseDto
   ): Promise<ExpertReview> {
     const review = await this.getReview(reviewId);
 
@@ -592,25 +599,30 @@ export class ExpertRatingService {
       if (qualityReviews.length > 0) {
         categoryAverages.quality =
           Math.round(
-            (qualityReviews.reduce((sum, r) => sum + r.qualityRating, 0) / qualityReviews.length) * 100
+            (qualityReviews.reduce((sum, r) => sum + r.qualityRating, 0) / qualityReviews.length) *
+              100
           ) / 100;
       }
       if (commReviews.length > 0) {
         categoryAverages.communication =
           Math.round(
-            (commReviews.reduce((sum, r) => sum + r.communicationRating, 0) / commReviews.length) * 100
+            (commReviews.reduce((sum, r) => sum + r.communicationRating, 0) / commReviews.length) *
+              100
           ) / 100;
       }
       if (punctReviews.length > 0) {
         categoryAverages.punctuality =
           Math.round(
-            (punctReviews.reduce((sum, r) => sum + r.punctualityRating, 0) / punctReviews.length) * 100
+            (punctReviews.reduce((sum, r) => sum + r.punctualityRating, 0) / punctReviews.length) *
+              100
           ) / 100;
       }
       if (profReviews.length > 0) {
         categoryAverages.professionalism =
           Math.round(
-            (profReviews.reduce((sum, r) => sum + r.professionalismRating, 0) / profReviews.length) * 100
+            (profReviews.reduce((sum, r) => sum + r.professionalismRating, 0) /
+              profReviews.length) *
+              100
           ) / 100;
       }
       if (valueReviews.length > 0) {
@@ -633,11 +645,7 @@ export class ExpertRatingService {
   /**
    * Flag a review for moderation
    */
-  async flagReview(
-    reviewId: string,
-    reason: string,
-    userId: string,
-  ): Promise<ExpertReview> {
+  async flagReview(reviewId: string, reason: string, userId: string): Promise<ExpertReview> {
     const review = await this.getReview(reviewId);
 
     review.status = ReviewStatus.FLAGGED;
@@ -656,10 +664,7 @@ export class ExpertRatingService {
   /**
    * Mark a review as helpful/not helpful
    */
-  async voteReview(
-    reviewId: string,
-    isHelpful: boolean,
-  ): Promise<ExpertReview> {
+  async voteReview(reviewId: string, isHelpful: boolean): Promise<ExpertReview> {
     const review = await this.getReview(reviewId);
 
     if (isHelpful) {

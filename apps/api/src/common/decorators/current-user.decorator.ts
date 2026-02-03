@@ -7,5 +7,5 @@ export const CurrentUser = createParamDecorator(
     const user = request.user as TokenPayload;
 
     return data ? user?.[data] : user;
-  },
+  }
 );

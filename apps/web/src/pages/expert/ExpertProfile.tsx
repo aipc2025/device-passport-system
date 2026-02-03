@@ -31,7 +31,7 @@ export default function ExpertProfile() {
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ['expert-profile', user?.expertId],
-    queryFn: () => expertApi.getProfile(user?.expertId!),
+    queryFn: () => expertApi.getProfile(user?.expertId as string),
     enabled: !!user?.expertId,
   });
 
@@ -66,7 +66,7 @@ export default function ExpertProfile() {
 
   const updateMutation = useMutation({
     mutationFn: (data: Partial<ExpertProfileForm>) =>
-      expertApi.updateProfile(user?.expertId!, data),
+      expertApi.updateProfile(user?.expertId as string, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['expert-profile'] });
       toast.success(t('expert.profileUpdated', 'Profile updated successfully'));

@@ -102,18 +102,15 @@ export class DeviceTakeoverExpertController {
   async submitInspectionReport(
     @Param('id') id: string,
     @Request() req: any,
-    @Body() body: {
+    @Body()
+    body: {
       overallCondition: 'EXCELLENT' | 'GOOD' | 'FAIR' | 'POOR';
       functionalStatus: string;
       notes: string;
       photos: string[];
-    },
+    }
   ) {
-    return this.takeoverService.submitInspectionReport(
-      id,
-      req.user.expertId || req.user.sub,
-      body,
-    );
+    return this.takeoverService.submitInspectionReport(id, req.user.expertId || req.user.sub, body);
   }
 }
 
@@ -137,7 +134,7 @@ export class DeviceTakeoverAdminController {
   async getAllRequests(
     @Query('status') status?: TakeoverStatus,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page?: number,
-    @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit?: number,
+    @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit?: number
   ) {
     const result = await this.takeoverService.getAllTakeoverRequests({
       status,
@@ -167,10 +164,7 @@ export class DeviceTakeoverAdminController {
       },
     },
   })
-  async assignExpert(
-    @Param('id') id: string,
-    @Body('expertId') expertId: string,
-  ) {
+  async assignExpert(@Param('id') id: string, @Body('expertId') expertId: string) {
     return this.takeoverService.assignInspectionExpert(id, expertId);
   }
 
@@ -187,7 +181,7 @@ export class DeviceTakeoverAdminController {
   async approveRequest(
     @Param('id') id: string,
     @Request() req: any,
-    @Body('notes') notes?: string,
+    @Body('notes') notes?: string
   ) {
     const request = await this.takeoverService.approveRequest(id, req.user.sub, notes);
     return {
@@ -210,7 +204,7 @@ export class DeviceTakeoverAdminController {
   async rejectRequest(
     @Param('id') id: string,
     @Request() req: any,
-    @Body('reason') reason: string,
+    @Body('reason') reason: string
   ) {
     return this.takeoverService.rejectRequest(id, req.user.sub, reason);
   }

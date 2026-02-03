@@ -48,7 +48,7 @@ export default function ExpertPassport() {
 
   const { data: passport, isLoading, error } = useQuery<PassportData>({
     queryKey: ['expert-passport', user?.expertId],
-    queryFn: () => expertApi.getPassport(user?.expertId!),
+    queryFn: () => expertApi.getPassport(user?.expertId as string),
     enabled: !!user?.expertId,
   });
 

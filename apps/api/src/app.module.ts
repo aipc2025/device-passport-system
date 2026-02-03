@@ -43,22 +43,22 @@ import jwtConfig from './config/jwt.config';
       envFilePath: ['.env.local', '.env'],
     }),
 
-    // Rate Limiting
+    // Rate Limiting - disabled in development for testing, strict in production
     ThrottlerModule.forRoot([
       {
         name: 'short',
         ttl: 1000, // 1 second
-        limit: 10, // 10 requests per second
+        limit: process.env.NODE_ENV === 'production' ? 10 : 10000, // Very relaxed in dev
       },
       {
         name: 'medium',
         ttl: 60000, // 1 minute
-        limit: 100, // 100 requests per minute
+        limit: process.env.NODE_ENV === 'production' ? 100 : 100000, // Very relaxed in dev
       },
       {
         name: 'long',
         ttl: 900000, // 15 minutes
-        limit: 1000, // 1000 requests per 15 minutes
+        limit: process.env.NODE_ENV === 'production' ? 1000 : 1000000, // Very relaxed in dev
       },
     ]),
 

@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  BadRequestException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
@@ -29,7 +25,7 @@ export class UploadService {
   constructor(
     @InjectRepository(UploadedFile)
     private readonly uploadedFileRepository: Repository<UploadedFile>,
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService
   ) {
     this.uploadDir = this.configService.get('UPLOAD_DIR') || './uploads';
     this.maxFileSize = parseInt(this.configService.get('MAX_FILE_SIZE') || '10485760', 10); // 10MB default
@@ -76,10 +72,7 @@ export class UploadService {
     return `${year}${month}${day}${hours}${minutes}.${milliseconds}`;
   }
 
-  async uploadFile(
-    file: Express.Multer.File,
-    options: UploadOptions = {},
-  ): Promise<UploadedFile> {
+  async uploadFile(file: Express.Multer.File, options: UploadOptions = {}): Promise<UploadedFile> {
     // Validate file
     if (!file) {
       throw new BadRequestException('No file provided');
@@ -87,13 +80,13 @@ export class UploadService {
 
     if (file.size > this.maxFileSize) {
       throw new BadRequestException(
-        `File size exceeds maximum allowed size of ${this.maxFileSize / 1024 / 1024}MB`,
+        `File size exceeds maximum allowed size of ${this.maxFileSize / 1024 / 1024}MB`
       );
     }
 
     if (!this.allowedMimeTypes.includes(file.mimetype)) {
       throw new BadRequestException(
-        `File type ${file.mimetype} is not allowed. Allowed types: ${this.allowedMimeTypes.join(', ')}`,
+        `File type ${file.mimetype} is not allowed. Allowed types: ${this.allowedMimeTypes.join(', ')}`
       );
     }
 
@@ -144,7 +137,7 @@ export class UploadService {
 
   async uploadMultiple(
     files: Express.Multer.File[],
-    options: UploadOptions = {},
+    options: UploadOptions = {}
   ): Promise<UploadedFile[]> {
     const results: UploadedFile[] = [];
     for (const file of files) {
@@ -169,10 +162,7 @@ export class UploadService {
     return this.uploadedFileRepository.findByIds(ids);
   }
 
-  async findByEntity(
-    entityType: string,
-    entityId: string,
-  ): Promise<UploadedFile[]> {
+  async findByEntity(entityType: string, entityId: string): Promise<UploadedFile[]> {
     return this.uploadedFileRepository.find({
       where: {
         relatedEntityType: entityType,
@@ -184,7 +174,7 @@ export class UploadService {
   async updateRelatedEntity(
     fileId: string,
     entityType: string,
-    entityId: string,
+    entityId: string
   ): Promise<UploadedFile> {
     const file = await this.findById(fileId);
     file.relatedEntityType = entityType;

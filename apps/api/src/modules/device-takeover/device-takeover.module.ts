@@ -7,19 +7,11 @@ import {
 } from './device-takeover.controller';
 import { DeviceTakeoverService } from './device-takeover.service';
 import { PointModule } from '../point/point.module';
-import {
-  DeviceTakeoverRequest,
-  DevicePassport,
-  SequenceCounter,
-} from '../../database/entities';
+import { DeviceTakeoverRequest, DevicePassport, SequenceCounter } from '../../database/entities';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      DeviceTakeoverRequest,
-      DevicePassport,
-      SequenceCounter,
-    ]),
+    TypeOrmModule.forFeature([DeviceTakeoverRequest, DevicePassport, SequenceCounter]),
     PointModule,
   ],
   controllers: [

@@ -1,12 +1,5 @@
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
-import {
-  IsString,
-  IsOptional,
-  IsNumber,
-  IsBoolean,
-  IsEnum,
-  MaxLength,
-} from 'class-validator';
+import { IsString, IsOptional, IsNumber, IsBoolean, IsEnum, MaxLength } from 'class-validator';
 import { PackagingType } from '@device-passport/shared';
 
 export class CreateProductDto {

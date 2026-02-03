@@ -2,11 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ExpertMatchingService } from './expert-matching.service';
-import {
-  ServiceRequest,
-  IndividualExpert,
-  ExpertMatchResult,
-} from '../../database/entities';
+import { ServiceRequest, IndividualExpert, ExpertMatchResult } from '../../database/entities';
 import {
   ServiceRequestStatus,
   ServiceType,
@@ -55,8 +51,8 @@ describe('ExpertMatchingService', () => {
     completedServices: 25,
     serviceRadius: 100,
     currentLocation: 'Shanghai',
-    locationLat: 31.2500,
-    locationLng: 121.5000,
+    locationLat: 31.25,
+    locationLng: 121.5,
     professionalField: 'Industrial Automation',
     servicesOffered: 'PLC Programming, Installation',
     certifications: ['Siemens Certified'],
@@ -127,16 +123,12 @@ describe('ExpertMatchingService', () => {
 
   describe('matchExpertsToServiceRequest', () => {
     it('should match experts to a service request successfully', async () => {
-      serviceRequestRepository.findOne.mockResolvedValue(
-        mockServiceRequest as ServiceRequest,
-      );
-      expertRepository.find.mockResolvedValue([
-        mockExpert1 as IndividualExpert,
-      ]);
+      serviceRequestRepository.findOne.mockResolvedValue(mockServiceRequest as ServiceRequest);
+      expertRepository.find.mockResolvedValue([mockExpert1 as IndividualExpert]);
       matchResultRepository.findOne.mockResolvedValue(null);
       matchResultRepository.create.mockImplementation((data) => data as any);
       matchResultRepository.save.mockImplementation((data) =>
-        Promise.resolve({ ...data, id: 'match-123' } as any),
+        Promise.resolve({ ...data, id: 'match-123' } as any)
       );
 
       const results = await service.matchExpertsToServiceRequest('request-123');
@@ -161,9 +153,7 @@ describe('ExpertMatchingService', () => {
         ...mockServiceRequest,
         status: ServiceRequestStatus.COMPLETED,
       };
-      serviceRequestRepository.findOne.mockResolvedValue(
-        closedRequest as ServiceRequest,
-      );
+      serviceRequestRepository.findOne.mockResolvedValue(closedRequest as ServiceRequest);
 
       const results = await service.matchExpertsToServiceRequest('request-123');
 
@@ -171,12 +161,8 @@ describe('ExpertMatchingService', () => {
     });
 
     it('should skip experts that are already matched', async () => {
-      serviceRequestRepository.findOne.mockResolvedValue(
-        mockServiceRequest as ServiceRequest,
-      );
-      expertRepository.find.mockResolvedValue([
-        mockExpert1 as IndividualExpert,
-      ]);
+      serviceRequestRepository.findOne.mockResolvedValue(mockServiceRequest as ServiceRequest);
+      expertRepository.find.mockResolvedValue([mockExpert1 as IndividualExpert]);
       matchResultRepository.findOne.mockResolvedValue({
         id: 'existing-match',
       } as any);
@@ -197,12 +183,8 @@ describe('ExpertMatchingService', () => {
         yearsOfExperience: 1,
       };
 
-      serviceRequestRepository.findOne.mockResolvedValue(
-        mockServiceRequest as ServiceRequest,
-      );
-      expertRepository.find.mockResolvedValue([
-        lowSkillExpert as IndividualExpert,
-      ]);
+      serviceRequestRepository.findOne.mockResolvedValue(mockServiceRequest as ServiceRequest);
+      expertRepository.find.mockResolvedValue([lowSkillExpert as IndividualExpert]);
       matchResultRepository.findOne.mockResolvedValue(null);
 
       const results = await service.matchExpertsToServiceRequest('request-123');
@@ -216,7 +198,7 @@ describe('ExpertMatchingService', () => {
     it('should calculate match score with all components', () => {
       const result = service.calculateMatchScore(
         mockExpert1 as IndividualExpert,
-        mockServiceRequest as ServiceRequest,
+        mockServiceRequest as ServiceRequest
       );
 
       expect(result.totalScore).toBeGreaterThan(0);
@@ -241,17 +223,15 @@ describe('ExpertMatchingService', () => {
 
       const result1 = service.calculateMatchScore(
         expertWithMatchingSkills as IndividualExpert,
-        mockServiceRequest as ServiceRequest,
+        mockServiceRequest as ServiceRequest
       );
 
       const result2 = service.calculateMatchScore(
         expertWithFewSkills as IndividualExpert,
-        mockServiceRequest as ServiceRequest,
+        mockServiceRequest as ServiceRequest
       );
 
-      expect(result1.breakdown.skillScore).toBeGreaterThan(
-        result2.breakdown.skillScore,
-      );
+      expect(result1.breakdown.skillScore).toBeGreaterThan(result2.breakdown.skillScore);
     });
 
     it('should give location bonus to nearby experts', () => {
@@ -269,17 +249,15 @@ describe('ExpertMatchingService', () => {
 
       const result1 = service.calculateMatchScore(
         nearExpert as IndividualExpert,
-        mockServiceRequest as ServiceRequest,
+        mockServiceRequest as ServiceRequest
       );
 
       const result2 = service.calculateMatchScore(
         farExpert as IndividualExpert,
-        mockServiceRequest as ServiceRequest,
+        mockServiceRequest as ServiceRequest
       );
 
-      expect(result1.breakdown.locationScore).toBeGreaterThan(
-        result2.breakdown.locationScore,
-      );
+      expect(result1.breakdown.locationScore).toBeGreaterThan(result2.breakdown.locationScore);
       expect(result1.distanceKm).toBeLessThan(result2.distanceKm || 999999);
     });
 
@@ -296,17 +274,15 @@ describe('ExpertMatchingService', () => {
 
       const result1 = service.calculateMatchScore(
         experiencedExpert as IndividualExpert,
-        mockServiceRequest as ServiceRequest,
+        mockServiceRequest as ServiceRequest
       );
 
       const result2 = service.calculateMatchScore(
         juniorExpert as IndividualExpert,
-        mockServiceRequest as ServiceRequest,
+        mockServiceRequest as ServiceRequest
       );
 
-      expect(result1.breakdown.experienceScore).toBeGreaterThan(
-        result2.breakdown.experienceScore,
-      );
+      expect(result1.breakdown.experienceScore).toBeGreaterThan(result2.breakdown.experienceScore);
     });
 
     it('should give bonus to experts in RUSHING status', () => {
@@ -322,12 +298,12 @@ describe('ExpertMatchingService', () => {
 
       const result1 = service.calculateMatchScore(
         rushingExpert as IndividualExpert,
-        mockServiceRequest as ServiceRequest,
+        mockServiceRequest as ServiceRequest
       );
 
       const result2 = service.calculateMatchScore(
         idleExpert as IndividualExpert,
-        mockServiceRequest as ServiceRequest,
+        mockServiceRequest as ServiceRequest
       );
 
       expect(result1.totalScore).toBeGreaterThan(result2.totalScore);
@@ -346,12 +322,12 @@ describe('ExpertMatchingService', () => {
 
       const result1 = service.calculateMatchScore(
         diamondExpert as IndividualExpert,
-        mockServiceRequest as ServiceRequest,
+        mockServiceRequest as ServiceRequest
       );
 
       const result2 = service.calculateMatchScore(
         standardExpert as IndividualExpert,
-        mockServiceRequest as ServiceRequest,
+        mockServiceRequest as ServiceRequest
       );
 
       expect(result1.totalScore).toBeGreaterThan(result2.totalScore);
@@ -372,17 +348,15 @@ describe('ExpertMatchingService', () => {
 
       const result1 = service.calculateMatchScore(
         highRatedExpert as IndividualExpert,
-        mockServiceRequest as ServiceRequest,
+        mockServiceRequest as ServiceRequest
       );
 
       const result2 = service.calculateMatchScore(
         lowRatedExpert as IndividualExpert,
-        mockServiceRequest as ServiceRequest,
+        mockServiceRequest as ServiceRequest
       );
 
-      expect(result1.breakdown.ratingScore).toBeGreaterThan(
-        result2.breakdown.ratingScore,
-      );
+      expect(result1.breakdown.ratingScore).toBeGreaterThan(result2.breakdown.ratingScore);
     });
   });
 
@@ -394,10 +368,7 @@ describe('ExpertMatchingService', () => {
         locationLng: 121.4737,
       };
 
-      const result = (service as any).calculateLocationScore(
-        nearExpert,
-        mockServiceRequest,
-      );
+      const result = (service as any).calculateLocationScore(nearExpert, mockServiceRequest);
 
       expect(result.locationScore).toBe(100); // Raw maximum score
       expect(result.distanceKm).toBeLessThan(10);
@@ -411,10 +382,7 @@ describe('ExpertMatchingService', () => {
         serviceRadius: 50, // 50km radius
       };
 
-      const result = (service as any).calculateLocationScore(
-        farExpert,
-        mockServiceRequest,
-      );
+      const result = (service as any).calculateLocationScore(farExpert, mockServiceRequest);
 
       expect(result.locationScore).toBe(0);
     });
@@ -426,10 +394,7 @@ describe('ExpertMatchingService', () => {
         locationLng: null,
       };
 
-      const result = (service as any).calculateLocationScore(
-        expertNoLocation,
-        mockServiceRequest,
-      );
+      const result = (service as any).calculateLocationScore(expertNoLocation, mockServiceRequest);
 
       expect(result.locationScore).toBe(50); // Default score
       expect(result.distanceKm).toBeNull();
@@ -443,10 +408,7 @@ describe('ExpertMatchingService', () => {
         skillTags: ['PLC', 'Siemens', 'S7-1500'], // All required skills
       };
 
-      const score = (service as any).calculateSkillScore(
-        expertPerfectSkills,
-        mockServiceRequest,
-      );
+      const score = (service as any).calculateSkillScore(expertPerfectSkills, mockServiceRequest);
 
       expect(score).toBe(100); // Raw maximum score
     });
@@ -457,10 +419,7 @@ describe('ExpertMatchingService', () => {
         skillTags: ['cooking', 'painting'], // Completely different
       };
 
-      const score = (service as any).calculateSkillScore(
-        expertNoSkills,
-        mockServiceRequest,
-      );
+      const score = (service as any).calculateSkillScore(expertNoSkills, mockServiceRequest);
 
       expect(score).toBe(0);
     });
@@ -471,10 +430,7 @@ describe('ExpertMatchingService', () => {
         skillTags: ['PLC'], // Only 1 out of 3 skills
       };
 
-      const score = (service as any).calculateSkillScore(
-        expertPartialSkills,
-        mockServiceRequest,
-      );
+      const score = (service as any).calculateSkillScore(expertPartialSkills, mockServiceRequest);
 
       expect(score).toBeGreaterThan(0);
       expect(score).toBeLessThan(100);
@@ -489,9 +445,7 @@ describe('ExpertMatchingService', () => {
         yearsOfExperience: 15,
       };
 
-      const score = (service as any).calculateExperienceScore(
-        expertVeryExperienced,
-      );
+      const score = (service as any).calculateExperienceScore(expertVeryExperienced);
 
       expect(score).toBe(100); // Raw maximum score
     });
@@ -502,9 +456,7 @@ describe('ExpertMatchingService', () => {
         yearsOfExperience: 0,
       };
 
-      const score = (service as any).calculateExperienceScore(
-        expertNoExperience,
-      );
+      const score = (service as any).calculateExperienceScore(expertNoExperience);
 
       expect(score).toBe(20); // Minimum score
     });

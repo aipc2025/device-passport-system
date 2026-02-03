@@ -75,7 +75,10 @@ async function bootstrap() {
   // ==========================================
   // Swagger Documentation (Conditionally Enabled)
   // ==========================================
-  if (configService.get('NODE_ENV') !== 'production' || configService.get('ENABLE_SWAGGER') === 'true') {
+  if (
+    configService.get('NODE_ENV') !== 'production' ||
+    configService.get('ENABLE_SWAGGER') === 'true'
+  ) {
     const config = new DocumentBuilder()
       .setTitle('Device Passport System API')
       .setDescription('B2B Device Passport Traceability System - API Documentation')
@@ -121,10 +124,14 @@ async function bootstrap() {
 
   // Log important configuration
   console.log('Configuration:');
-  console.log(`  - Database: ${configService.get('DATABASE_HOST')}:${configService.get('DATABASE_PORT')}`);
+  console.log(
+    `  - Database: ${configService.get('DATABASE_HOST')}:${configService.get('DATABASE_PORT')}`
+  );
   console.log(`  - Redis: ${configService.get('REDIS_HOST')}:${configService.get('REDIS_PORT')}`);
   console.log(`  - CORS Origins: ${corsOrigins.join(', ') || 'All'}`);
-  console.log(`  - Rate Limiting: ${configService.get('RATE_LIMIT_ENABLED') === 'true' ? 'Enabled' : 'Disabled'}`);
+  console.log(
+    `  - Rate Limiting: ${configService.get('RATE_LIMIT_ENABLED') === 'true' ? 'Enabled' : 'Disabled'}`
+  );
   console.log(`  - JWT Expiry: ${configService.get('JWT_EXPIRES_IN')}`);
   console.log('');
   console.log('Ready to accept connections! 🚀');

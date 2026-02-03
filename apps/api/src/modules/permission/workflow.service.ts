@@ -132,7 +132,7 @@ export class WorkflowService {
       qcApproved?: boolean;
       packageComplete?: boolean;
       trackingNumber?: string;
-    },
+    }
   ): Promise<{
     allowed: boolean;
     reason?: string;
@@ -140,7 +140,7 @@ export class WorkflowService {
   }> {
     // Find the transition rule
     const transition = this.transitions.find(
-      (t) => t.fromStatus === currentStatus && t.toStatus === targetStatus,
+      (t) => t.fromStatus === currentStatus && t.toStatus === targetStatus
     );
 
     if (!transition) {
@@ -153,7 +153,7 @@ export class WorkflowService {
     // Check if user has required permission
     const hasPermission = await this.permissionService.checkPermission(
       userId,
-      transition.requiredPermission,
+      transition.requiredPermission
     );
 
     if (!hasPermission) {
@@ -206,14 +206,9 @@ export class WorkflowService {
       qcApproved?: boolean;
       packageComplete?: boolean;
       trackingNumber?: string;
-    },
+    }
   ): Promise<void> {
-    const result = await this.canTransition(
-      userId,
-      currentStatus,
-      targetStatus,
-      deviceData,
-    );
+    const result = await this.canTransition(userId, currentStatus, targetStatus, deviceData);
 
     if (!result.allowed) {
       if (result.requiredPermission) {
@@ -223,9 +218,7 @@ export class WorkflowService {
       }
     }
 
-    this.logger.log(
-      `User ${userId} transitioned device from ${currentStatus} to ${targetStatus}`,
-    );
+    this.logger.log(`User ${userId} transitioned device from ${currentStatus} to ${targetStatus}`);
   }
 
   /**
@@ -233,7 +226,7 @@ export class WorkflowService {
    */
   async getAvailableTransitions(
     userId: string,
-    currentStatus: DeviceStatus,
+    currentStatus: DeviceStatus
   ): Promise<
     Array<{
       toStatus: DeviceStatus;
@@ -242,15 +235,13 @@ export class WorkflowService {
       requiredPermission: string;
     }>
   > {
-    const availableTransitions = this.transitions.filter(
-      (t) => t.fromStatus === currentStatus,
-    );
+    const availableTransitions = this.transitions.filter((t) => t.fromStatus === currentStatus);
 
     const result = [];
     for (const transition of availableTransitions) {
       const hasPermission = await this.permissionService.checkPermission(
         userId,
-        transition.requiredPermission,
+        transition.requiredPermission
       );
 
       result.push({
@@ -297,9 +288,7 @@ export class WorkflowService {
    * Validate workflow for a specific role
    * Returns which transitions this role can perform
    */
-  async getRoleWorkflowCapabilities(
-    userId: string,
-  ): Promise<{
+  async getRoleWorkflowCapabilities(userId: string): Promise<{
     canApproveQC: boolean;
     canPackage: boolean;
     canShip: boolean;

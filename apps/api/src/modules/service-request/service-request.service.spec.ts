@@ -1,17 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
-import {
-  NotFoundException,
-  ForbiddenException,
-  BadRequestException,
-} from '@nestjs/common';
+import { NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { ServiceRequestService } from './service-request.service';
-import {
-  ServiceRequest,
-  ExpertApplication,
-  IndividualExpert,
-} from '../../database/entities';
+import { ServiceRequest, ExpertApplication, IndividualExpert } from '../../database/entities';
 import {
   ServiceRequestStatus,
   ServiceType,
@@ -173,12 +165,8 @@ describe('ServiceRequestService', () => {
 
     it('should create a service request successfully', async () => {
       const createdRequest = { ...mockServiceRequest };
-      serviceRequestRepository.create.mockReturnValue(
-        createdRequest as ServiceRequest,
-      );
-      serviceRequestRepository.save.mockResolvedValue(
-        createdRequest as ServiceRequest,
-      );
+      serviceRequestRepository.create.mockReturnValue(createdRequest as ServiceRequest);
+      serviceRequestRepository.save.mockResolvedValue(createdRequest as ServiceRequest);
 
       const result = await service.create('user-123', 'org-123', createDto);
 
@@ -189,12 +177,8 @@ describe('ServiceRequestService', () => {
 
     it('should set default status to DRAFT', async () => {
       const createdRequest = { ...mockServiceRequest, status: ServiceRequestStatus.DRAFT };
-      serviceRequestRepository.create.mockReturnValue(
-        createdRequest as ServiceRequest,
-      );
-      serviceRequestRepository.save.mockResolvedValue(
-        createdRequest as ServiceRequest,
-      );
+      serviceRequestRepository.create.mockReturnValue(createdRequest as ServiceRequest);
+      serviceRequestRepository.save.mockResolvedValue(createdRequest as ServiceRequest);
 
       const result = await service.create('user-123', 'org-123', createDto);
 
@@ -206,12 +190,8 @@ describe('ServiceRequestService', () => {
       delete (dtoWithoutCurrency as any).budgetCurrency;
 
       const createdRequest = { ...mockServiceRequest, budgetCurrency: 'USD' };
-      serviceRequestRepository.create.mockReturnValue(
-        createdRequest as ServiceRequest,
-      );
-      serviceRequestRepository.save.mockResolvedValue(
-        createdRequest as ServiceRequest,
-      );
+      serviceRequestRepository.create.mockReturnValue(createdRequest as ServiceRequest);
+      serviceRequestRepository.save.mockResolvedValue(createdRequest as ServiceRequest);
 
       const result = await service.create('user-123', 'org-123', dtoWithoutCurrency);
 
@@ -235,12 +215,8 @@ describe('ServiceRequestService', () => {
         createdByUserId: null,
         organizationId: null,
       };
-      serviceRequestRepository.create.mockReturnValue(
-        createdRequest as any,
-      );
-      serviceRequestRepository.save.mockResolvedValue(
-        createdRequest as any,
-      );
+      serviceRequestRepository.create.mockReturnValue(createdRequest as any);
+      serviceRequestRepository.save.mockResolvedValue(createdRequest as any);
 
       const result = await service.createPublic(publicDto);
 
@@ -273,9 +249,7 @@ describe('ServiceRequestService', () => {
     it('should throw NotFoundException if request not found', async () => {
       serviceRequestRepository.findOne.mockResolvedValue(null);
 
-      await expect(
-        service.publish('non-existent', 'user-123'),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.publish('non-existent', 'user-123')).rejects.toThrow(NotFoundException);
     });
 
     it('should throw ForbiddenException if user is not creator', async () => {
@@ -286,9 +260,7 @@ describe('ServiceRequestService', () => {
       };
       serviceRequestRepository.findOne.mockResolvedValue(draftRequest as ServiceRequest);
 
-      await expect(
-        service.publish('request-123', 'user-123'),
-      ).rejects.toThrow(ForbiddenException);
+      await expect(service.publish('request-123', 'user-123')).rejects.toThrow(ForbiddenException);
     });
 
     it('should throw BadRequestException if request already published', async () => {
@@ -299,9 +271,7 @@ describe('ServiceRequestService', () => {
       };
       serviceRequestRepository.findOne.mockResolvedValue(publishedRequest as ServiceRequest);
 
-      await expect(
-        service.publish('request-123', 'user-123'),
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.publish('request-123', 'user-123')).rejects.toThrow(BadRequestException);
     });
   });
 
@@ -330,9 +300,7 @@ describe('ServiceRequestService', () => {
     it('should throw NotFoundException if request not found', async () => {
       serviceRequestRepository.findOne.mockResolvedValue(null);
 
-      await expect(
-        service.cancel('non-existent', 'user-123'),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.cancel('non-existent', 'user-123')).rejects.toThrow(NotFoundException);
     });
 
     it('should throw ForbiddenException if user is not creator', async () => {
@@ -342,9 +310,7 @@ describe('ServiceRequestService', () => {
       };
       serviceRequestRepository.findOne.mockResolvedValue(request as ServiceRequest);
 
-      await expect(
-        service.cancel('request-123', 'user-123'),
-      ).rejects.toThrow(ForbiddenException);
+      await expect(service.cancel('request-123', 'user-123')).rejects.toThrow(ForbiddenException);
     });
   });
 
@@ -364,9 +330,7 @@ describe('ServiceRequestService', () => {
     it('should throw NotFoundException if request not found', async () => {
       serviceRequestRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.findOne('non-existent')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(service.findOne('non-existent')).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -386,9 +350,7 @@ describe('ServiceRequestService', () => {
     it('should throw NotFoundException if request not found', async () => {
       serviceRequestRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.findByCode('INVALID-CODE')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(service.findByCode('INVALID-CODE')).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -419,11 +381,7 @@ describe('ServiceRequestService', () => {
         applicationCount: 1,
       } as ServiceRequest);
 
-      const result = await service.applyToService(
-        'request-123',
-        'expert-123',
-        applyDto,
-      );
+      const result = await service.applyToService('request-123', 'expert-123', applyDto);
 
       expect(result).toEqual(mockApplication);
       expect(applicationRepository.save).toHaveBeenCalled();
@@ -432,9 +390,9 @@ describe('ServiceRequestService', () => {
     it('should throw NotFoundException if service request not found', async () => {
       serviceRequestRepository.findOne.mockResolvedValue(null);
 
-      await expect(
-        service.applyToService('non-existent', 'expert-123', applyDto),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.applyToService('non-existent', 'expert-123', applyDto)).rejects.toThrow(
+        NotFoundException
+      );
     });
 
     it('should throw BadRequestException if request not open', async () => {
@@ -444,9 +402,9 @@ describe('ServiceRequestService', () => {
       };
       serviceRequestRepository.findOne.mockResolvedValue(draftRequest as ServiceRequest);
 
-      await expect(
-        service.applyToService('request-123', 'expert-123', applyDto),
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.applyToService('request-123', 'expert-123', applyDto)).rejects.toThrow(
+        BadRequestException
+      );
     });
 
     it('should throw BadRequestException if expert already applied', async () => {
@@ -458,9 +416,9 @@ describe('ServiceRequestService', () => {
       serviceRequestRepository.findOne.mockResolvedValue(openRequest as ServiceRequest);
       applicationRepository.findOne.mockResolvedValue(mockApplication as ExpertApplication);
 
-      await expect(
-        service.applyToService('request-123', 'expert-123', applyDto),
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.applyToService('request-123', 'expert-123', applyDto)).rejects.toThrow(
+        BadRequestException
+      );
     });
   });
 
@@ -499,9 +457,9 @@ describe('ServiceRequestService', () => {
     it('should throw NotFoundException if application not found', async () => {
       applicationRepository.findOne.mockResolvedValue(null);
 
-      await expect(
-        service.acceptApplication('non-existent', 'user-123'),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.acceptApplication('non-existent', 'user-123')).rejects.toThrow(
+        NotFoundException
+      );
     });
 
     it('should throw ForbiddenException if user is not request creator', async () => {
@@ -517,9 +475,9 @@ describe('ServiceRequestService', () => {
       applicationRepository.findOne.mockResolvedValue(application as any);
       serviceRequestRepository.findOne.mockResolvedValue(request as ServiceRequest);
 
-      await expect(
-        service.acceptApplication('app-123', 'user-123'),
-      ).rejects.toThrow(ForbiddenException);
+      await expect(service.acceptApplication('app-123', 'user-123')).rejects.toThrow(
+        ForbiddenException
+      );
     });
   });
 
@@ -554,9 +512,9 @@ describe('ServiceRequestService', () => {
     it('should throw NotFoundException if application not found', async () => {
       applicationRepository.findOne.mockResolvedValue(null);
 
-      await expect(
-        service.rejectApplication('non-existent', 'user-123'),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.rejectApplication('non-existent', 'user-123')).rejects.toThrow(
+        NotFoundException
+      );
     });
   });
 
@@ -586,9 +544,9 @@ describe('ServiceRequestService', () => {
     it('should throw NotFoundException if request not found', async () => {
       serviceRequestRepository.findOne.mockResolvedValue(null);
 
-      await expect(
-        service.completeRequest('non-existent', 'user-123'),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.completeRequest('non-existent', 'user-123')).rejects.toThrow(
+        NotFoundException
+      );
     });
 
     it('should throw BadRequestException if request not in progress yet', async () => {
@@ -599,9 +557,9 @@ describe('ServiceRequestService', () => {
       };
       serviceRequestRepository.findOne.mockResolvedValue(publishedRequest as ServiceRequest);
 
-      await expect(
-        service.completeRequest('request-123', 'user-123'),
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.completeRequest('request-123', 'user-123')).rejects.toThrow(
+        BadRequestException
+      );
     });
   });
 
@@ -614,7 +572,7 @@ describe('ServiceRequestService', () => {
       expect(serviceRequestRepository.increment).toHaveBeenCalledWith(
         { id: 'request-123' },
         'viewCount',
-        1,
+        1
       );
     });
   });

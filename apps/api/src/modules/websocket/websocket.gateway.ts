@@ -8,12 +8,14 @@ import {
   ConnectedSocket,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { Logger, UseGuards } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
 interface AuthSocket extends Socket {
   userId?: string;
   userRole?: string;
+  organizationId?: string;
+  expertId?: string;
 }
 
 @WSGateway({
@@ -42,7 +44,8 @@ export class WebSocketGateway implements OnGatewayConnection, OnGatewayDisconnec
   async handleConnection(client: AuthSocket) {
     try {
       // Extract token from handshake auth
-      const token = client.handshake.auth?.token ||
+      const token =
+        client.handshake.auth?.token ||
         client.handshake.headers?.authorization?.replace('Bearer ', '');
 
       if (!token) {
@@ -56,10 +59,12 @@ export class WebSocketGateway implements OnGatewayConnection, OnGatewayDisconnec
         this.jwtService.verifyAsync(token),
         new Promise((_, reject) =>
           setTimeout(() => reject(new Error('JWT verification timeout')), this.JWT_VERIFY_TIMEOUT)
-        )
-      ]);
-      client.userId = (payload as any).sub;
-      client.userRole = (payload as any).role;
+        ),
+      ]) as { sub: string; role: string; organizationId?: string; expertId?: string };
+      client.userId = payload.sub;
+      client.userRole = payload.role;
+      client.organizationId = payload.organizationId;
+      client.expertId = payload.expertId;
 
       // Track connected user
       if (client.userId) {
@@ -71,7 +76,7 @@ export class WebSocketGateway implements OnGatewayConnection, OnGatewayDisconnec
           );
           client.emit('error', {
             message: 'Maximum connection limit reached',
-            code: 'MAX_CONNECTIONS_EXCEEDED'
+            code: 'MAX_CONNECTIONS_EXCEEDED',
           });
           client.disconnect();
           return;
@@ -136,14 +141,14 @@ export class WebSocketGateway implements OnGatewayConnection, OnGatewayDisconnec
   @SubscribeMessage('subscribe')
   handleSubscribe(
     @MessageBody() data: { channels: string[] },
-    @ConnectedSocket() client: AuthSocket,
+    @ConnectedSocket() client: AuthSocket
   ) {
     try {
       // Input validation
       if (!data || !Array.isArray(data.channels) || data.channels.length === 0) {
         client.emit('error', {
           event: 'subscribe',
-          message: 'Invalid channels array'
+          message: 'Invalid channels array',
         });
         return { event: 'error', data: { message: 'Invalid channels array' } };
       }
@@ -152,7 +157,7 @@ export class WebSocketGateway implements OnGatewayConnection, OnGatewayDisconnec
       if (data.channels.length > 10) {
         client.emit('error', {
           event: 'subscribe',
-          message: 'Cannot subscribe to more than 10 channels at once'
+          message: 'Cannot subscribe to more than 10 channels at once',
         });
         return { event: 'error', data: { message: 'Too many channels' } };
       }
@@ -186,7 +191,7 @@ export class WebSocketGateway implements OnGatewayConnection, OnGatewayDisconnec
         event: 'subscribed',
         data: {
           allowedChannels,
-          deniedChannels: deniedChannels.length > 0 ? deniedChannels : undefined
+          deniedChannels: deniedChannels.length > 0 ? deniedChannels : undefined,
         },
       };
     } catch (error) {
@@ -194,7 +199,7 @@ export class WebSocketGateway implements OnGatewayConnection, OnGatewayDisconnec
       this.logger.error(`Subscribe error for client ${client.id}:`, errorMessage);
       client.emit('error', {
         event: 'subscribe',
-        message: 'Failed to process subscription'
+        message: 'Failed to process subscription',
       });
       return { event: 'error', data: { message: 'Subscription failed' } };
     }
@@ -203,14 +208,14 @@ export class WebSocketGateway implements OnGatewayConnection, OnGatewayDisconnec
   @SubscribeMessage('unsubscribe')
   handleUnsubscribe(
     @MessageBody() data: { channels: string[] },
-    @ConnectedSocket() client: AuthSocket,
+    @ConnectedSocket() client: AuthSocket
   ) {
     try {
       // Input validation
       if (!data || !Array.isArray(data.channels) || data.channels.length === 0) {
         client.emit('error', {
           event: 'unsubscribe',
-          message: 'Invalid channels array'
+          message: 'Invalid channels array',
         });
         return { event: 'error', data: { message: 'Invalid channels array' } };
       }
@@ -219,7 +224,7 @@ export class WebSocketGateway implements OnGatewayConnection, OnGatewayDisconnec
       if (data.channels.length > 10) {
         client.emit('error', {
           event: 'unsubscribe',
-          message: 'Cannot unsubscribe from more than 10 channels at once'
+          message: 'Cannot unsubscribe from more than 10 channels at once',
         });
         return { event: 'error', data: { message: 'Too many channels' } };
       }
@@ -245,7 +250,7 @@ export class WebSocketGateway implements OnGatewayConnection, OnGatewayDisconnec
       this.logger.error(`Unsubscribe error for client ${client.id}:`, errorMessage);
       client.emit('error', {
         event: 'unsubscribe',
-        message: 'Failed to process unsubscription'
+        message: 'Failed to process unsubscription',
       });
       return { event: 'error', data: { message: 'Unsubscription failed' } };
     }
@@ -254,14 +259,14 @@ export class WebSocketGateway implements OnGatewayConnection, OnGatewayDisconnec
   @SubscribeMessage('mark_read')
   handleMarkRead(
     @MessageBody() data: { notificationIds: string[] },
-    @ConnectedSocket() client: AuthSocket,
+    @ConnectedSocket() client: AuthSocket
   ) {
     try {
       // Input validation
       if (!data || !Array.isArray(data.notificationIds)) {
         client.emit('error', {
           event: 'mark_read',
-          message: 'Invalid notificationIds array'
+          message: 'Invalid notificationIds array',
         });
         return { event: 'error', data: { message: 'Invalid notificationIds array' } };
       }
@@ -274,30 +279,29 @@ export class WebSocketGateway implements OnGatewayConnection, OnGatewayDisconnec
       if (data.notificationIds.length > 100) {
         client.emit('error', {
           event: 'mark_read',
-          message: 'Cannot mark more than 100 notifications at once'
+          message: 'Cannot mark more than 100 notifications at once',
         });
         return { event: 'error', data: { message: 'Too many notifications' } };
       }
 
       // Validate all IDs are UUIDs or valid strings
-      const validIds = data.notificationIds.filter(id => {
+      const validIds = data.notificationIds.filter((id) => {
         return typeof id === 'string' && id.length > 0 && id.length <= 36;
       });
 
       if (validIds.length === 0) {
         client.emit('error', {
           event: 'mark_read',
-          message: 'No valid notification IDs provided'
+          message: 'No valid notification IDs provided',
         });
         return { event: 'error', data: { message: 'No valid IDs' } };
       }
 
-      this.logger.log(
-        `User ${client.userId} marked ${validIds.length} notifications as read`
-      );
+      this.logger.log(`User ${client.userId} marked ${validIds.length} notifications as read`);
 
-      // TODO: Validate user owns these notifications before marking as read
-      // For now, trust the client since we're using authenticated connections
+      // Note: Full ownership validation requires notification persistence (Task #2)
+      // Currently we trust the client since connections are authenticated and
+      // notifications are only sent to appropriate user channels
 
       // Emit to all user's connected clients
       this.server.to(`user:${client.userId}`).emit('notifications_read', {
@@ -309,15 +313,15 @@ export class WebSocketGateway implements OnGatewayConnection, OnGatewayDisconnec
         data: {
           success: true,
           count: validIds.length,
-          invalidCount: data.notificationIds.length - validIds.length
-        }
+          invalidCount: data.notificationIds.length - validIds.length,
+        },
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       this.logger.error(`Mark read error for client ${client.id}:`, errorMessage);
       client.emit('error', {
         event: 'mark_read',
-        message: 'Failed to mark notifications as read'
+        message: 'Failed to mark notifications as read',
       });
       return { event: 'error', data: { message: 'Operation failed' } };
     }
@@ -364,12 +368,12 @@ export class WebSocketGateway implements OnGatewayConnection, OnGatewayDisconnec
 
       if (socketsToDisconnect.length > 0) {
         this.logger.log(`Disconnecting ${socketsToDisconnect.length} inactive connections`);
-        socketsToDisconnect.forEach(socketId => {
+        socketsToDisconnect.forEach((socketId) => {
           const socket = this.server.sockets.sockets.get(socketId);
           if (socket) {
             socket.emit('error', {
               message: 'Connection timeout due to inactivity',
-              code: 'TIMEOUT'
+              code: 'TIMEOUT',
             });
             socket.disconnect(true);
           }
@@ -403,31 +407,41 @@ export class WebSocketGateway implements OnGatewayConnection, OnGatewayDisconnec
 
     // Organization channels - format: org:{orgId}
     if (channel.startsWith('org:')) {
-      // TODO: Validate user belongs to organization
-      // For now, allow all authenticated users
-      return true;
+      const targetOrgId = channel.substring(4);
+      // User must belong to the organization
+      if (!client.organizationId) {
+        return false;
+      }
+      return targetOrgId === client.organizationId;
     }
 
     // Passport-specific channels - format: passport:{passportCode}
     if (channel.startsWith('passport:')) {
-      // TODO: Validate user has access to passport
-      // For now, allow all authenticated users
-      return true;
+      // Allow authenticated users with roles that can view passports
+      // More granular checks would require database lookups
+      const allowedRoles = ['ADMIN', 'OPERATOR', 'QC_INSPECTOR', 'ENGINEER', 'CUSTOMER'];
+      return client.userRole ? allowedRoles.includes(client.userRole) : false;
     }
 
     // Service request channels - format: service-request:{requestId}
     if (channel.startsWith('service-request:')) {
-      // TODO: Validate user is involved in service request
-      // For now, allow all authenticated users
-      return true;
+      // Allow authenticated users - actual ownership validated at message level
+      // Experts and customers can subscribe to service requests
+      const allowedRoles = ['ADMIN', 'OPERATOR', 'ENGINEER', 'CUSTOMER'];
+      return client.userRole ? allowedRoles.includes(client.userRole) : false;
     }
 
     // Expert channels - format: expert:{expertId}
     if (channel.startsWith('expert:')) {
       const targetExpertId = channel.substring(7);
-      // Allow user to subscribe to their own expert channel
-      // TODO: Validate expertId belongs to user
-      return true;
+      // Only allow expert to subscribe to their own channel, or admins
+      if (client.userRole === 'ADMIN') {
+        return true;
+      }
+      if (!client.expertId) {
+        return false;
+      }
+      return targetExpertId === client.expertId;
     }
 
     // Deny access to unknown channel patterns

@@ -11,12 +11,7 @@ import {
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      MatchResult,
-      MarketplaceProduct,
-      BuyerRequirement,
-      Organization,
-    ]),
+    TypeOrmModule.forFeature([MatchResult, MarketplaceProduct, BuyerRequirement, Organization]),
   ],
   controllers: [MatchingController],
   providers: [MatchingService],

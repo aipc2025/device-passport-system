@@ -11,11 +11,16 @@ export class LocationController {
   @ApiOperation({ summary: 'Find nearby experts' })
   @ApiQuery({ name: 'lat', type: Number, required: true })
   @ApiQuery({ name: 'lng', type: Number, required: true })
-  @ApiQuery({ name: 'radius', type: Number, required: false, description: 'Search radius in kilometers (default: 50)' })
+  @ApiQuery({
+    name: 'radius',
+    type: Number,
+    required: false,
+    description: 'Search radius in kilometers (default: 50)',
+  })
   async findNearbyExperts(
     @Query('lat', ParseFloatPipe) latitude: number,
     @Query('lng', ParseFloatPipe) longitude: number,
-    @Query('radius') radius?: number,
+    @Query('radius') radius?: number
   ) {
     const searchRadius = radius || 50;
     return this.locationService.findNearbyExperts(latitude, longitude, searchRadius);
@@ -25,11 +30,16 @@ export class LocationController {
   @ApiOperation({ summary: 'Find nearby service requests' })
   @ApiQuery({ name: 'lat', type: Number, required: true })
   @ApiQuery({ name: 'lng', type: Number, required: true })
-  @ApiQuery({ name: 'radius', type: Number, required: false, description: 'Search radius in kilometers (default: 50)' })
+  @ApiQuery({
+    name: 'radius',
+    type: Number,
+    required: false,
+    description: 'Search radius in kilometers (default: 50)',
+  })
   async findNearbyServiceRequests(
     @Query('lat', ParseFloatPipe) latitude: number,
     @Query('lng', ParseFloatPipe) longitude: number,
-    @Query('radius') radius?: number,
+    @Query('radius') radius?: number
   ) {
     const searchRadius = radius || 50;
     return this.locationService.findNearbyServiceRequests(latitude, longitude, searchRadius);
@@ -39,11 +49,16 @@ export class LocationController {
   @ApiOperation({ summary: 'Find nearby devices' })
   @ApiQuery({ name: 'lat', type: Number, required: true })
   @ApiQuery({ name: 'lng', type: Number, required: true })
-  @ApiQuery({ name: 'radius', type: Number, required: false, description: 'Search radius in kilometers (default: 50)' })
+  @ApiQuery({
+    name: 'radius',
+    type: Number,
+    required: false,
+    description: 'Search radius in kilometers (default: 50)',
+  })
   async findNearbyDevices(
     @Query('lat', ParseFloatPipe) latitude: number,
     @Query('lng', ParseFloatPipe) longitude: number,
-    @Query('radius') radius?: number,
+    @Query('radius') radius?: number
   ) {
     const searchRadius = radius || 50;
     return this.locationService.findNearbyDevices(latitude, longitude, searchRadius);
@@ -55,7 +70,7 @@ export class LocationController {
   @ApiQuery({ name: 'lng', type: Number, required: true })
   async reverseGeocode(
     @Query('lat', ParseFloatPipe) latitude: number,
-    @Query('lng', ParseFloatPipe) longitude: number,
+    @Query('lng', ParseFloatPipe) longitude: number
   ) {
     return this.locationService.reverseGeocode(latitude, longitude);
   }

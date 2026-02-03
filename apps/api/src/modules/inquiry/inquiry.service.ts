@@ -28,17 +28,13 @@ export class InquiryService {
     @InjectRepository(BuyerRequirement)
     private readonly requirementRepository: Repository<BuyerRequirement>,
     @InjectRepository(Organization)
-    private readonly organizationRepository: Repository<Organization>,
+    private readonly organizationRepository: Repository<Organization>
   ) {}
 
   /**
    * Create a new inquiry
    */
-  async createInquiry(
-    buyerOrgId: string,
-    userId: string,
-    dto: CreateInquiryDto,
-  ): Promise<Inquiry> {
+  async createInquiry(buyerOrgId: string, userId: string, dto: CreateInquiryDto): Promise<Inquiry> {
     // Validate supplier organization
     const supplierOrg = await this.organizationRepository.findOne({
       where: { id: dto.supplierOrgId },
@@ -87,9 +83,7 @@ export class InquiryService {
       quantity: dto.quantity,
       targetPrice: dto.targetPrice,
       targetCurrency: dto.targetCurrency || 'USD',
-      requiredDeliveryDate: dto.requiredDeliveryDate
-        ? new Date(dto.requiredDeliveryDate)
-        : null,
+      requiredDeliveryDate: dto.requiredDeliveryDate ? new Date(dto.requiredDeliveryDate) : null,
       status: InquiryStatus.PENDING,
     });
 
@@ -109,20 +103,12 @@ export class InquiryService {
 
     // Update product inquiry count if linked
     if (dto.marketplaceProductId) {
-      await this.productRepository.increment(
-        { id: dto.marketplaceProductId },
-        'inquiryCount',
-        1,
-      );
+      await this.productRepository.increment({ id: dto.marketplaceProductId }, 'inquiryCount', 1);
     }
 
     // Update requirement quote count if linked
     if (dto.buyerRequirementId) {
-      await this.requirementRepository.increment(
-        { id: dto.buyerRequirementId },
-        'quoteCount',
-        1,
-      );
+      await this.requirementRepository.increment({ id: dto.buyerRequirementId }, 'quoteCount', 1);
     }
 
     return this.getInquiryById(savedInquiry.id);
@@ -195,10 +181,7 @@ export class InquiryService {
    */
   async getAllInquiries(organizationId: string): Promise<Inquiry[]> {
     return this.inquiryRepository.find({
-      where: [
-        { buyerOrgId: organizationId },
-        { supplierOrgId: organizationId },
-      ],
+      where: [{ buyerOrgId: organizationId }, { supplierOrgId: organizationId }],
       relations: ['buyerOrg', 'supplierOrg', 'marketplaceProduct'],
       order: { createdAt: 'DESC' },
     });
@@ -210,15 +193,27 @@ export class InquiryService {
   async updateStatus(
     id: string,
     organizationId: string,
-    dto: UpdateInquiryStatusDto,
+    dto: UpdateInquiryStatusDto
   ): Promise<Inquiry> {
     const inquiry = await this.getInquiryWithAccess(id, organizationId);
 
     // Validate status transition
     const validTransitions: Record<InquiryStatus, InquiryStatus[]> = {
-      [InquiryStatus.PENDING]: [InquiryStatus.RESPONDED, InquiryStatus.REJECTED, InquiryStatus.EXPIRED],
-      [InquiryStatus.RESPONDED]: [InquiryStatus.NEGOTIATING, InquiryStatus.ACCEPTED, InquiryStatus.REJECTED],
-      [InquiryStatus.NEGOTIATING]: [InquiryStatus.ACCEPTED, InquiryStatus.REJECTED, InquiryStatus.EXPIRED],
+      [InquiryStatus.PENDING]: [
+        InquiryStatus.RESPONDED,
+        InquiryStatus.REJECTED,
+        InquiryStatus.EXPIRED,
+      ],
+      [InquiryStatus.RESPONDED]: [
+        InquiryStatus.NEGOTIATING,
+        InquiryStatus.ACCEPTED,
+        InquiryStatus.REJECTED,
+      ],
+      [InquiryStatus.NEGOTIATING]: [
+        InquiryStatus.ACCEPTED,
+        InquiryStatus.REJECTED,
+        InquiryStatus.EXPIRED,
+      ],
       [InquiryStatus.ACCEPTED]: [],
       [InquiryStatus.REJECTED]: [],
       [InquiryStatus.EXPIRED]: [],
@@ -234,7 +229,9 @@ export class InquiryService {
       inquiry.respondedAt = new Date();
     }
 
-    if ([InquiryStatus.ACCEPTED, InquiryStatus.REJECTED, InquiryStatus.EXPIRED].includes(dto.status)) {
+    if (
+      [InquiryStatus.ACCEPTED, InquiryStatus.REJECTED, InquiryStatus.EXPIRED].includes(dto.status)
+    ) {
       inquiry.closedAt = new Date();
       if (dto.closeReason) {
         inquiry.closeReason = dto.closeReason;
@@ -251,12 +248,16 @@ export class InquiryService {
     inquiryId: string,
     userId: string,
     organizationId: string,
-    dto: CreateMessageDto,
+    dto: CreateMessageDto
   ): Promise<InquiryMessage> {
     const inquiry = await this.getInquiryWithAccess(inquiryId, organizationId);
 
     // Check if inquiry is still active
-    if ([InquiryStatus.ACCEPTED, InquiryStatus.REJECTED, InquiryStatus.EXPIRED].includes(inquiry.status)) {
+    if (
+      [InquiryStatus.ACCEPTED, InquiryStatus.REJECTED, InquiryStatus.EXPIRED].includes(
+        inquiry.status
+      )
+    ) {
       throw new BadRequestException('Cannot send messages to a closed inquiry');
     }
 
@@ -315,10 +316,7 @@ export class InquiryService {
   /**
    * Mark messages as read
    */
-  async markMessagesAsRead(
-    inquiryId: string,
-    organizationId: string,
-  ): Promise<void> {
+  async markMessagesAsRead(inquiryId: string, organizationId: string): Promise<void> {
     await this.getInquiryWithAccess(inquiryId, organizationId);
 
     await this.messageRepository.update(
@@ -330,7 +328,7 @@ export class InquiryService {
       {
         isRead: true,
         readAt: new Date(),
-      },
+      }
     );
 
     // Actually we want to mark messages NOT from our org as read
@@ -352,10 +350,7 @@ export class InquiryService {
    */
   async getUnreadCount(organizationId: string): Promise<number> {
     const inquiries = await this.inquiryRepository.find({
-      where: [
-        { buyerOrgId: organizationId },
-        { supplierOrgId: organizationId },
-      ],
+      where: [{ buyerOrgId: organizationId }, { supplierOrgId: organizationId }],
       select: ['id'],
     });
 

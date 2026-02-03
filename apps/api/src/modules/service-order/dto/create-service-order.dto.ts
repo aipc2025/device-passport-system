@@ -1,10 +1,4 @@
-import {
-  IsString,
-  IsEnum,
-  IsOptional,
-  IsEmail,
-  IsDateString,
-} from 'class-validator';
+import { IsString, IsEnum, IsOptional, IsEmail, IsDateString } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ServiceType, ServicePriority } from '@device-passport/shared';
 

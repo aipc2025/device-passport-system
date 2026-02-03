@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 import {
@@ -12,12 +8,7 @@ import {
   ServiceOrderListItem,
   LifecycleEventType,
 } from '@device-passport/shared';
-import {
-  ServiceOrder,
-  DevicePassport,
-  Organization,
-  User,
-} from '../../database/entities';
+import { ServiceOrder, DevicePassport, Organization, User } from '../../database/entities';
 import { CreateServiceOrderDto, UpdateServiceOrderDto, PublicServiceRequestDto } from './dto';
 import { LifecycleService } from '../lifecycle/lifecycle.service';
 
@@ -32,12 +23,12 @@ export class ServiceOrderService {
     private organizationRepository: Repository<Organization>,
     @InjectRepository(User)
     private userRepository: Repository<User>,
-    private lifecycleService: LifecycleService,
+    private lifecycleService: LifecycleService
   ) {}
 
   async findAll(
     filters: ServiceOrderFilters,
-    userId?: string,
+    userId?: string
   ): Promise<PaginatedResponse<ServiceOrderListItem>> {
     const {
       search,
@@ -59,7 +50,7 @@ export class ServiceOrderService {
     if (search) {
       queryBuilder.andWhere(
         '(order.orderNumber LIKE :search OR order.title LIKE :search OR order.passportCode LIKE :search)',
-        { search: `%${search}%` },
+        { search: `%${search}%` }
       );
     }
 
@@ -136,10 +127,7 @@ export class ServiceOrderService {
     return order;
   }
 
-  async create(
-    createDto: CreateServiceOrderDto,
-    userId: string,
-  ): Promise<ServiceOrder> {
+  async create(createDto: CreateServiceOrderDto, userId: string): Promise<ServiceOrder> {
     // Find passport
     const passport = await this.passportRepository.findOne({
       where: { passportCode: createDto.passportCode.toUpperCase() },
@@ -185,7 +173,7 @@ export class ServiceOrderService {
       },
       userId,
       user?.name || 'System',
-      user?.role || 'SYSTEM',
+      user?.role || 'SYSTEM'
     );
 
     return savedOrder;
@@ -243,7 +231,7 @@ export class ServiceOrderService {
   async update(
     id: string,
     updateDto: UpdateServiceOrderDto,
-    userId: string,
+    userId: string
   ): Promise<ServiceOrder> {
     const order = await this.findById(id);
 
@@ -284,13 +272,11 @@ export class ServiceOrderService {
     return this.serviceOrderRepository.save(order);
   }
 
-  async getAvailableEngineers(): Promise<{ id: string; name: string; email: string; role: string }[]> {
+  async getAvailableEngineers(): Promise<
+    { id: string; name: string; email: string; role: string }[]
+  > {
     const engineers = await this.userRepository.find({
-      where: [
-        { role: 'ENGINEER' as any },
-        { role: 'OPERATOR' as any },
-        { role: 'ADMIN' as any },
-      ],
+      where: [{ role: 'ENGINEER' as any }, { role: 'OPERATOR' as any }, { role: 'ADMIN' as any }],
       select: ['id', 'name', 'email', 'role'],
       order: { name: 'ASC' },
     });

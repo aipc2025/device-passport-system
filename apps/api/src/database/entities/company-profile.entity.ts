@@ -7,11 +7,7 @@ import {
   OneToOne,
   JoinColumn,
 } from 'typeorm';
-import {
-  CompanyType,
-  RegistrationStatus,
-  PurchaseFrequency,
-} from '@device-passport/shared';
+import { CompanyType, RegistrationStatus, PurchaseFrequency } from '@device-passport/shared';
 import { Organization } from './organization.entity';
 
 /**

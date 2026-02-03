@@ -3,13 +3,17 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ProductTypeConfig } from '../../database/entities';
 import { CreateProductTypeDto, UpdateProductTypeDto } from './dto';
-import { PRODUCT_TYPE_NAMES, PRODUCT_TYPE_DESCRIPTIONS, ProductLine } from '@device-passport/shared';
+import {
+  PRODUCT_TYPE_NAMES,
+  PRODUCT_TYPE_DESCRIPTIONS,
+  ProductLine,
+} from '@device-passport/shared';
 
 @Injectable()
 export class ProductTypeService {
   constructor(
     @InjectRepository(ProductTypeConfig)
-    private readonly productTypeRepository: Repository<ProductTypeConfig>,
+    private readonly productTypeRepository: Repository<ProductTypeConfig>
   ) {}
 
   async seedDefaultTypes(): Promise<void> {

@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  ConflictException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import {
@@ -24,7 +20,7 @@ export class SavedService {
     @InjectRepository(MarketplaceProduct)
     private readonly productRepository: Repository<MarketplaceProduct>,
     @InjectRepository(BuyerRequirement)
-    private readonly requirementRepository: Repository<BuyerRequirement>,
+    private readonly requirementRepository: Repository<BuyerRequirement>
   ) {}
 
   /**
@@ -33,7 +29,7 @@ export class SavedService {
   async saveItem(
     userId: string,
     organizationId: string,
-    dto: CreateSavedItemDto,
+    dto: CreateSavedItemDto
   ): Promise<SavedItem> {
     // Check if already saved
     const existing = await this.savedItemRepository.findOne({
@@ -159,11 +155,7 @@ export class SavedService {
   /**
    * Check if an item is saved
    */
-  async isSaved(
-    userId: string,
-    itemType: SavedItemType,
-    itemId: string,
-  ): Promise<boolean> {
+  async isSaved(userId: string, itemType: SavedItemType, itemId: string): Promise<boolean> {
     const count = await this.savedItemRepository.count({
       where: { userId, itemType, itemId },
     });
@@ -177,7 +169,7 @@ export class SavedService {
     userId: string,
     organizationId: string,
     itemType: SavedItemType,
-    itemId: string,
+    itemId: string
   ): Promise<{ isSaved: boolean; savedItemId?: string }> {
     const existing = await this.savedItemRepository.findOne({
       where: { userId, itemType, itemId },

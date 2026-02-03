@@ -10,9 +10,8 @@ export class AddScopeConfigToUsers1738664000000 implements MigrationInterface {
         type: 'jsonb',
         isNullable: true,
         default: null,
-        comment:
-          'Permission scope configuration (dataScope, productLines, departments, etc.)',
-      }),
+        comment: 'Permission scope configuration (dataScope, productLines, departments, etc.)',
+      })
     );
 
     // Create GIN index on scope_config for faster JSONB queries

@@ -3,11 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In, Between } from 'typeorm';
 import * as ExcelJS from 'exceljs';
 import * as QRCode from 'qrcode';
-import {
-  DevicePassport,
-  LifecycleEvent,
-  ServiceOrder,
-} from '../../database/entities';
+import { DevicePassport, LifecycleEvent, ServiceOrder } from '../../database/entities';
 
 interface ExportPassportOptions {
   ids?: string[];
@@ -30,7 +26,7 @@ export class ExportService {
     @InjectRepository(LifecycleEvent)
     private readonly lifecycleRepository: Repository<LifecycleEvent>,
     @InjectRepository(ServiceOrder)
-    private readonly serviceOrderRepository: Repository<ServiceOrder>,
+    private readonly serviceOrderRepository: Repository<ServiceOrder>
   ) {}
 
   /**
@@ -279,9 +275,7 @@ export class ExportService {
   /**
    * Export service orders to Excel
    */
-  async exportServiceOrdersToExcel(
-    options: ExportServiceOrderOptions,
-  ): Promise<Buffer> {
+  async exportServiceOrdersToExcel(options: ExportServiceOrderOptions): Promise<Buffer> {
     const where: any = {};
 
     if (options.startDate && options.endDate) {

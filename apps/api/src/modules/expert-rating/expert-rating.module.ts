@@ -11,12 +11,7 @@ import { ExpertRatingController } from './expert-rating.controller';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      ExpertServiceRecord,
-      ExpertReview,
-      IndividualExpert,
-      ServiceRequest,
-    ]),
+    TypeOrmModule.forFeature([ExpertServiceRecord, ExpertReview, IndividualExpert, ServiceRequest]),
   ],
   controllers: [ExpertRatingController],
   providers: [ExpertRatingService],

@@ -1,13 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import {
-  IsString,
-  IsOptional,
-  IsNumber,
-  IsEnum,
-  IsBoolean,
-  Min,
-  Max,
-} from 'class-validator';
+import { IsString, IsOptional, IsNumber, IsEnum, IsBoolean, Min, Max } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ProductLine } from '@device-passport/shared';
 
@@ -65,7 +57,10 @@ export class MarketplaceSearchDto {
   @Min(0)
   maxDistanceKm?: number;
 
-  @ApiPropertyOptional({ description: 'Sort by field', enum: ['createdAt', 'price', 'distance', 'viewCount'] })
+  @ApiPropertyOptional({
+    description: 'Sort by field',
+    enum: ['createdAt', 'price', 'distance', 'viewCount'],
+  })
   @IsOptional()
   @IsString()
   sortBy?: 'createdAt' | 'price' | 'distance' | 'viewCount';

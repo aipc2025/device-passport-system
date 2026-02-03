@@ -1,11 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In, Not } from 'typeorm';
-import {
-  ServiceRequest,
-  IndividualExpert,
-  ExpertMatchResult,
-} from '../../database/entities';
+import { ServiceRequest, IndividualExpert, ExpertMatchResult } from '../../database/entities';
 import {
   ServiceRequestStatus,
   ExpertMatchType,
@@ -38,9 +34,9 @@ const WEIGHTS = {
 
 // Work status bonus points (added on top of base score)
 const WORK_STATUS_BONUS = {
-  [ExpertWorkStatus.RUSHING]: 15,    // Highest priority
-  [ExpertWorkStatus.IDLE]: 5,        // Normal priority
-  [ExpertWorkStatus.BOOKED]: 0,      // Already has work
+  [ExpertWorkStatus.RUSHING]: 15, // Highest priority
+  [ExpertWorkStatus.IDLE]: 5, // Normal priority
+  [ExpertWorkStatus.BOOKED]: 0, // Already has work
   [ExpertWorkStatus.IN_SERVICE]: -5, // Currently busy
   [ExpertWorkStatus.OFF_DUTY]: -100, // Not available
 };
@@ -64,7 +60,7 @@ export class ExpertMatchingService {
     @InjectRepository(IndividualExpert)
     private expertRepository: Repository<IndividualExpert>,
     @InjectRepository(ExpertMatchResult)
-    private matchResultRepository: Repository<ExpertMatchResult>,
+    private matchResultRepository: Repository<ExpertMatchResult>
   ) {}
 
   /**
@@ -102,7 +98,7 @@ export class ExpertMatchingService {
       // Calculate match score
       const { totalScore, breakdown, distanceKm } = this.calculateMatchScore(
         expert,
-        serviceRequest,
+        serviceRequest
       );
 
       // Only create match if score meets threshold
@@ -131,13 +127,10 @@ export class ExpertMatchingService {
    */
   calculateMatchScore(
     expert: IndividualExpert,
-    serviceRequest: ServiceRequest,
+    serviceRequest: ServiceRequest
   ): { totalScore: number; breakdown: ScoreBreakdown; distanceKm: number | null } {
     // 1. Location Score (25%)
-    const { locationScore, distanceKm } = this.calculateLocationScore(
-      expert,
-      serviceRequest,
-    );
+    const { locationScore, distanceKm } = this.calculateLocationScore(expert, serviceRequest);
 
     // 2. Skills Score (20%)
     const skillScore = this.calculateSkillScore(expert, serviceRequest);
@@ -155,7 +148,7 @@ export class ExpertMatchingService {
     const keywordScore = this.calculateKeywordScore(expert, serviceRequest);
 
     // Calculate base weighted score
-    let baseScore =
+    const baseScore =
       (locationScore * WEIGHTS.LOCATION +
         skillScore * WEIGHTS.SKILLS +
         experienceScore * WEIGHTS.EXPERIENCE +
@@ -194,16 +187,15 @@ export class ExpertMatchingService {
    * Calculate keyword match score
    * Matches service request title/description with expert's skills, tags, and professional field
    */
-  private calculateKeywordScore(
-    expert: IndividualExpert,
-    serviceRequest: ServiceRequest,
-  ): number {
+  private calculateKeywordScore(expert: IndividualExpert, serviceRequest: ServiceRequest): number {
     // Build search text from service request
     const searchText = [
       serviceRequest.title || '',
       serviceRequest.description || '',
       ...(serviceRequest.requiredSkills || []),
-    ].join(' ').toLowerCase();
+    ]
+      .join(' ')
+      .toLowerCase();
 
     if (!searchText.trim()) {
       return 50; // Default if no searchable text
@@ -215,7 +207,9 @@ export class ExpertMatchingService {
       expert.professionalField || '',
       expert.servicesOffered || '',
       ...(expert.certifications || []),
-    ].map(k => k.toLowerCase()).filter(k => k.length > 0);
+    ]
+      .map((k) => k.toLowerCase())
+      .filter((k) => k.length > 0);
 
     if (expertKeywords.length === 0) {
       return 30; // Expert has no keywords
@@ -227,7 +221,7 @@ export class ExpertMatchingService {
 
     for (const keyword of expertKeywords) {
       // Split compound keywords
-      const words = keyword.split(/[\s,;]+/).filter(w => w.length > 2);
+      const words = keyword.split(/[\s,;]+/).filter((w) => w.length > 2);
       for (const word of words) {
         totalWeight++;
         if (searchText.includes(word)) {
@@ -251,7 +245,7 @@ export class ExpertMatchingService {
    */
   private calculateLocationScore(
     expert: IndividualExpert,
-    serviceRequest: ServiceRequest,
+    serviceRequest: ServiceRequest
   ): { locationScore: number; distanceKm: number | null } {
     if (
       !expert.locationLat ||
@@ -266,7 +260,7 @@ export class ExpertMatchingService {
       Number(expert.locationLat),
       Number(expert.locationLng),
       Number(serviceRequest.locationLat),
-      Number(serviceRequest.locationLng),
+      Number(serviceRequest.locationLng)
     );
 
     // Check if within service radius
@@ -295,14 +289,8 @@ export class ExpertMatchingService {
   /**
    * Calculate skill match score
    */
-  private calculateSkillScore(
-    expert: IndividualExpert,
-    serviceRequest: ServiceRequest,
-  ): number {
-    if (
-      !serviceRequest.requiredSkills ||
-      serviceRequest.requiredSkills.length === 0
-    ) {
+  private calculateSkillScore(expert: IndividualExpert, serviceRequest: ServiceRequest): number {
+    if (!serviceRequest.requiredSkills || serviceRequest.requiredSkills.length === 0) {
       return 70; // No specific skills required
     }
 
@@ -311,19 +299,13 @@ export class ExpertMatchingService {
     }
 
     // Calculate matching percentage
-    const requiredSkills = serviceRequest.requiredSkills.map((s) =>
-      s.toLowerCase(),
-    );
+    const requiredSkills = serviceRequest.requiredSkills.map((s) => s.toLowerCase());
     const expertSkills = expert.skillTags.map((s) => s.toLowerCase());
 
     let matchCount = 0;
     for (const required of requiredSkills) {
       // Check for exact match or partial match
-      if (
-        expertSkills.some(
-          (skill) => skill.includes(required) || required.includes(skill),
-        )
-      ) {
+      if (expertSkills.some((skill) => skill.includes(required) || required.includes(skill))) {
         matchCount++;
       }
     }
@@ -358,8 +340,7 @@ export class ExpertMatchingService {
     // Check last location update freshness
     if (expert.lastLocationUpdateAt) {
       const hoursSinceUpdate =
-        (Date.now() - new Date(expert.lastLocationUpdateAt).getTime()) /
-        (1000 * 60 * 60);
+        (Date.now() - new Date(expert.lastLocationUpdateAt).getTime()) / (1000 * 60 * 60);
 
       if (hoursSinceUpdate < 1) return 100; // Updated within last hour
       if (hoursSinceUpdate < 4) return 90;
@@ -391,12 +372,7 @@ export class ExpertMatchingService {
   /**
    * Calculate distance between two points using Haversine formula
    */
-  private calculateDistance(
-    lat1: number,
-    lng1: number,
-    lat2: number,
-    lng2: number,
-  ): number {
+  private calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
     const R = 6371; // Earth's radius in km
     const dLat = this.toRad(lat2 - lat1);
     const dLng = this.toRad(lng2 - lng1);
@@ -417,10 +393,7 @@ export class ExpertMatchingService {
   /**
    * Get matches for an expert
    */
-  async getMatchesForExpert(
-    expertId: string,
-    limit = 50,
-  ): Promise<ExpertMatchResult[]> {
+  async getMatchesForExpert(expertId: string, limit = 50): Promise<ExpertMatchResult[]> {
     return this.matchResultRepository.find({
       where: { expertId, status: In([ExpertMatchStatus.NEW, ExpertMatchStatus.VIEWED]) },
       relations: ['serviceRequest', 'serviceRequest.organization'],
@@ -434,7 +407,7 @@ export class ExpertMatchingService {
    */
   async getMatchesForServiceRequest(
     serviceRequestId: string,
-    limit = 50,
+    limit = 50
   ): Promise<ExpertMatchResult[]> {
     return this.matchResultRepository.find({
       where: { serviceRequestId },
@@ -479,7 +452,7 @@ export class ExpertMatchingService {
   async createManualMatch(
     expertId: string,
     serviceRequestId: string,
-    source: MatchSource,
+    source: MatchSource
   ): Promise<ExpertMatchResult> {
     const expert = await this.expertRepository.findOne({ where: { id: expertId } });
     const serviceRequest = await this.serviceRequestRepository.findOne({
@@ -490,10 +463,7 @@ export class ExpertMatchingService {
       throw new Error('Expert or service request not found');
     }
 
-    const { totalScore, breakdown, distanceKm } = this.calculateMatchScore(
-      expert,
-      serviceRequest,
-    );
+    const { totalScore, breakdown, distanceKm } = this.calculateMatchScore(expert, serviceRequest);
 
     const matchResult = this.matchResultRepository.create({
       matchType: ExpertMatchType.SERVICE_TO_EXPERT,
@@ -515,7 +485,7 @@ export class ExpertMatchingService {
   async pushToExperts(
     serviceRequestId: string,
     expertIds: string[],
-    pushSource: MatchSource = MatchSource.PLATFORM_RECOMMENDED,
+    pushSource: MatchSource = MatchSource.PLATFORM_RECOMMENDED
   ): Promise<{ success: number; failed: number; matches: ExpertMatchResult[] }> {
     const serviceRequest = await this.serviceRequestRepository.findOne({
       where: { id: serviceRequestId },
@@ -557,7 +527,7 @@ export class ExpertMatchingService {
 
         const { totalScore, breakdown, distanceKm } = this.calculateMatchScore(
           expert,
-          serviceRequest,
+          serviceRequest
         );
 
         const matchResult = this.matchResultRepository.create({
@@ -651,10 +621,7 @@ export class ExpertMatchingService {
           continue;
         }
 
-        const { totalScore, breakdown, distanceKm } = this.calculateMatchScore(
-          expert,
-          request,
-        );
+        const { totalScore, breakdown, distanceKm } = this.calculateMatchScore(expert, request);
 
         // RUSHING experts have lower threshold
         const rushingThreshold = MINIMUM_MATCH_SCORE - 10;
@@ -697,14 +664,16 @@ export class ExpertMatchingService {
       workStatus?: ExpertWorkStatus;
       minScore?: number;
       limit?: number;
-    } = {},
-  ): Promise<Array<{
-    expert: IndividualExpert;
-    score: number;
-    breakdown: ScoreBreakdown;
-    distanceKm: number | null;
-    hasExistingMatch: boolean;
-  }>> {
+    } = {}
+  ): Promise<
+    Array<{
+      expert: IndividualExpert;
+      score: number;
+      breakdown: ScoreBreakdown;
+      distanceKm: number | null;
+      hasExistingMatch: boolean;
+    }>
+  > {
     const serviceRequest = await this.serviceRequestRepository.findOne({
       where: { id: serviceRequestId },
     });
@@ -714,7 +683,8 @@ export class ExpertMatchingService {
     }
 
     // Build expert query
-    const queryBuilder = this.expertRepository.createQueryBuilder('expert')
+    const queryBuilder = this.expertRepository
+      .createQueryBuilder('expert')
       .where('expert.registrationStatus = :status', { status: RegistrationStatus.APPROVED })
       .andWhere('expert.isAvailable = :available', { available: true });
 
@@ -723,7 +693,9 @@ export class ExpertMatchingService {
       queryBuilder.andWhere('expert.workStatus = :workStatus', { workStatus: options.workStatus });
     } else {
       // Exclude OFF_DUTY experts
-      queryBuilder.andWhere('expert.workStatus != :offDuty', { offDuty: ExpertWorkStatus.OFF_DUTY });
+      queryBuilder.andWhere('expert.workStatus != :offDuty', {
+        offDuty: ExpertWorkStatus.OFF_DUTY,
+      });
     }
 
     // Keyword search in expert profile
@@ -734,17 +706,21 @@ export class ExpertMatchingService {
           LOWER(expert.professionalField) LIKE :keyword OR
           LOWER(expert.servicesOffered) LIKE :keyword OR
           EXISTS (SELECT 1 FROM jsonb_array_elements_text(expert.skillTags) as tag WHERE LOWER(tag) LIKE :keyword))`,
-        { keyword },
+        { keyword }
       );
     }
 
     // Order by RUSHING first, then by rating
-    queryBuilder.orderBy(`
+    queryBuilder
+      .orderBy(
+        `
       CASE
         WHEN expert.workStatus = '${ExpertWorkStatus.RUSHING}' THEN 1
         WHEN expert.workStatus = '${ExpertWorkStatus.IDLE}' THEN 2
         ELSE 3
-      END`, 'ASC')
+      END`,
+        'ASC'
+      )
       .addOrderBy('expert.avgRating', 'DESC', 'NULLS LAST')
       .take(options.limit || 50);
 
@@ -755,7 +731,7 @@ export class ExpertMatchingService {
       experts.map(async (expert) => {
         const { totalScore, breakdown, distanceKm } = this.calculateMatchScore(
           expert,
-          serviceRequest,
+          serviceRequest
         );
 
         const existingMatch = await this.matchResultRepository.findOne({
@@ -769,14 +745,12 @@ export class ExpertMatchingService {
           distanceKm,
           hasExistingMatch: !!existingMatch,
         };
-      }),
+      })
     );
 
     // Filter by minimum score if specified
     const minScore = options.minScore || 0;
-    return results
-      .filter((r) => r.score >= minScore)
-      .sort((a, b) => b.score - a.score);
+    return results.filter((r) => r.score >= minScore).sort((a, b) => b.score - a.score);
   }
 
   /**
@@ -801,7 +775,7 @@ export class ExpertMatchingService {
   async markAsNotified(matchIds: string[]): Promise<void> {
     await this.matchResultRepository.update(
       { id: In(matchIds) },
-      { expertNotified: true, updatedAt: new Date() },
+      { expertNotified: true, updatedAt: new Date() }
     );
   }
 }

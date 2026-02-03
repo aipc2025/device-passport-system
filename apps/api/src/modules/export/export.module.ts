@@ -12,13 +12,7 @@ import {
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      DevicePassport,
-      LifecycleEvent,
-      ServiceOrder,
-      User,
-      Organization,
-    ]),
+    TypeOrmModule.forFeature([DevicePassport, LifecycleEvent, ServiceOrder, User, Organization]),
   ],
   controllers: [ExportController],
   providers: [ExportService],

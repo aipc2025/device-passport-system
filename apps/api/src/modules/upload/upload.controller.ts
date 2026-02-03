@@ -13,13 +13,7 @@ import {
   ParseUUIDPipe,
 } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiConsumes,
-  ApiBody,
-  ApiBearerAuth,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiConsumes, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
 import { Response } from 'express';
 import { JwtAuthGuard } from '../../common/guards';
 import { CurrentUser } from '../../common/decorators';
@@ -64,7 +58,7 @@ export class UploadController {
     @Body('fileCategory') fileCategory: FileCategory,
     @Body('relatedEntityType') relatedEntityType?: string,
     @Body('relatedEntityId') relatedEntityId?: string,
-    @CurrentUser() user?: User,
+    @CurrentUser() user?: User
   ) {
     const options: UploadOptions = {
       fileCategory: fileCategory || FileCategory.OTHER,
@@ -111,7 +105,7 @@ export class UploadController {
   async uploadMultiple(
     @UploadedFiles() files: Express.Multer.File[],
     @Body('fileCategory') fileCategory: FileCategory,
-    @CurrentUser() user?: User,
+    @CurrentUser() user?: User
   ) {
     const options: UploadOptions = {
       fileCategory: fileCategory || FileCategory.OTHER,
@@ -132,7 +126,9 @@ export class UploadController {
   @Post('public')
   @UseInterceptors(FileInterceptor('file'))
   @ApiConsumes('multipart/form-data')
-  @ApiOperation({ summary: 'Upload a file without authentication (for registration or service request)' })
+  @ApiOperation({
+    summary: 'Upload a file without authentication (for registration or service request)',
+  })
   @ApiBody({
     schema: {
       type: 'object',
@@ -155,7 +151,7 @@ export class UploadController {
   async uploadPublic(
     @UploadedFile() file: Express.Multer.File,
     @Body('fileCategory') fileCategory: FileCategory,
-    @Body('passportCode') passportCode?: string,
+    @Body('passportCode') passportCode?: string
   ) {
     const options: UploadOptions = {
       fileCategory: fileCategory || FileCategory.OTHER,
@@ -190,10 +186,7 @@ export class UploadController {
 
   @Get(':id/download')
   @ApiOperation({ summary: 'Download file' })
-  async downloadFile(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Res() res: Response,
-  ) {
+  async downloadFile(@Param('id', ParseUUIDPipe) id: string, @Res() res: Response) {
     const file = await this.uploadService.findById(id);
     const buffer = this.uploadService.getFileBuffer(file);
 

@@ -38,7 +38,7 @@ async function bootstrap() {
       transformOptions: {
         enableImplicitConversion: true,
       },
-    }),
+    })
   );
 
   // Transform interceptor - wraps all responses in { success, data, timestamp }

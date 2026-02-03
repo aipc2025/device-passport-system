@@ -570,32 +570,64 @@ export class InitialSchema1738502400000 implements MigrationInterface {
     `);
 
     // Create indexes for performance
-    await queryRunner.query(`CREATE INDEX "IDX_device_passport_code" ON "device_passport" ("passportCode")`);
-    await queryRunner.query(`CREATE INDEX "IDX_device_passport_status" ON "device_passport" ("status")`);
-    await queryRunner.query(`CREATE INDEX "IDX_lifecycle_event_passport" ON "lifecycle_event" ("passportId")`);
+    await queryRunner.query(
+      `CREATE INDEX "IDX_device_passport_code" ON "device_passport" ("passportCode")`
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_device_passport_status" ON "device_passport" ("status")`
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_lifecycle_event_passport" ON "lifecycle_event" ("passportId")`
+    );
     await queryRunner.query(`CREATE INDEX "IDX_user_email" ON "user" ("email")`);
     await queryRunner.query(`CREATE INDEX "IDX_user_organization" ON "user" ("organizationId")`);
     await queryRunner.query(`CREATE INDEX "IDX_expert_code" ON "individual_expert" ("expertCode")`);
-    await queryRunner.query(`CREATE INDEX "IDX_expert_status" ON "individual_expert" ("registrationStatus")`);
-    await queryRunner.query(`CREATE INDEX "IDX_service_request_status" ON "service_request" ("status")`);
-    await queryRunner.query(`CREATE INDEX "IDX_marketplace_product_status" ON "marketplace_product" ("status")`);
-    await queryRunner.query(`CREATE INDEX "IDX_buyer_requirement_status" ON "buyer_requirement" ("status")`);
+    await queryRunner.query(
+      `CREATE INDEX "IDX_expert_status" ON "individual_expert" ("registrationStatus")`
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_service_request_status" ON "service_request" ("status")`
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_marketplace_product_status" ON "marketplace_product" ("status")`
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_buyer_requirement_status" ON "buyer_requirement" ("status")`
+    );
     await queryRunner.query(`CREATE INDEX "IDX_inquiry_status" ON "inquiry" ("status")`);
 
     // Add foreign key constraints
-    await queryRunner.query(`ALTER TABLE "user" ADD CONSTRAINT "FK_user_organization" FOREIGN KEY ("organizationId") REFERENCES "organization"("id") ON DELETE SET NULL`);
-    await queryRunner.query(`ALTER TABLE "device_passport" ADD CONSTRAINT "FK_device_passport_supplier" FOREIGN KEY ("supplierId") REFERENCES "organization"("id") ON DELETE SET NULL`);
-    await queryRunner.query(`ALTER TABLE "device_passport" ADD CONSTRAINT "FK_device_passport_customer" FOREIGN KEY ("customerId") REFERENCES "organization"("id") ON DELETE SET NULL`);
-    await queryRunner.query(`ALTER TABLE "lifecycle_event" ADD CONSTRAINT "FK_lifecycle_event_passport" FOREIGN KEY ("passportId") REFERENCES "device_passport"("id") ON DELETE CASCADE`);
-    await queryRunner.query(`ALTER TABLE "organization_contact" ADD CONSTRAINT "FK_organization_contact_org" FOREIGN KEY ("organizationId") REFERENCES "organization"("id") ON DELETE CASCADE`);
+    await queryRunner.query(
+      `ALTER TABLE "user" ADD CONSTRAINT "FK_user_organization" FOREIGN KEY ("organizationId") REFERENCES "organization"("id") ON DELETE SET NULL`
+    );
+    await queryRunner.query(
+      `ALTER TABLE "device_passport" ADD CONSTRAINT "FK_device_passport_supplier" FOREIGN KEY ("supplierId") REFERENCES "organization"("id") ON DELETE SET NULL`
+    );
+    await queryRunner.query(
+      `ALTER TABLE "device_passport" ADD CONSTRAINT "FK_device_passport_customer" FOREIGN KEY ("customerId") REFERENCES "organization"("id") ON DELETE SET NULL`
+    );
+    await queryRunner.query(
+      `ALTER TABLE "lifecycle_event" ADD CONSTRAINT "FK_lifecycle_event_passport" FOREIGN KEY ("passportId") REFERENCES "device_passport"("id") ON DELETE CASCADE`
+    );
+    await queryRunner.query(
+      `ALTER TABLE "organization_contact" ADD CONSTRAINT "FK_organization_contact_org" FOREIGN KEY ("organizationId") REFERENCES "organization"("id") ON DELETE CASCADE`
+    );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     // Drop foreign key constraints
-    await queryRunner.query(`ALTER TABLE "organization_contact" DROP CONSTRAINT "FK_organization_contact_org"`);
-    await queryRunner.query(`ALTER TABLE "lifecycle_event" DROP CONSTRAINT "FK_lifecycle_event_passport"`);
-    await queryRunner.query(`ALTER TABLE "device_passport" DROP CONSTRAINT "FK_device_passport_customer"`);
-    await queryRunner.query(`ALTER TABLE "device_passport" DROP CONSTRAINT "FK_device_passport_supplier"`);
+    await queryRunner.query(
+      `ALTER TABLE "organization_contact" DROP CONSTRAINT "FK_organization_contact_org"`
+    );
+    await queryRunner.query(
+      `ALTER TABLE "lifecycle_event" DROP CONSTRAINT "FK_lifecycle_event_passport"`
+    );
+    await queryRunner.query(
+      `ALTER TABLE "device_passport" DROP CONSTRAINT "FK_device_passport_customer"`
+    );
+    await queryRunner.query(
+      `ALTER TABLE "device_passport" DROP CONSTRAINT "FK_device_passport_supplier"`
+    );
     await queryRunner.query(`ALTER TABLE "user" DROP CONSTRAINT "FK_user_organization"`);
 
     // Drop indexes

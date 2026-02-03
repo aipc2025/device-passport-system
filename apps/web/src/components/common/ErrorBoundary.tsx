@@ -1,6 +1,7 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { captureException } from '../../utils/errorTracking';
 
 interface Props {
   children: ReactNode;
@@ -31,11 +32,16 @@ class ErrorBoundary extends Component<Props, State> {
       errorInfo,
     });
 
-    // Log to error reporting service (e.g., Sentry)
-    if (process.env.NODE_ENV === 'production') {
-      // TODO: Send to error tracking service
-      // Example: Sentry.captureException(error);
-    }
+    // Send to error tracking service
+    captureException(error, {
+      componentStack: errorInfo.componentStack || undefined,
+      tags: {
+        errorBoundary: 'true',
+      },
+      extra: {
+        url: window.location.href,
+      },
+    });
   }
 
   private handleReset = () => {

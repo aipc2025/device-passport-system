@@ -86,7 +86,7 @@ export class ExpertRatingController {
   @ApiResponse({ status: 201, description: 'Service record created' })
   async createServiceRecord(
     @Request() req: AuthenticatedRequest,
-    @Body() dto: CreateServiceRecordDto,
+    @Body() dto: CreateServiceRecordDto
   ) {
     return this.ratingService.createServiceRecord(dto, req.user.sub);
   }
@@ -108,7 +108,7 @@ export class ExpertRatingController {
   async getExpertServiceRecords(
     @Param('expertId') expertId: string,
     @Query('status') status?: ServiceRecordStatus,
-    @Query('limit') limit?: number,
+    @Query('limit') limit?: number
   ) {
     return this.ratingService.getExpertServiceRecords(expertId, status, limit);
   }
@@ -121,7 +121,7 @@ export class ExpertRatingController {
   async getMyServiceRecords(
     @Request() req: AuthenticatedRequest,
     @Query('status') status?: ServiceRecordStatus,
-    @Query('limit') limit?: number,
+    @Query('limit') limit?: number
   ) {
     return this.ratingService.getCustomerServiceRecords(req.user.sub, status, limit);
   }
@@ -134,7 +134,7 @@ export class ExpertRatingController {
   async updateServiceRecord(
     @Request() req: AuthenticatedRequest,
     @Param('id') id: string,
-    @Body() dto: UpdateServiceRecordDto,
+    @Body() dto: UpdateServiceRecordDto
   ) {
     const isExpert = !!req.user.expertId;
     const userId = isExpert ? req.user.expertId! : req.user.sub;
@@ -146,15 +146,12 @@ export class ExpertRatingController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Start service (expert)' })
   @ApiResponse({ status: 200, description: 'Service started' })
-  async startService(
-    @Request() req: AuthenticatedRequest,
-    @Param('id') id: string,
-  ) {
+  async startService(@Request() req: AuthenticatedRequest, @Param('id') id: string) {
     return this.ratingService.updateServiceRecord(
       id,
       { status: ServiceRecordStatus.IN_PROGRESS },
       req.user.expertId || req.user.sub,
-      true,
+      true
     );
   }
 
@@ -166,7 +163,7 @@ export class ExpertRatingController {
   async completeService(
     @Request() req: AuthenticatedRequest,
     @Param('id') id: string,
-    @Body() dto: { finalPrice?: number; completionNotes?: string },
+    @Body() dto: { finalPrice?: number; completionNotes?: string }
   ) {
     return this.ratingService.updateServiceRecord(
       id,
@@ -176,7 +173,7 @@ export class ExpertRatingController {
         completionNotes: dto.completionNotes,
       },
       req.user.expertId || req.user.sub,
-      true,
+      true
     );
   }
 
@@ -185,10 +182,7 @@ export class ExpertRatingController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Customer confirms service completion' })
   @ApiResponse({ status: 200, description: 'Service confirmed' })
-  async confirmCompletion(
-    @Request() req: AuthenticatedRequest,
-    @Param('id') id: string,
-  ) {
+  async confirmCompletion(@Request() req: AuthenticatedRequest, @Param('id') id: string) {
     return this.ratingService.confirmCompletion(id, req.user.sub);
   }
 
@@ -200,7 +194,7 @@ export class ExpertRatingController {
   async cancelService(
     @Request() req: AuthenticatedRequest,
     @Param('id') id: string,
-    @Body() dto: { reason?: string },
+    @Body() dto: { reason?: string }
   ) {
     const isExpert = !!req.user.expertId;
     const userId = isExpert ? req.user.expertId! : req.user.sub;
@@ -215,7 +209,7 @@ export class ExpertRatingController {
       id,
       { status: ServiceRecordStatus.CANCELLED },
       userId,
-      isExpert,
+      isExpert
     );
   }
 
@@ -226,10 +220,7 @@ export class ExpertRatingController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a review for completed service' })
   @ApiResponse({ status: 201, description: 'Review created' })
-  async createReview(
-    @Request() req: AuthenticatedRequest,
-    @Body() dto: CreateReviewDto,
-  ) {
+  async createReview(@Request() req: AuthenticatedRequest, @Body() dto: CreateReviewDto) {
     return this.ratingService.createReview(dto, req.user.sub);
   }
 
@@ -245,10 +236,7 @@ export class ExpertRatingController {
   @Get('reviews/expert/:expertId')
   @ApiOperation({ summary: 'Get reviews for an expert (public)' })
   @ApiResponse({ status: 200, description: 'List of reviews' })
-  async getExpertReviews(
-    @Param('expertId') expertId: string,
-    @Query('limit') limit?: number,
-  ) {
+  async getExpertReviews(@Param('expertId') expertId: string, @Query('limit') limit?: number) {
     return this.ratingService.getExpertReviews(expertId, ReviewStatus.PUBLISHED, limit);
   }
 
@@ -260,7 +248,7 @@ export class ExpertRatingController {
   async respondToReview(
     @Request() req: AuthenticatedRequest,
     @Param('id') id: string,
-    @Body() dto: ExpertResponseDto,
+    @Body() dto: ExpertResponseDto
   ) {
     return this.ratingService.respondToReview(id, req.user.expertId || req.user.sub, dto);
   }
@@ -273,7 +261,7 @@ export class ExpertRatingController {
   async flagReview(
     @Request() req: AuthenticatedRequest,
     @Param('id') id: string,
-    @Body() dto: FlagReviewDto,
+    @Body() dto: FlagReviewDto
   ) {
     return this.ratingService.flagReview(id, dto.reason, req.user.sub);
   }
@@ -283,10 +271,7 @@ export class ExpertRatingController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Vote on review helpfulness' })
   @ApiResponse({ status: 200, description: 'Vote recorded' })
-  async voteReview(
-    @Param('id') id: string,
-    @Body() dto: VoteReviewDto,
-  ) {
+  async voteReview(@Param('id') id: string, @Body() dto: VoteReviewDto) {
     return this.ratingService.voteReview(id, dto.isHelpful);
   }
 

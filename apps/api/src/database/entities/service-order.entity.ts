@@ -9,11 +9,7 @@ import {
   OneToMany,
   Index,
 } from 'typeorm';
-import {
-  ServiceOrderStatus,
-  ServiceType,
-  ServicePriority,
-} from '@device-passport/shared';
+import { ServiceOrderStatus, ServiceType, ServicePriority } from '@device-passport/shared';
 import { DevicePassport } from './device-passport.entity';
 import { Organization } from './organization.entity';
 import { User } from './user.entity';

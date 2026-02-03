@@ -9,20 +9,10 @@ import {
   ParseUUIDPipe,
   Query,
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiBearerAuth,
-  ApiParam,
-  ApiQuery,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { RegistrationService } from './registration.service';
-import {
-  CompanyRegistrationDto,
-  ExpertRegistrationDto,
-  UpdateRegistrationStatusDto,
-} from './dto';
+import { CompanyRegistrationDto, ExpertRegistrationDto, UpdateRegistrationStatusDto } from './dto';
 import { JwtAuthGuard, RolesGuard } from '../../common/guards';
 import { Public, CurrentUser, Roles } from '../../common/decorators';
 import { TokenPayload, UserRole, RegistrationType } from '@device-passport/shared';
@@ -62,7 +52,10 @@ export class RegistrationController {
     // Sanitize and validate input
     const sanitizedCode = code.trim().toUpperCase();
     if (!/^[A-Z]{3}$/.test(sanitizedCode)) {
-      return { available: false, message: 'Invalid code format. Must be exactly 3 uppercase letters.' };
+      return {
+        available: false,
+        message: 'Invalid code format. Must be exactly 3 uppercase letters.',
+      };
     }
     return this.registrationService.checkCodeAvailability(sanitizedCode);
   }
@@ -115,7 +108,7 @@ export class RegistrationController {
     @Param('id', ParseUUIDPipe) id: string,
     @Query('type') type: RegistrationType,
     @Body() dto: UpdateRegistrationStatusDto,
-    @CurrentUser() user: TokenPayload,
+    @CurrentUser() user: TokenPayload
   ) {
     if (type === RegistrationType.COMPANY) {
       await this.registrationService.updateCompanyStatus(id, dto, user.sub);

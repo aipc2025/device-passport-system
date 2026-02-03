@@ -25,7 +25,7 @@ export class RolesGuard implements CanActivate {
     // Check if user's role has sufficient permission level
     const userLevel = ROLE_PERMISSION_LEVELS[user.role as UserRole] || 0;
     const minRequiredLevel = Math.min(
-      ...requiredRoles.map((role) => ROLE_PERMISSION_LEVELS[role] || 0),
+      ...requiredRoles.map((role) => ROLE_PERMISSION_LEVELS[role] || 0)
     );
 
     return userLevel >= minRequiredLevel;

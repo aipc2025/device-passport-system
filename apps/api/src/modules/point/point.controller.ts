@@ -46,7 +46,7 @@ export class PointController {
     @Request() req: any,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number,
-    @Query('pointType') pointType?: PointType,
+    @Query('pointType') pointType?: PointType
   ) {
     const result = await this.pointService.getTransactionHistory(req.user.sub, {
       page,
@@ -129,11 +129,7 @@ export class PointRuleAdminController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update a point rule' })
-  async updateRule(
-    @Param('id') id: string,
-    @Body() body: Partial<PointRule>,
-    @Request() req: any,
-  ) {
+  async updateRule(@Param('id') id: string, @Body() body: Partial<PointRule>, @Request() req: any) {
     return this.pointService.updateRule(id, {
       ...body,
       modifiedBy: req.user.sub,

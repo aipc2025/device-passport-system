@@ -7,7 +7,13 @@ import {
   User,
   SequenceCounter,
 } from '../../database/entities';
-import { TakeoverStatus, TakeoverReason, DeviceStatus, ProductLine, OriginCode } from '@device-passport/shared';
+import {
+  TakeoverStatus,
+  TakeoverReason,
+  DeviceStatus,
+  ProductLine,
+  OriginCode,
+} from '@device-passport/shared';
 import { PointService } from '../point/point.service';
 
 @Injectable()
@@ -20,7 +26,7 @@ export class DeviceTakeoverService {
     @InjectRepository(SequenceCounter)
     private sequenceRepo: Repository<SequenceCounter>,
     private dataSource: DataSource,
-    private pointService: PointService,
+    private pointService: PointService
   ) {}
 
   // ============================================
@@ -47,7 +53,7 @@ export class DeviceTakeoverService {
       industry?: string;
       customerNotes?: string;
       organizationId?: string;
-    },
+    }
   ): Promise<DeviceTakeoverRequest> {
     // Generate request code
     const requestCode = await this.generateRequestCode();
@@ -133,7 +139,7 @@ export class DeviceTakeoverService {
 
   async assignInspectionExpert(
     requestId: string,
-    expertId: string,
+    expertId: string
   ): Promise<DeviceTakeoverRequest> {
     const request = await this.getTakeoverRequest(requestId);
 
@@ -155,7 +161,7 @@ export class DeviceTakeoverService {
       functionalStatus: string;
       notes: string;
       photos: string[];
-    },
+    }
   ): Promise<DeviceTakeoverRequest> {
     const request = await this.getTakeoverRequest(requestId);
 
@@ -176,15 +182,10 @@ export class DeviceTakeoverService {
     await this.takeoverRepo.save(request);
 
     // Award points to expert for completing inspection
-    await this.pointService.awardPoints(
-      expertId,
-      'EXPERT',
-      'DEVICE_INSPECTION',
-      {
-        relatedTakeoverId: requestId,
-        description: `Completed device inspection: ${request.deviceName}`,
-      },
-    );
+    await this.pointService.awardPoints(expertId, 'EXPERT', 'DEVICE_INSPECTION', {
+      relatedTakeoverId: requestId,
+      description: `Completed device inspection: ${request.deviceName}`,
+    });
 
     return request;
   }
@@ -196,7 +197,7 @@ export class DeviceTakeoverService {
   async approveRequest(
     requestId: string,
     adminUserId: string,
-    notes?: string,
+    notes?: string
   ): Promise<DeviceTakeoverRequest> {
     const request = await this.getTakeoverRequest(requestId);
 
@@ -218,15 +219,10 @@ export class DeviceTakeoverService {
     await this.takeoverRepo.save(request);
 
     // Award points to customer for successful takeover
-    await this.pointService.awardPoints(
-      request.customerUserId,
-      'CUSTOMER',
-      'DEVICE_TAKEOVER',
-      {
-        relatedTakeoverId: requestId,
-        description: `Device takeover approved: ${request.deviceName}`,
-      },
-    );
+    await this.pointService.awardPoints(request.customerUserId, 'CUSTOMER', 'DEVICE_TAKEOVER', {
+      relatedTakeoverId: requestId,
+      description: `Device takeover approved: ${request.deviceName}`,
+    });
 
     return request;
   }
@@ -234,7 +230,7 @@ export class DeviceTakeoverService {
   async rejectRequest(
     requestId: string,
     adminUserId: string,
-    reason: string,
+    reason: string
   ): Promise<DeviceTakeoverRequest> {
     const request = await this.getTakeoverRequest(requestId);
 
@@ -301,7 +297,11 @@ export class DeviceTakeoverService {
     if (industryLower.includes('plastic')) {
       return ProductLine.PP;
     }
-    if (industryLower.includes('hospital') || industryLower.includes('lab') || industryLower.includes('medical')) {
+    if (
+      industryLower.includes('hospital') ||
+      industryLower.includes('lab') ||
+      industryLower.includes('medical')
+    ) {
       return ProductLine.HL;
     }
     if (industryLower.includes('education') || industryLower.includes('training')) {
@@ -364,10 +364,9 @@ export class DeviceTakeoverService {
       sum += input.charCodeAt(i) * (i + 1);
     }
     const checksumNum = sum % 36;
-    const checksumChar = checksumNum < 10
-      ? checksumNum.toString()
-      : String.fromCharCode(55 + checksumNum);
-    return checksumChar + ((sum % 10).toString());
+    const checksumChar =
+      checksumNum < 10 ? checksumNum.toString() : String.fromCharCode(55 + checksumNum);
+    return checksumChar + (sum % 10).toString();
   }
 
   // ============================================

@@ -38,7 +38,7 @@ export class ContactController {
   @ApiParam({ name: 'id', description: 'Contact ID' })
   async findById(
     @Param('orgId', ParseUUIDPipe) orgId: string,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id', ParseUUIDPipe) id: string
   ) {
     return this.contactService.findById(orgId, id);
   }
@@ -47,10 +47,7 @@ export class ContactController {
   @Roles(UserRole.OPERATOR)
   @ApiOperation({ summary: 'Create a new contact' })
   @ApiParam({ name: 'orgId', description: 'Organization ID' })
-  async create(
-    @Param('orgId', ParseUUIDPipe) orgId: string,
-    @Body() dto: CreateContactDto,
-  ) {
+  async create(@Param('orgId', ParseUUIDPipe) orgId: string, @Body() dto: CreateContactDto) {
     return this.contactService.create(orgId, dto);
   }
 
@@ -62,7 +59,7 @@ export class ContactController {
   async update(
     @Param('orgId', ParseUUIDPipe) orgId: string,
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() dto: UpdateContactDto,
+    @Body() dto: UpdateContactDto
   ) {
     return this.contactService.update(orgId, id, dto);
   }
@@ -75,7 +72,7 @@ export class ContactController {
   async updateNotes(
     @Param('orgId', ParseUUIDPipe) orgId: string,
     @Param('id', ParseUUIDPipe) id: string,
-    @Body('personalNotes') personalNotes: string,
+    @Body('personalNotes') personalNotes: string
   ) {
     return this.contactService.updateNotes(orgId, id, personalNotes);
   }
@@ -87,7 +84,7 @@ export class ContactController {
   @ApiParam({ name: 'id', description: 'Contact ID' })
   async delete(
     @Param('orgId', ParseUUIDPipe) orgId: string,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id', ParseUUIDPipe) id: string
   ) {
     await this.contactService.delete(orgId, id);
     return { success: true };

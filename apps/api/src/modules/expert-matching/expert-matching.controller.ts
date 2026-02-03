@@ -30,7 +30,10 @@ class PushToExpertsDto {
   @IsUUID('4', { each: true })
   expertIds: string[];
 
-  @ApiProperty({ description: 'Source of the push (defaults to PLATFORM_RECOMMENDED)', required: false })
+  @ApiProperty({
+    description: 'Source of the push (defaults to PLATFORM_RECOMMENDED)',
+    required: false,
+  })
   @IsOptional()
   @IsEnum(MatchSource)
   source?: MatchSource;
@@ -73,17 +76,11 @@ export class ExpertMatchingController {
   @Roles(UserRole.CUSTOMER, UserRole.ENGINEER)
   @ApiOperation({ summary: 'Get my match recommendations (as expert)' })
   @ApiQuery({ name: 'limit', required: false, type: Number })
-  async getMyMatches(
-    @CurrentUser() user: TokenPayload,
-    @Query('limit') limit?: number,
-  ) {
+  async getMyMatches(@CurrentUser() user: TokenPayload, @Query('limit') limit?: number) {
     if (!user.expertId) {
       return [];
     }
-    const matches = await this.matchingService.getMatchesForExpert(
-      user.expertId,
-      limit || 50,
-    );
+    const matches = await this.matchingService.getMatchesForExpert(user.expertId, limit || 50);
 
     // Enhance with match source labels
     return matches.map((match) => ({
@@ -99,12 +96,9 @@ export class ExpertMatchingController {
   @ApiQuery({ name: 'limit', required: false, type: Number })
   async getMatchesForRequest(
     @Param('id', ParseUUIDPipe) id: string,
-    @Query('limit') limit?: number,
+    @Query('limit') limit?: number
   ) {
-    const matches = await this.matchingService.getMatchesForServiceRequest(
-      id,
-      limit || 50,
-    );
+    const matches = await this.matchingService.getMatchesForServiceRequest(id, limit || 50);
 
     return matches.map((match) => ({
       ...match,
@@ -132,10 +126,7 @@ export class ExpertMatchingController {
   @Roles(UserRole.CUSTOMER, UserRole.ENGINEER)
   @ApiOperation({ summary: 'Mark match as viewed' })
   @ApiParam({ name: 'id', description: 'Match ID' })
-  async markAsViewed(
-    @CurrentUser() user: TokenPayload,
-    @Param('id', ParseUUIDPipe) id: string,
-  ) {
+  async markAsViewed(@CurrentUser() user: TokenPayload, @Param('id', ParseUUIDPipe) id: string) {
     const viewerType = user.expertId ? 'expert' : 'customer';
     await this.matchingService.markAsViewed(id, viewerType);
     return { message: 'Match marked as viewed' };
@@ -157,12 +148,12 @@ export class ExpertMatchingController {
   @ApiParam({ name: 'expertId', description: 'Expert ID' })
   async createManualMatch(
     @Param('serviceRequestId', ParseUUIDPipe) serviceRequestId: string,
-    @Param('expertId', ParseUUIDPipe) expertId: string,
+    @Param('expertId', ParseUUIDPipe) expertId: string
   ) {
     const match = await this.matchingService.createManualMatch(
       expertId,
       serviceRequestId,
-      MatchSource.PLATFORM_RECOMMENDED,
+      MatchSource.PLATFORM_RECOMMENDED
     );
     return {
       message: 'Manual match created',
@@ -181,12 +172,12 @@ export class ExpertMatchingController {
   @ApiBody({ type: PushToExpertsDto })
   async pushToExperts(
     @Param('serviceRequestId', ParseUUIDPipe) serviceRequestId: string,
-    @Body() dto: PushToExpertsDto,
+    @Body() dto: PushToExpertsDto
   ) {
     const result = await this.matchingService.pushToExperts(
       serviceRequestId,
       dto.expertIds,
-      dto.source || MatchSource.PLATFORM_RECOMMENDED,
+      dto.source || MatchSource.PLATFORM_RECOMMENDED
     );
     return {
       message: `Pushed to ${result.success} experts (${result.failed} failed)`,
@@ -236,17 +227,14 @@ export class ExpertMatchingController {
     @Query('keyword') keyword?: string,
     @Query('workStatus') workStatus?: ExpertWorkStatus,
     @Query('minScore') minScore?: number,
-    @Query('limit') limit?: number,
+    @Query('limit') limit?: number
   ) {
-    const results = await this.matchingService.searchExpertsForRequest(
-      serviceRequestId,
-      {
-        keyword,
-        workStatus,
-        minScore: minScore ? Number(minScore) : undefined,
-        limit: limit ? Number(limit) : undefined,
-      },
-    );
+    const results = await this.matchingService.searchExpertsForRequest(serviceRequestId, {
+      keyword,
+      workStatus,
+      minScore: minScore ? Number(minScore) : undefined,
+      limit: limit ? Number(limit) : undefined,
+    });
 
     return results.map((r) => ({
       expert: {
@@ -273,10 +261,12 @@ export class ExpertMatchingController {
   @Post('auto-match-rushing')
   @Roles(UserRole.ADMIN, UserRole.OPERATOR)
   @ApiOperation({ summary: 'Trigger auto-matching for RUSHING experts' })
-  @ApiQuery({ name: 'serviceRequestId', required: false, description: 'Specific service request ID (optional)' })
-  async triggerAutoMatchRushing(
-    @Query('serviceRequestId') serviceRequestId?: string,
-  ) {
+  @ApiQuery({
+    name: 'serviceRequestId',
+    required: false,
+    description: 'Specific service request ID (optional)',
+  })
+  async triggerAutoMatchRushing(@Query('serviceRequestId') serviceRequestId?: string) {
     const result = await this.matchingService.autoMatchRushingExperts(serviceRequestId);
     return {
       message: 'Auto-matching completed',
@@ -288,9 +278,7 @@ export class ExpertMatchingController {
   @Roles(UserRole.ADMIN, UserRole.OPERATOR)
   @ApiOperation({ summary: 'Get matches pending notification' })
   @ApiQuery({ name: 'expertId', required: false, description: 'Filter by expert ID' })
-  async getPendingNotifications(
-    @Query('expertId') expertId?: string,
-  ) {
+  async getPendingNotifications(@Query('expertId') expertId?: string) {
     const matches = await this.matchingService.getPendingNotifications(expertId);
     return matches.map((m) => ({
       id: m.id,
@@ -307,7 +295,12 @@ export class ExpertMatchingController {
   @Post('mark-notified')
   @Roles(UserRole.ADMIN, UserRole.OPERATOR)
   @ApiOperation({ summary: 'Mark matches as notified' })
-  @ApiBody({ schema: { type: 'object', properties: { matchIds: { type: 'array', items: { type: 'string' } } } } })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: { matchIds: { type: 'array', items: { type: 'string' } } },
+    },
+  })
   async markAsNotified(@Body('matchIds') matchIds: string[]) {
     await this.matchingService.markAsNotified(matchIds);
     return { message: `Marked ${matchIds.length} matches as notified` };

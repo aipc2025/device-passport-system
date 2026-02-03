@@ -59,11 +59,11 @@ export class ExpertMatchResult {
   // Score breakdown (JSONB)
   @Column({ name: 'score_breakdown', type: 'jsonb', default: '{}' })
   scoreBreakdown: {
-    locationScore?: number;      // 30% - Distance-based
-    skillScore?: number;         // 25% - Skills match
-    experienceScore?: number;    // 15% - Years of experience
-    availabilityScore?: number;  // 15% - Availability match
-    ratingScore?: number;        // 15% - Expert rating
+    locationScore?: number; // 30% - Distance-based
+    skillScore?: number; // 25% - Skills match
+    experienceScore?: number; // 15% - Years of experience
+    availabilityScore?: number; // 15% - Availability match
+    ratingScore?: number; // 15% - Expert rating
   };
 
   // Distance in km

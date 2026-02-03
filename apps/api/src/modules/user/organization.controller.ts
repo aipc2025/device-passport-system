@@ -55,10 +55,7 @@ export class OrganizationController {
   @Patch(':id')
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Update organization (Admin only)' })
-  async update(
-    @Param('id') id: string,
-    @Body() updateOrganizationDto: UpdateOrganizationDto,
-  ) {
+  async update(@Param('id') id: string, @Body() updateOrganizationDto: UpdateOrganizationDto) {
     return this.organizationService.update(id, updateOrganizationDto);
   }
 

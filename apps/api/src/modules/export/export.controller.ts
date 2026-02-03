@@ -21,7 +21,7 @@ export class ExportController {
     @Query('status') status?: string,
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
-    @Res() res?: Response,
+    @Res() res?: Response
   ) {
     const buffer = await this.exportService.exportPassportsToExcel({
       ids,
@@ -44,7 +44,7 @@ export class ExportController {
   @ApiQuery({ name: 'ids', required: false, type: [String] })
   async exportPassportsToCSV(
     @Query('ids', new ParseArrayPipe({ optional: true })) ids?: string[],
-    @Res() res?: Response,
+    @Res() res?: Response
   ) {
     const csv = await this.exportService.exportPassportsToCSV({ ids });
 
@@ -59,10 +59,7 @@ export class ExportController {
   @Get('lifecycle/excel')
   @ApiOperation({ summary: 'Export lifecycle events to Excel' })
   @ApiQuery({ name: 'passportId', required: true, type: String })
-  async exportLifecycleToExcel(
-    @Query('passportId') passportId: string,
-    @Res() res?: Response,
-  ) {
+  async exportLifecycleToExcel(@Query('passportId') passportId: string, @Res() res?: Response) {
     const buffer = await this.exportService.exportLifecycleToExcel(passportId);
 
     res!.set({
@@ -79,7 +76,7 @@ export class ExportController {
   @ApiQuery({ name: 'ids', required: true, type: [String] })
   async exportQRCodesBatch(
     @Query('ids', new ParseArrayPipe({ items: String })) ids: string[],
-    @Res() res?: Response,
+    @Res() res?: Response
   ) {
     const buffer = await this.exportService.exportQRCodesBatchPDF(ids);
 
@@ -101,7 +98,7 @@ export class ExportController {
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
     @Query('status') status?: string,
-    @Res() res?: Response,
+    @Res() res?: Response
   ) {
     const buffer = await this.exportService.exportServiceOrdersToExcel({
       startDate: startDate ? new Date(startDate) : undefined,

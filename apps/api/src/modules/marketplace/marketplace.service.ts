@@ -31,7 +31,7 @@ export class MarketplaceService {
     @InjectRepository(Organization)
     private readonly organizationRepository: Repository<Organization>,
     @InjectRepository(SupplierProduct)
-    private readonly supplierProductRepository: Repository<SupplierProduct>,
+    private readonly supplierProductRepository: Repository<SupplierProduct>
   ) {}
 
   // ==========================================
@@ -40,7 +40,7 @@ export class MarketplaceService {
 
   async createProduct(
     organizationId: string,
-    dto: CreateMarketplaceProductDto,
+    dto: CreateMarketplaceProductDto
   ): Promise<MarketplaceProduct> {
     await this.validateOrganization(organizationId);
 
@@ -67,7 +67,7 @@ export class MarketplaceService {
   async updateProduct(
     organizationId: string,
     id: string,
-    dto: UpdateMarketplaceProductDto,
+    dto: UpdateMarketplaceProductDto
   ): Promise<MarketplaceProduct> {
     const product = await this.getProductByIdAndOrg(id, organizationId);
 
@@ -96,7 +96,9 @@ export class MarketplaceService {
 
   async activateProduct(organizationId: string, id: string): Promise<MarketplaceProduct> {
     const product = await this.getProductByIdAndOrg(id, organizationId);
-    if (![MarketplaceListingStatus.DRAFT, MarketplaceListingStatus.PAUSED].includes(product.status)) {
+    if (
+      ![MarketplaceListingStatus.DRAFT, MarketplaceListingStatus.PAUSED].includes(product.status)
+    ) {
       throw new BadRequestException('Only draft or paused products can be activated');
     }
     product.status = MarketplaceListingStatus.ACTIVE;
@@ -142,15 +144,19 @@ export class MarketplaceService {
       featuredFirst = true,
     } = query;
 
-    const qb = this.productRepository.createQueryBuilder('p')
+    const qb = this.productRepository
+      .createQueryBuilder('p')
       .leftJoinAndSelect('p.organization', 'org')
       .where('p.status = :status', { status: MarketplaceListingStatus.ACTIVE });
 
     // Keyword search (title and description)
     if (keyword) {
-      qb.andWhere('(LOWER(p.listingTitle) LIKE LOWER(:keyword) OR LOWER(p.description) LIKE LOWER(:keyword))', {
-        keyword: `%${keyword}%`,
-      });
+      qb.andWhere(
+        '(LOWER(p.listingTitle) LIKE LOWER(:keyword) OR LOWER(p.description) LIKE LOWER(:keyword))',
+        {
+          keyword: `%${keyword}%`,
+        }
+      );
     }
 
     // Category filter
@@ -178,13 +184,16 @@ export class MarketplaceService {
 
     // Distance filter using Haversine formula (PostgreSQL)
     if (userLat !== undefined && userLng !== undefined && maxDistanceKm !== undefined) {
-      qb.andWhere(`
+      qb.andWhere(
+        `
         (6371 * acos(
           cos(radians(:userLat)) * cos(radians(p.locationLat)) *
           cos(radians(p.locationLng) - radians(:userLng)) +
           sin(radians(:userLat)) * sin(radians(p.locationLat))
         )) <= :maxDistanceKm
-      `, { userLat, userLng, maxDistanceKm });
+      `,
+        { userLat, userLng, maxDistanceKm }
+      );
     }
 
     // Ordering
@@ -194,13 +203,16 @@ export class MarketplaceService {
 
     // Sort by distance if coordinates provided
     if (sortBy === 'distance' && userLat !== undefined && userLng !== undefined) {
-      qb.addSelect(`
+      qb.addSelect(
+        `
         (6371 * acos(
           cos(radians(:userLat)) * cos(radians(p.locationLat)) *
           cos(radians(p.locationLng) - radians(:userLng)) +
           sin(radians(:userLat)) * sin(radians(p.locationLat))
         ))
-      `, 'distance');
+      `,
+        'distance'
+      );
       qb.addOrderBy('distance', sortOrder as 'ASC' | 'DESC');
     } else if (sortBy === 'price') {
       qb.addOrderBy('p.minPrice', sortOrder as 'ASC' | 'DESC');
@@ -234,7 +246,7 @@ export class MarketplaceService {
   async createRequirement(
     organizationId: string,
     userId: string,
-    dto: CreateBuyerRequirementDto,
+    dto: CreateBuyerRequirementDto
   ): Promise<BuyerRequirement> {
     await this.validateOrganization(organizationId);
 
@@ -253,13 +265,15 @@ export class MarketplaceService {
   async updateRequirement(
     organizationId: string,
     id: string,
-    dto: UpdateBuyerRequirementDto,
+    dto: UpdateBuyerRequirementDto
   ): Promise<BuyerRequirement> {
     const requirement = await this.getRequirementByIdAndOrg(id, organizationId);
 
     Object.assign(requirement, {
       ...dto,
-      deliveryDeadline: dto.deliveryDeadline ? new Date(dto.deliveryDeadline) : requirement.deliveryDeadline,
+      deliveryDeadline: dto.deliveryDeadline
+        ? new Date(dto.deliveryDeadline)
+        : requirement.deliveryDeadline,
       validUntil: dto.validUntil ? new Date(dto.validUntil) : requirement.validUntil,
     });
 
@@ -307,16 +321,20 @@ export class MarketplaceService {
       limit = 20,
     } = query;
 
-    const qb = this.requirementRepository.createQueryBuilder('r')
+    const qb = this.requirementRepository
+      .createQueryBuilder('r')
       .leftJoinAndSelect('r.organization', 'org')
       .where('r.status = :status', { status: RFQStatus.OPEN })
       .andWhere('r.isPublic = :isPublic', { isPublic: true });
 
     // Keyword search
     if (keyword) {
-      qb.andWhere('(LOWER(r.title) LIKE LOWER(:keyword) OR LOWER(r.description) LIKE LOWER(:keyword))', {
-        keyword: `%${keyword}%`,
-      });
+      qb.andWhere(
+        '(LOWER(r.title) LIKE LOWER(:keyword) OR LOWER(r.description) LIKE LOWER(:keyword))',
+        {
+          keyword: `%${keyword}%`,
+        }
+      );
     }
 
     // Category filter
@@ -381,7 +399,10 @@ export class MarketplaceService {
     }
   }
 
-  private async getProductByIdAndOrg(id: string, organizationId: string): Promise<MarketplaceProduct> {
+  private async getProductByIdAndOrg(
+    id: string,
+    organizationId: string
+  ): Promise<MarketplaceProduct> {
     const product = await this.productRepository.findOne({
       where: { id, organizationId },
     });
@@ -391,7 +412,10 @@ export class MarketplaceService {
     return product;
   }
 
-  private async getRequirementByIdAndOrg(id: string, organizationId: string): Promise<BuyerRequirement> {
+  private async getRequirementByIdAndOrg(
+    id: string,
+    organizationId: string
+  ): Promise<BuyerRequirement> {
     const requirement = await this.requirementRepository.findOne({
       where: { id, organizationId },
     });

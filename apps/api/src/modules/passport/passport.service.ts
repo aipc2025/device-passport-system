@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like, Between } from 'typeorm';
 import * as QRCode from 'qrcode';
@@ -37,12 +33,15 @@ export class PassportService {
     private passportCodeService: PassportCodeService,
     private lifecycleService: LifecycleService,
     private configService: ConfigService,
-    private permissionService: PermissionService,
+    private permissionService: PermissionService
   ) {
     this.baseUrl = this.configService.get('VITE_API_URL') || 'http://localhost:3000';
   }
 
-  async findAll(filters: PassportQueryFilters, user: TokenPayload): Promise<PaginatedResponse<PassportListItem>> {
+  async findAll(
+    filters: PassportQueryFilters,
+    user: TokenPayload
+  ): Promise<PaginatedResponse<PassportListItem>> {
     const {
       search,
       productLine,
@@ -69,7 +68,7 @@ export class PassportService {
     if (search) {
       queryBuilder.andWhere(
         '(passport.passportCode LIKE :search OR passport.deviceName LIKE :search OR passport.deviceModel LIKE :search)',
-        { search: `%${search}%` },
+        { search: `%${search}%` }
       );
     }
 
@@ -153,10 +152,7 @@ export class PassportService {
     return passport;
   }
 
-  async create(
-    createPassportDto: CreatePassportDto,
-    userId: string,
-  ): Promise<DevicePassport> {
+  async create(createPassportDto: CreatePassportDto, userId: string): Promise<DevicePassport> {
     const { productLine, originCode, supplierId, ...rest } = createPassportDto;
 
     // Look up supplier code if supplierId is provided
@@ -174,7 +170,7 @@ export class PassportService {
     const passportCode = await this.passportCodeService.generateCode(
       productLine,
       originCode,
-      supplierCode,
+      supplierCode
     );
 
     // Create passport
@@ -193,12 +189,17 @@ export class PassportService {
 
     // Create initial lifecycle event
     const user = await this.userRepository.findOne({ where: { id: userId } });
-    await this.lifecycleService.create({
-      passportId: savedPassport.id,
-      eventType: LifecycleEventType.STATUS_CHANGE,
-      newStatus: DeviceStatus.CREATED,
-      description: 'Device passport created',
-    }, userId, user?.name || 'System', user?.role || 'SYSTEM');
+    await this.lifecycleService.create(
+      {
+        passportId: savedPassport.id,
+        eventType: LifecycleEventType.STATUS_CHANGE,
+        newStatus: DeviceStatus.CREATED,
+        description: 'Device passport created',
+      },
+      userId,
+      user?.name || 'System',
+      user?.role || 'SYSTEM'
+    );
 
     return savedPassport;
   }
@@ -206,7 +207,7 @@ export class PassportService {
   async update(
     id: string,
     updatePassportDto: UpdatePassportDto,
-    userId: string,
+    userId: string
   ): Promise<DevicePassport> {
     const passport = await this.findById(id);
 
@@ -218,7 +219,7 @@ export class PassportService {
   async updateStatus(
     id: string,
     updateStatusDto: UpdateStatusDto,
-    userId: string,
+    userId: string
   ): Promise<DevicePassport> {
     const passport = await this.findById(id);
     const { status: newStatus, note, location } = updateStatusDto;
@@ -227,7 +228,7 @@ export class PassportService {
     const validTransitions = VALID_STATUS_TRANSITIONS[passport.status];
     if (!validTransitions.includes(newStatus)) {
       throw new BadRequestException(
-        `Invalid status transition from ${passport.status} to ${newStatus}`,
+        `Invalid status transition from ${passport.status} to ${newStatus}`
       );
     }
 
@@ -245,16 +246,21 @@ export class PassportService {
 
     // Create lifecycle event
     const user = await this.userRepository.findOne({ where: { id: userId } });
-    await this.lifecycleService.create({
-      passportId: id,
-      eventType: LifecycleEventType.STATUS_CHANGE,
-      previousStatus,
-      newStatus,
-      previousLocation,
-      newLocation: location,
-      description: `Status changed from ${previousStatus} to ${newStatus}`,
-      note,
-    }, userId, user?.name || 'System', user?.role || 'SYSTEM');
+    await this.lifecycleService.create(
+      {
+        passportId: id,
+        eventType: LifecycleEventType.STATUS_CHANGE,
+        previousStatus,
+        newStatus,
+        previousLocation,
+        newLocation: location,
+        description: `Status changed from ${previousStatus} to ${newStatus}`,
+        note,
+      },
+      userId,
+      user?.name || 'System',
+      user?.role || 'SYSTEM'
+    );
 
     return updatedPassport;
   }
@@ -280,7 +286,7 @@ export class PassportService {
   async updateLocation(
     id: string,
     locationDto: { lat: number; lng: number; address?: string },
-    userId: string,
+    userId: string
   ): Promise<DevicePassport> {
     const passport = await this.findById(id);
     const previousLocation = passport.currentLocation;
@@ -298,13 +304,18 @@ export class PassportService {
 
     // Create lifecycle event for location change
     const user = await this.userRepository.findOne({ where: { id: userId } });
-    await this.lifecycleService.create({
-      passportId: id,
-      eventType: LifecycleEventType.LOCATION_CHANGE,
-      previousLocation,
-      newLocation: locationDto.address || `${locationDto.lat}, ${locationDto.lng}`,
-      description: `GPS location updated to ${locationDto.lat}, ${locationDto.lng}`,
-    }, userId, user?.name || 'System', user?.role || 'SYSTEM');
+    await this.lifecycleService.create(
+      {
+        passportId: id,
+        eventType: LifecycleEventType.LOCATION_CHANGE,
+        previousLocation,
+        newLocation: locationDto.address || `${locationDto.lat}, ${locationDto.lng}`,
+        description: `GPS location updated to ${locationDto.lat}, ${locationDto.lng}`,
+      },
+      userId,
+      user?.name || 'System',
+      user?.role || 'SYSTEM'
+    );
 
     return updatedPassport;
   }

@@ -17,7 +17,7 @@ export class ExpertCodeService {
     private counterRepository: Repository<ExpertSequenceCounter>,
     @InjectRepository(IndividualExpert)
     private expertRepository: Repository<IndividualExpert>,
-    private dataSource: DataSource,
+    private dataSource: DataSource
   ) {}
 
   /**

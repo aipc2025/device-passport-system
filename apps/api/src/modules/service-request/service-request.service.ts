@@ -6,11 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
-import {
-  ServiceRequest,
-  ExpertApplication,
-  IndividualExpert,
-} from '../../database/entities';
+import { ServiceRequest, ExpertApplication, IndividualExpert } from '../../database/entities';
 import {
   ServiceRequestStatus,
   ExpertApplicationStatus,
@@ -105,7 +101,7 @@ export class ServiceRequestService {
     private applicationRepository: Repository<ExpertApplication>,
     @InjectRepository(IndividualExpert)
     private expertRepository: Repository<IndividualExpert>,
-    private dataSource: DataSource,
+    private dataSource: DataSource
   ) {}
 
   // ==========================================
@@ -115,7 +111,7 @@ export class ServiceRequestService {
   async create(
     userId: string,
     organizationId: string | null,
-    data: CreateServiceRequestDto,
+    data: CreateServiceRequestDto
   ): Promise<ServiceRequest> {
     // Generate request code
     const requestCode = await this.generateRequestCode();
@@ -203,11 +199,7 @@ export class ServiceRequestService {
     return this.serviceRequestRepository.save(serviceRequest);
   }
 
-  async update(
-    id: string,
-    userId: string,
-    data: UpdateServiceRequestDto,
-  ): Promise<ServiceRequest> {
+  async update(id: string, userId: string, data: UpdateServiceRequestDto): Promise<ServiceRequest> {
     const request = await this.findOne(id);
 
     if (request.createdByUserId !== userId) {
@@ -326,10 +318,9 @@ export class ServiceRequestService {
       .andWhere('sr.status = :status', { status: ServiceRequestStatus.OPEN });
 
     if (params.search) {
-      qb.andWhere(
-        '(sr.title ILIKE :search OR sr.description ILIKE :search)',
-        { search: `%${params.search}%` },
-      );
+      qb.andWhere('(sr.title ILIKE :search OR sr.description ILIKE :search)', {
+        search: `%${params.search}%`,
+      });
     }
 
     if (params.serviceType) {
@@ -358,7 +349,7 @@ export class ServiceRequestService {
   async applyToService(
     serviceRequestId: string,
     expertId: string,
-    data: ApplyToServiceDto,
+    data: ApplyToServiceDto
   ): Promise<ExpertApplication> {
     const request = await this.findOne(serviceRequestId);
 
@@ -388,11 +379,7 @@ export class ServiceRequestService {
     });
 
     // Increment application count
-    await this.serviceRequestRepository.increment(
-      { id: serviceRequestId },
-      'applicationCount',
-      1,
-    );
+    await this.serviceRequestRepository.increment({ id: serviceRequestId }, 'applicationCount', 1);
 
     return this.applicationRepository.save(application);
   }
@@ -416,7 +403,7 @@ export class ServiceRequestService {
 
   async getApplicationsForRequest(
     serviceRequestId: string,
-    userId: string,
+    userId: string
   ): Promise<ExpertApplication[]> {
     const request = await this.findOne(serviceRequestId);
 
@@ -439,10 +426,7 @@ export class ServiceRequestService {
     });
   }
 
-  async acceptApplication(
-    applicationId: string,
-    userId: string,
-  ): Promise<ExpertApplication> {
+  async acceptApplication(applicationId: string, userId: string): Promise<ExpertApplication> {
     const application = await this.applicationRepository.findOne({
       where: { id: applicationId },
       relations: ['serviceRequest'],
@@ -490,7 +474,7 @@ export class ServiceRequestService {
           status: ExpertApplicationStatus.REJECTED,
           reviewedAt: new Date(),
           rejectionReason: 'Another applicant was selected',
-        },
+        }
       );
 
       await queryRunner.commitTransaction();
@@ -506,7 +490,7 @@ export class ServiceRequestService {
   async rejectApplication(
     applicationId: string,
     userId: string,
-    reason?: string,
+    reason?: string
   ): Promise<ExpertApplication> {
     const application = await this.applicationRepository.findOne({
       where: { id: applicationId },

@@ -200,7 +200,9 @@ export class CompanyRegistrationDto {
   @IsString()
   @MinLength(2)
   @MaxLength(6)
-  @Matches(/^[A-Z0-9]{2,6}$/, { message: 'Organization code must be 2-6 uppercase letters or numbers' })
+  @Matches(/^[A-Z0-9]{2,6}$/, {
+    message: 'Organization code must be 2-6 uppercase letters or numbers',
+  })
   organizationCode: string;
 
   // Roles

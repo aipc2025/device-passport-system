@@ -17,18 +17,10 @@ import {
   UploadedFile,
   ExpertWorkHistory,
 } from '../../database/entities';
-import {
-  CompanyRegistrationDto,
-  ExpertRegistrationDto,
-  UpdateRegistrationStatusDto,
-} from './dto';
+import { CompanyRegistrationDto, ExpertRegistrationDto, UpdateRegistrationStatusDto } from './dto';
 import { UploadService } from '../upload/upload.service';
 import { ExpertCodeService } from '../expert/expert-code.service';
-import {
-  RegistrationStatus,
-  RegistrationType,
-  UserRole,
-} from '@device-passport/shared';
+import { RegistrationStatus, RegistrationType, UserRole } from '@device-passport/shared';
 
 // Types for registration (exported for controller use)
 export interface PendingRegistration {
@@ -74,7 +66,7 @@ export class RegistrationService {
     private readonly uploadedFileRepository: Repository<UploadedFile>,
     private readonly uploadService: UploadService,
     private readonly expertCodeService: ExpertCodeService,
-    private readonly dataSource: DataSource,
+    private readonly dataSource: DataSource
   ) {}
 
   async checkCodeAvailability(code: string): Promise<{ available: boolean }> {
@@ -171,7 +163,7 @@ export class RegistrationService {
           queryRunner.manager.create(OrganizationContact, {
             organizationId: savedOrg.id,
             ...contactDto,
-          }),
+          })
         );
         await queryRunner.manager.save(contacts);
       }
@@ -183,7 +175,7 @@ export class RegistrationService {
             organizationId: savedOrg.id,
             ...productDto,
             isActive: true,
-          }),
+          })
         );
         await queryRunner.manager.save(products);
       }
@@ -286,7 +278,7 @@ export class RegistrationService {
             endDate: wh.endDate ? new Date(wh.endDate) : undefined,
             isCurrent: wh.isCurrent ?? false,
             isPublic: wh.isPublic ?? true,
-          }),
+          })
         );
         await queryRunner.manager.save(workHistories);
       }
@@ -356,9 +348,10 @@ export class RegistrationService {
         return {
           registrationType: RegistrationType.COMPANY,
           status: profile.registrationStatus,
-          adminNotes: profile.registrationStatus === RegistrationStatus.REJECTED
-            ? profile.adminNotes
-            : undefined,
+          adminNotes:
+            profile.registrationStatus === RegistrationStatus.REJECTED
+              ? profile.adminNotes
+              : undefined,
           reviewedAt: profile.reviewedAt,
           submittedAt: profile.createdAt,
         };
@@ -374,9 +367,8 @@ export class RegistrationService {
       return {
         registrationType: RegistrationType.INDIVIDUAL_EXPERT,
         status: expert.registrationStatus,
-        adminNotes: expert.registrationStatus === RegistrationStatus.REJECTED
-          ? expert.adminNotes
-          : undefined,
+        adminNotes:
+          expert.registrationStatus === RegistrationStatus.REJECTED ? expert.adminNotes : undefined,
         reviewedAt: expert.reviewedAt,
         submittedAt: expert.createdAt,
       };
@@ -443,7 +435,7 @@ export class RegistrationService {
   async updateCompanyStatus(
     profileId: string,
     dto: UpdateRegistrationStatusDto,
-    adminUserId: string,
+    adminUserId: string
   ): Promise<void> {
     const profile = await this.companyProfileRepository.findOne({
       where: { id: profileId },
@@ -479,7 +471,7 @@ export class RegistrationService {
   async updateExpertStatus(
     expertId: string,
     dto: UpdateRegistrationStatusDto,
-    adminUserId: string,
+    adminUserId: string
   ): Promise<void> {
     const expert = await this.expertRepository.findOne({
       where: { id: expertId },

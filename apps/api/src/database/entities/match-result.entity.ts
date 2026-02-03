@@ -14,12 +14,12 @@ import { BuyerRequirement } from './buyer-requirement.entity';
 import { Organization } from './organization.entity';
 
 export interface ScoreBreakdown {
-  categoryMatch: number;      // 0-20 points
-  hsCodeMatch: number;        // 0-20 points
-  priceRangeMatch: number;    // 0-15 points
-  locationProximity: number;  // 0-25 points (highest weight)
-  textSimilarity: number;     // 0-10 points
-  frequencyMatch: number;     // 0-10 points
+  categoryMatch: number; // 0-20 points
+  hsCodeMatch: number; // 0-20 points
+  priceRangeMatch: number; // 0-15 points
+  locationProximity: number; // 0-25 points (highest weight)
+  textSimilarity: number; // 0-10 points
+  frequencyMatch: number; // 0-10 points
 }
 
 @Entity('match_results')

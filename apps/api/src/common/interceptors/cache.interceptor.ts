@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  NestInterceptor,
-  ExecutionContext,
-  CallHandler,
-} from '@nestjs/common';
+import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
 import { Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { ConfigService } from '@nestjs/config';
@@ -42,7 +37,7 @@ export class CacheInterceptor implements NestInterceptor {
       tap((data) => {
         this.cache.set(key, { data, timestamp: Date.now() });
         this.cleanupExpiredCache();
-      }),
+      })
     );
   }
 

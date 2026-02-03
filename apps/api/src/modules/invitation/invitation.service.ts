@@ -19,7 +19,7 @@ export class InvitationService {
     private invitationRecordRepo: Repository<InvitationRecord>,
     @InjectRepository(User)
     private userRepo: Repository<User>,
-    private pointService: PointService,
+    private pointService: PointService
   ) {}
 
   // ============================================
@@ -34,7 +34,7 @@ export class InvitationService {
       expiresInDays?: number;
       campaign?: string;
       channel?: string;
-    },
+    }
   ): Promise<InvitationCode> {
     // Generate unique code
     const code = await this.generateUniqueCode();
@@ -109,7 +109,7 @@ export class InvitationService {
     registrationInfo?: {
       ip?: string;
       deviceFingerprint?: string;
-    },
+    }
   ): Promise<InvitationRecord> {
     // Check if invitee was already invited
     const existingRecord = await this.invitationRecordRepo.findOne({
@@ -160,7 +160,7 @@ export class InvitationService {
       {
         relatedUserId: inviteeId,
         description: 'Invited user completed registration',
-      },
+      }
     );
 
     // Mark reward as claimed
@@ -179,16 +179,11 @@ export class InvitationService {
     }
 
     // Award points to inviter
-    await this.pointService.awardPoints(
-      record.inviterId,
-      'EXPERT',
-      'INVITE_FIRST_ORDER',
-      {
-        relatedUserId: inviteeId,
-        relatedServiceRecordId: orderId,
-        description: 'Invited user completed first order',
-      },
-    );
+    await this.pointService.awardPoints(record.inviterId, 'EXPERT', 'INVITE_FIRST_ORDER', {
+      relatedUserId: inviteeId,
+      relatedServiceRecordId: orderId,
+      description: 'Invited user completed first order',
+    });
 
     // Mark reward as claimed
     record.firstOrderRewardClaimed = true;
@@ -227,11 +222,14 @@ export class InvitationService {
 
   async checkSuspiciousActivity(
     ip: string,
-    deviceFingerprint?: string,
+    deviceFingerprint?: string
   ): Promise<{ suspicious: boolean; reason?: string }> {
     const recentRecords = await this.invitationRecordRepo.find({
       where: [
-        { registrationIp: ip, createdAt: MoreThanOrEqual(new Date(Date.now() - 24 * 60 * 60 * 1000)) },
+        {
+          registrationIp: ip,
+          createdAt: MoreThanOrEqual(new Date(Date.now() - 24 * 60 * 60 * 1000)),
+        },
       ],
     });
 

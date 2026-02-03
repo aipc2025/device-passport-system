@@ -40,10 +40,7 @@ export class PassportController {
   @Post()
   @Roles(UserRole.OPERATOR)
   @ApiOperation({ summary: 'Create new device passport' })
-  async create(
-    @Body() createPassportDto: CreatePassportDto,
-    @CurrentUser() user: TokenPayload,
-  ) {
+  async create(@Body() createPassportDto: CreatePassportDto, @CurrentUser() user: TokenPayload) {
     return this.passportService.create(createPassportDto, user.sub);
   }
 
@@ -53,7 +50,7 @@ export class PassportController {
   async update(
     @Param('id') id: string,
     @Body() updatePassportDto: UpdatePassportDto,
-    @CurrentUser() user: TokenPayload,
+    @CurrentUser() user: TokenPayload
   ) {
     return this.passportService.update(id, updatePassportDto, user.sub);
   }
@@ -64,7 +61,7 @@ export class PassportController {
   async updateStatus(
     @Param('id') id: string,
     @Body() updateStatusDto: UpdateStatusDto,
-    @CurrentUser() user: TokenPayload,
+    @CurrentUser() user: TokenPayload
   ) {
     return this.passportService.updateStatus(id, updateStatusDto, user.sub);
   }
@@ -99,7 +96,7 @@ export class PassportController {
   async updateLocation(
     @Param('id') id: string,
     @Body() locationDto: { lat: number; lng: number; address?: string },
-    @CurrentUser() user: TokenPayload,
+    @CurrentUser() user: TokenPayload
   ) {
     return this.passportService.updateLocation(id, locationDto, user.sub);
   }

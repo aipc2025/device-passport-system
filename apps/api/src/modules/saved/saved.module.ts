@@ -11,12 +11,7 @@ import {
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      SavedItem,
-      Organization,
-      MarketplaceProduct,
-      BuyerRequirement,
-    ]),
+    TypeOrmModule.forFeature([SavedItem, Organization, MarketplaceProduct, BuyerRequirement]),
   ],
   controllers: [SavedController],
   providers: [SavedService],

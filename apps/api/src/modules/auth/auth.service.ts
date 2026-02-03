@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  UnauthorizedException,
-  ConflictException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -18,7 +14,7 @@ export class AuthService {
     private userRepository: Repository<User>,
     @InjectRepository(IndividualExpert)
     private expertRepository: Repository<IndividualExpert>,
-    private jwtService: JwtService,
+    private jwtService: JwtService
   ) {}
 
   async login(loginDto: LoginDto): Promise<AuthResponse> {
@@ -114,6 +110,8 @@ export class AuthService {
       role: user.role,
       organizationId: user.organizationId,
       scopeConfig: user.scopeConfig || undefined,
+      isExpert: !!expert,
+      expertId: expert?.id,
     };
 
     const accessToken = this.jwtService.sign(payload);

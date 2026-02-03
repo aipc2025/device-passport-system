@@ -53,7 +53,7 @@ export default function DeviceTakeoverApply() {
   const [documents, setDocuments] = useState<UploadedFile[]>([]);
   const [uploading, setUploading] = useState(false);
 
-  const lang = i18n.language === 'zh' ? 'zh' : 'en';
+  const lang = i18n.language.startsWith('zh') ? 'zh' : i18n.language.startsWith('vi') ? 'vi' : 'en';
 
   const {
     register,

@@ -58,7 +58,7 @@ const creditLevelIcons: Record<CreditLevel, string> = {
 export default function MyPoints() {
   const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState<'all' | 'reward' | 'penalty'>('all');
-  const lang = i18n.language === 'zh' ? 'zh' : 'en';
+  const lang = i18n.language.startsWith('zh') ? 'zh' : i18n.language.startsWith('vi') ? 'vi' : 'en';
 
   // Fetch point account
   const { data: account, isLoading: accountLoading } = useQuery({

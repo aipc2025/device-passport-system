@@ -49,7 +49,8 @@ const SKILLS_BY_CATEGORY: Record<SkillCategory, SkillCode[]> = {
 export default function IndustrySkillStep() {
   const { t, i18n } = useTranslation();
   const { expertData, updateExpertData } = useRegistrationStore();
-  const lang = i18n.language.startsWith('zh') ? 'zh' : 'en';
+  // Support zh, en, vi - default to en for other languages
+  const lang = i18n.language.startsWith('zh') ? 'zh' : i18n.language.startsWith('vi') ? 'vi' : 'en';
 
   const toggleIndustry = (code: IndustryCode) => {
     const industries = [...(expertData.industries || [])];
@@ -138,7 +139,7 @@ export default function IndustrySkillStep() {
           </div>
         )}
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+        <div className="flex flex-wrap gap-2">
           {allIndustries.map((code) => {
             const isSelected = expertData.industries?.includes(code);
             const name = INDUSTRY_CODE_NAMES[code]?.[lang] || code;
@@ -148,13 +149,13 @@ export default function IndustrySkillStep() {
                 type="button"
                 onClick={() => toggleIndustry(code)}
                 className={clsx(
-                  'flex items-center justify-between px-3 py-2 text-sm rounded-lg border transition-all',
+                  'flex items-center px-3 py-2 text-sm rounded-lg border transition-all whitespace-nowrap',
                   isSelected
                     ? 'border-primary-500 bg-primary-50 text-primary-700'
                     : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
                 )}
               >
-                <span className="truncate">{name}</span>
+                <span>{name}</span>
                 {isSelected && <CheckIcon className="h-4 w-4 ml-1 flex-shrink-0" />}
               </button>
             );
@@ -207,7 +208,7 @@ export default function IndustrySkillStep() {
             <h4 className="text-sm font-medium text-gray-600">
               {SKILL_CATEGORY_NAMES[category as SkillCategory]?.[lang]}
             </h4>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            <div className="flex flex-wrap gap-2">
               {skills.map((code) => {
                 const isSelected = expertData.skills?.includes(code);
                 const name = SKILL_CODE_NAMES[code]?.[lang] || code;
@@ -217,13 +218,13 @@ export default function IndustrySkillStep() {
                     type="button"
                     onClick={() => toggleSkill(code)}
                     className={clsx(
-                      'flex items-center justify-between px-3 py-2 text-sm rounded-lg border transition-all',
+                      'flex items-center px-3 py-2 text-sm rounded-lg border transition-all whitespace-nowrap',
                       isSelected
                         ? 'border-green-500 bg-green-50 text-green-700'
                         : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
                     )}
                   >
-                    <span className="truncate">{name}</span>
+                    <span>{name}</span>
                     {isSelected && <CheckIcon className="h-4 w-4 ml-1 flex-shrink-0" />}
                   </button>
                 );

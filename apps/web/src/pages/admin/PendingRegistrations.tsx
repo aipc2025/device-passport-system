@@ -15,9 +15,9 @@ import {
 import FilePreview from '../../components/common/FilePreview';
 
 // Local mappings for ExpertType display names
-const EXPERT_TYPE_DISPLAY: Record<ExpertType, { en: string; zh: string }> = {
-  [ExpertType.TECHNICAL]: { en: 'Technical', zh: '技术类' },
-  [ExpertType.BUSINESS]: { en: 'Business', zh: '商务类' },
+const EXPERT_TYPE_DISPLAY: Record<ExpertType, { en: string; zh: string; vi: string }> = {
+  [ExpertType.TECHNICAL]: { en: 'Technical', zh: '技术类', vi: 'Kỹ thuật' },
+  [ExpertType.BUSINESS]: { en: 'Business', zh: '商务类', vi: 'Kinh doanh' },
 };
 import {
   BuildingOfficeIcon,
@@ -170,7 +170,7 @@ interface ExpertDetails {
 
 export default function PendingRegistrations() {
   const { t, i18n } = useTranslation();
-  const lang = i18n.language === 'zh' ? 'zh' : 'en';
+  const lang = i18n.language.startsWith('zh') ? 'zh' : i18n.language.startsWith('vi') ? 'vi' : 'en';
 
   const [registrations, setRegistrations] = useState<PendingRegistration[]>([]);
   const [loading, setLoading] = useState(true);

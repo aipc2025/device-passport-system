@@ -10,22 +10,9 @@ async function bootstrap() {
   // Global prefix
   app.setGlobalPrefix('api/v1');
 
-  // CORS
+  // CORS - allow all origins in development
   app.enableCors({
-    origin: process.env.CORS_ORIGINS?.split(',') || [
-      'http://localhost:5173',
-      'http://localhost:5174',
-      'http://localhost:5175',
-      'http://localhost:5176',
-      'http://localhost:5177',
-      'http://localhost:5178',
-      'http://localhost:5179',
-      'http://localhost:5180',
-      'http://192.168.71.21:5173',
-      'http://192.168.71.21:5174',
-      'http://192.168.71.21:5175',
-      'http://192.168.71.21:5176',
-    ],
+    origin: process.env.CORS_ORIGINS?.split(',') || true, // true allows all origins in development
     credentials: true,
   });
 

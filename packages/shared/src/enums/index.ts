@@ -350,16 +350,16 @@ export enum CurrencyCode {
 /**
  * Currency display names
  */
-export const CURRENCY_NAMES: Record<CurrencyCode, { en: string; zh: string; symbol: string }> = {
-  [CurrencyCode.CNY]: { en: 'Chinese Yuan', zh: '人民币', symbol: '¥' },
-  [CurrencyCode.USD]: { en: 'US Dollar', zh: '美元', symbol: '$' },
-  [CurrencyCode.EUR]: { en: 'Euro', zh: '欧元', symbol: '€' },
-  [CurrencyCode.VND]: { en: 'Vietnamese Dong', zh: '越南盾', symbol: '₫' },
-  [CurrencyCode.MYR]: { en: 'Malaysian Ringgit', zh: '马来西亚林吉特', symbol: 'RM' },
-  [CurrencyCode.THB]: { en: 'Thai Baht', zh: '泰铢', symbol: '฿' },
-  [CurrencyCode.IDR]: { en: 'Indonesian Rupiah', zh: '印尼盾', symbol: 'Rp' },
-  [CurrencyCode.AED]: { en: 'UAE Dirham', zh: '阿联酋迪拉姆', symbol: 'د.إ' },
-  [CurrencyCode.SAR]: { en: 'Saudi Riyal', zh: '沙特里亚尔', symbol: '﷼' },
+export const CURRENCY_NAMES: Record<CurrencyCode, { en: string; zh: string; vi: string; symbol: string }> = {
+  [CurrencyCode.CNY]: { en: 'Chinese Yuan', zh: '人民币', vi: 'Nhân dân tệ', symbol: '¥' },
+  [CurrencyCode.USD]: { en: 'US Dollar', zh: '美元', vi: 'Đô la Mỹ', symbol: '$' },
+  [CurrencyCode.EUR]: { en: 'Euro', zh: '欧元', vi: 'Euro', symbol: '€' },
+  [CurrencyCode.VND]: { en: 'Vietnamese Dong', zh: '越南盾', vi: 'Đồng Việt Nam', symbol: '₫' },
+  [CurrencyCode.MYR]: { en: 'Malaysian Ringgit', zh: '马来西亚林吉特', vi: 'Ringgit Malaysia', symbol: 'RM' },
+  [CurrencyCode.THB]: { en: 'Thai Baht', zh: '泰铢', vi: 'Baht Thái', symbol: '฿' },
+  [CurrencyCode.IDR]: { en: 'Indonesian Rupiah', zh: '印尼盾', vi: 'Rupiah Indonesia', symbol: 'Rp' },
+  [CurrencyCode.AED]: { en: 'UAE Dirham', zh: '阿联酋迪拉姆', vi: 'Dirham UAE', symbol: 'د.إ' },
+  [CurrencyCode.SAR]: { en: 'Saudi Riyal', zh: '沙特里亚尔', vi: 'Riyal Saudi', symbol: '﷼' },
 };
 
 /**
@@ -615,11 +615,11 @@ export enum ServiceUrgency {
 /**
  * Service urgency display names
  */
-export const SERVICE_URGENCY_NAMES: Record<ServiceUrgency, { en: string; zh: string }> = {
-  [ServiceUrgency.LOW]: { en: 'Low', zh: '低' },
-  [ServiceUrgency.NORMAL]: { en: 'Normal', zh: '普通' },
-  [ServiceUrgency.HIGH]: { en: 'High', zh: '高' },
-  [ServiceUrgency.URGENT]: { en: 'Urgent', zh: '紧急' },
+export const SERVICE_URGENCY_NAMES: Record<ServiceUrgency, { en: string; zh: string; vi: string }> = {
+  [ServiceUrgency.LOW]: { en: 'Low', zh: '低', vi: 'Thấp' },
+  [ServiceUrgency.NORMAL]: { en: 'Normal', zh: '普通', vi: 'Bình thường' },
+  [ServiceUrgency.HIGH]: { en: 'High', zh: '高', vi: 'Cao' },
+  [ServiceUrgency.URGENT]: { en: 'Urgent', zh: '紧急', vi: 'Khẩn cấp' },
 };
 
 /**
@@ -733,10 +733,10 @@ export enum ExpertTypeCode {
 /**
  * Expert type code display names
  */
-export const EXPERT_TYPE_CODE_NAMES: Record<ExpertTypeCode, { en: string; zh: string }> = {
-  [ExpertTypeCode.T]: { en: 'Technical', zh: '技术类' },
-  [ExpertTypeCode.B]: { en: 'Business', zh: '商务类' },
-  [ExpertTypeCode.A]: { en: 'All (Technical + Business)', zh: '综合类（技术+商务）' },
+export const EXPERT_TYPE_CODE_NAMES: Record<ExpertTypeCode, { en: string; zh: string; vi: string }> = {
+  [ExpertTypeCode.T]: { en: 'Technical', zh: '技术类', vi: 'Kỹ thuật' },
+  [ExpertTypeCode.B]: { en: 'Business', zh: '商务类', vi: 'Kinh doanh' },
+  [ExpertTypeCode.A]: { en: 'All (Technical + Business)', zh: '综合类（技术+商务）', vi: 'Tất cả' },
 };
 
 /**
@@ -819,29 +819,29 @@ export const INDUSTRY_CODE_NAMES_ZH: Record<IndustryCode, string> = {
 };
 
 /**
- * Industry code display names (bilingual)
+ * Industry code display names (trilingual: en, zh, vi)
  */
-export const INDUSTRY_CODE_NAMES: Record<IndustryCode, { en: string; zh: string }> = {
-  [IndustryCode.A]: { en: 'Automotive', zh: '汽车制造' },
-  [IndustryCode.B]: { en: 'Building & Construction', zh: '建筑工程' },
-  [IndustryCode.C]: { en: 'Chemical', zh: '化工' },
-  [IndustryCode.D]: { en: 'Pharmaceutical', zh: '制药' },
-  [IndustryCode.E]: { en: 'Electronics', zh: '电子' },
-  [IndustryCode.F]: { en: 'Food & Beverage', zh: '食品饮料' },
-  [IndustryCode.G]: { en: 'General Manufacturing', zh: '通用制造' },
-  [IndustryCode.H]: { en: 'Home Appliances', zh: '家电' },
-  [IndustryCode.L]: { en: 'Logistics', zh: '物流' },
-  [IndustryCode.M]: { en: 'Metallurgy', zh: '冶金' },
-  [IndustryCode.N]: { en: 'New Energy', zh: '新能源' },
-  [IndustryCode.O]: { en: 'Oil & Gas', zh: '石油天然气' },
-  [IndustryCode.P]: { en: 'Packaging', zh: '包装' },
-  [IndustryCode.R]: { en: 'Rubber & Plastics', zh: '橡塑' },
-  [IndustryCode.S]: { en: 'Shipbuilding', zh: '船舶制造' },
-  [IndustryCode.T]: { en: 'Textile', zh: '纺织' },
-  [IndustryCode.U]: { en: 'Utilities', zh: '公用事业' },
-  [IndustryCode.W]: { en: 'Woodworking', zh: '木工' },
-  [IndustryCode.X]: { en: 'Mining', zh: '矿业' },
-  [IndustryCode.Z]: { en: 'Other', zh: '其他' },
+export const INDUSTRY_CODE_NAMES: Record<IndustryCode, { en: string; zh: string; vi: string }> = {
+  [IndustryCode.A]: { en: 'Automotive', zh: '汽车制造', vi: 'Ô tô' },
+  [IndustryCode.B]: { en: 'Building', zh: '建筑工程', vi: 'Xây dựng' },
+  [IndustryCode.C]: { en: 'Chemical', zh: '化工', vi: 'Hóa chất' },
+  [IndustryCode.D]: { en: 'Pharma', zh: '制药', vi: 'Dược phẩm' },
+  [IndustryCode.E]: { en: 'Electronics', zh: '电子', vi: 'Điện tử' },
+  [IndustryCode.F]: { en: 'Food & Bev', zh: '食品饮料', vi: 'Thực phẩm' },
+  [IndustryCode.G]: { en: 'Manufacturing', zh: '通用制造', vi: 'Sản xuất' },
+  [IndustryCode.H]: { en: 'Appliances', zh: '家电', vi: 'Gia dụng' },
+  [IndustryCode.L]: { en: 'Logistics', zh: '物流', vi: 'Logistics' },
+  [IndustryCode.M]: { en: 'Metallurgy', zh: '冶金', vi: 'Luyện kim' },
+  [IndustryCode.N]: { en: 'New Energy', zh: '新能源', vi: 'Năng lượng' },
+  [IndustryCode.O]: { en: 'Oil & Gas', zh: '石油天然气', vi: 'Dầu khí' },
+  [IndustryCode.P]: { en: 'Packaging', zh: '包装', vi: 'Đóng gói' },
+  [IndustryCode.R]: { en: 'Plastics', zh: '橡塑', vi: 'Nhựa' },
+  [IndustryCode.S]: { en: 'Shipbuilding', zh: '船舶制造', vi: 'Đóng tàu' },
+  [IndustryCode.T]: { en: 'Textile', zh: '纺织', vi: 'Dệt may' },
+  [IndustryCode.U]: { en: 'Utilities', zh: '公用事业', vi: 'Tiện ích' },
+  [IndustryCode.W]: { en: 'Woodwork', zh: '木工', vi: 'Gỗ' },
+  [IndustryCode.X]: { en: 'Mining', zh: '矿业', vi: 'Khai thác' },
+  [IndustryCode.Z]: { en: 'Other', zh: '其他', vi: 'Khác' },
 };
 
 /**
@@ -894,12 +894,12 @@ export enum SkillCategory {
 /**
  * Skill category display names
  */
-export const SKILL_CATEGORY_NAMES: Record<SkillCategory, { en: string; zh: string }> = {
-  [SkillCategory.AUTOMATION]: { en: 'Automation', zh: '自动化' },
-  [SkillCategory.ELECTROMECHANICAL]: { en: 'Electromechanical', zh: '机电' },
-  [SkillCategory.INSTRUMENTATION]: { en: 'Instrumentation', zh: '仪器仪表' },
-  [SkillCategory.SOFTWARE]: { en: 'Software', zh: '软件' },
-  [SkillCategory.SERVICE]: { en: 'Service', zh: '服务' },
+export const SKILL_CATEGORY_NAMES: Record<SkillCategory, { en: string; zh: string; vi: string }> = {
+  [SkillCategory.AUTOMATION]: { en: 'Automation', zh: '自动化', vi: 'Tự động hóa' },
+  [SkillCategory.ELECTROMECHANICAL]: { en: 'Electromechanical', zh: '机电', vi: 'Cơ điện' },
+  [SkillCategory.INSTRUMENTATION]: { en: 'Instrumentation', zh: '仪器仪表', vi: 'Thiết bị đo' },
+  [SkillCategory.SOFTWARE]: { en: 'Software', zh: '软件', vi: 'Phần mềm' },
+  [SkillCategory.SERVICE]: { en: 'Service', zh: '服务', vi: 'Dịch vụ' },
 };
 
 /**
@@ -1008,38 +1008,38 @@ export const SKILL_CODE_NAMES_ZH: Record<SkillCode, string> = {
 };
 
 /**
- * Skill code display names (bilingual)
+ * Skill code display names (trilingual: en, zh, vi)
  */
-export const SKILL_CODE_NAMES: Record<SkillCode, { en: string; zh: string }> = {
+export const SKILL_CODE_NAMES: Record<SkillCode, { en: string; zh: string; vi: string }> = {
   // Automation
-  [SkillCode.PL]: { en: 'PLC Programming', zh: 'PLC编程' },
-  [SkillCode.HM]: { en: 'HMI Design', zh: 'HMI设计' },
-  [SkillCode.RB]: { en: 'Robotics', zh: '机器人' },
-  [SkillCode.MC]: { en: 'Motion Control', zh: '运动控制' },
-  [SkillCode.VS]: { en: 'Vision Systems', zh: '视觉系统' },
-  [SkillCode.IO]: { en: 'IoT', zh: '物联网' },
+  [SkillCode.PL]: { en: 'PLC', zh: 'PLC编程', vi: 'PLC' },
+  [SkillCode.HM]: { en: 'HMI', zh: 'HMI设计', vi: 'HMI' },
+  [SkillCode.RB]: { en: 'Robotics', zh: '机器人', vi: 'Robot' },
+  [SkillCode.MC]: { en: 'Motion', zh: '运动控制', vi: 'Chuyển động' },
+  [SkillCode.VS]: { en: 'Vision', zh: '视觉系统', vi: 'Thị giác' },
+  [SkillCode.IO]: { en: 'IoT', zh: '物联网', vi: 'IoT' },
 
   // Electromechanical
-  [SkillCode.ED]: { en: 'Electrical Design', zh: '电气设计' },
-  [SkillCode.EI]: { en: 'Electrical Installation', zh: '电气安装' },
-  [SkillCode.MD]: { en: 'Mechanical Design', zh: '机械设计' },
-  [SkillCode.MI]: { en: 'Mechanical Installation', zh: '机械安装' },
-  [SkillCode.HD]: { en: 'Hydraulics', zh: '液压系统' },
-  [SkillCode.WD]: { en: 'Welding', zh: '焊接' },
+  [SkillCode.ED]: { en: 'Elec. Design', zh: '电气设计', vi: 'TK Điện' },
+  [SkillCode.EI]: { en: 'Elec. Install', zh: '电气安装', vi: 'LĐ Điện' },
+  [SkillCode.MD]: { en: 'Mech. Design', zh: '机械设计', vi: 'TK Cơ khí' },
+  [SkillCode.MI]: { en: 'Mech. Install', zh: '机械安装', vi: 'LĐ Cơ khí' },
+  [SkillCode.HD]: { en: 'Hydraulics', zh: '液压系统', vi: 'Thủy lực' },
+  [SkillCode.WD]: { en: 'Welding', zh: '焊接', vi: 'Hàn' },
 
   // Instrumentation
-  [SkillCode.IS]: { en: 'Instrumentation', zh: '仪器仪表' },
-  [SkillCode.NT]: { en: 'Networks', zh: '网络通讯' },
-  [SkillCode.SC]: { en: 'Safety Systems', zh: '安全系统' },
+  [SkillCode.IS]: { en: 'Instruments', zh: '仪器仪表', vi: 'Thiết bị đo' },
+  [SkillCode.NT]: { en: 'Networks', zh: '网络通讯', vi: 'Mạng' },
+  [SkillCode.SC]: { en: 'Safety', zh: '安全系统', vi: 'An toàn' },
 
   // Software
-  [SkillCode.SW]: { en: 'Software Development', zh: '软件开发' },
-  [SkillCode.AI]: { en: 'AI/Machine Learning', zh: 'AI/机器学习' },
+  [SkillCode.SW]: { en: 'Software', zh: '软件开发', vi: 'Phần mềm' },
+  [SkillCode.AI]: { en: 'AI/ML', zh: 'AI/机器学习', vi: 'AI/ML' },
 
   // Service
-  [SkillCode.MN]: { en: 'Maintenance', zh: '维护保养' },
-  [SkillCode.CM]: { en: 'Commissioning', zh: '调试' },
-  [SkillCode.PM]: { en: 'Project Management', zh: '项目管理' },
+  [SkillCode.MN]: { en: 'Maintenance', zh: '维护保养', vi: 'Bảo trì' },
+  [SkillCode.CM]: { en: 'Commissioning', zh: '调试', vi: 'Vận hành' },
+  [SkillCode.PM]: { en: 'Project Mgmt', zh: '项目管理', vi: 'Quản lý DA' },
 };
 
 /**
@@ -1055,11 +1055,11 @@ export enum WorkHistoryVerificationStatus {
 /**
  * Work history verification status display names
  */
-export const WORK_HISTORY_VERIFICATION_STATUS_NAMES: Record<WorkHistoryVerificationStatus, { en: string; zh: string }> = {
-  [WorkHistoryVerificationStatus.UNVERIFIED]: { en: 'Unverified', zh: '未验证' },
-  [WorkHistoryVerificationStatus.PENDING_VERIFICATION]: { en: 'Pending Verification', zh: '验证中' },
-  [WorkHistoryVerificationStatus.VERIFIED]: { en: 'Verified', zh: '已验证' },
-  [WorkHistoryVerificationStatus.REJECTED]: { en: 'Rejected', zh: '已拒绝' },
+export const WORK_HISTORY_VERIFICATION_STATUS_NAMES: Record<WorkHistoryVerificationStatus, { en: string; zh: string; vi: string }> = {
+  [WorkHistoryVerificationStatus.UNVERIFIED]: { en: 'Unverified', zh: '未验证', vi: 'Chưa xác minh' },
+  [WorkHistoryVerificationStatus.PENDING_VERIFICATION]: { en: 'Pending', zh: '验证中', vi: 'Đang xử lý' },
+  [WorkHistoryVerificationStatus.VERIFIED]: { en: 'Verified', zh: '已验证', vi: 'Đã xác minh' },
+  [WorkHistoryVerificationStatus.REJECTED]: { en: 'Rejected', zh: '已拒绝', vi: 'Đã từ chối' },
 };
 
 // ============================================
@@ -1080,12 +1080,12 @@ export enum ExpertWorkStatus {
 /**
  * Expert work status display names
  */
-export const EXPERT_WORK_STATUS_NAMES: Record<ExpertWorkStatus, { en: string; zh: string }> = {
-  [ExpertWorkStatus.RUSHING]: { en: 'Rushing', zh: '抢单中' },
-  [ExpertWorkStatus.IDLE]: { en: 'Idle', zh: '空闲' },
-  [ExpertWorkStatus.BOOKED]: { en: 'Booked', zh: '预定中' },
-  [ExpertWorkStatus.IN_SERVICE]: { en: 'In Service', zh: '服务中' },
-  [ExpertWorkStatus.OFF_DUTY]: { en: 'Off Duty', zh: '休息中' },
+export const EXPERT_WORK_STATUS_NAMES: Record<ExpertWorkStatus, { en: string; zh: string; vi: string }> = {
+  [ExpertWorkStatus.RUSHING]: { en: 'Rushing', zh: '抢单中', vi: 'Đang chạy đơn' },
+  [ExpertWorkStatus.IDLE]: { en: 'Idle', zh: '空闲', vi: 'Rảnh' },
+  [ExpertWorkStatus.BOOKED]: { en: 'Booked', zh: '预定中', vi: 'Đã đặt' },
+  [ExpertWorkStatus.IN_SERVICE]: { en: 'In Service', zh: '服务中', vi: 'Đang phục vụ' },
+  [ExpertWorkStatus.OFF_DUTY]: { en: 'Off Duty', zh: '休息中', vi: 'Nghỉ ngơi' },
 };
 
 /**
@@ -1101,11 +1101,11 @@ export enum ExpertMembershipLevel {
 /**
  * Expert membership level display names
  */
-export const EXPERT_MEMBERSHIP_LEVEL_NAMES: Record<ExpertMembershipLevel, { en: string; zh: string }> = {
-  [ExpertMembershipLevel.STANDARD]: { en: 'Standard', zh: '标准版' },
-  [ExpertMembershipLevel.SILVER]: { en: 'Silver', zh: '银牌会员' },
-  [ExpertMembershipLevel.GOLD]: { en: 'Gold', zh: '金牌会员' },
-  [ExpertMembershipLevel.DIAMOND]: { en: 'Diamond', zh: '钻石会员' },
+export const EXPERT_MEMBERSHIP_LEVEL_NAMES: Record<ExpertMembershipLevel, { en: string; zh: string; vi: string }> = {
+  [ExpertMembershipLevel.STANDARD]: { en: 'Standard', zh: '标准版', vi: 'Tiêu chuẩn' },
+  [ExpertMembershipLevel.SILVER]: { en: 'Silver', zh: '银牌会员', vi: 'Bạc' },
+  [ExpertMembershipLevel.GOLD]: { en: 'Gold', zh: '金牌会员', vi: 'Vàng' },
+  [ExpertMembershipLevel.DIAMOND]: { en: 'Diamond', zh: '钻石会员', vi: 'Kim cương' },
 };
 
 // ============================================
@@ -1124,10 +1124,10 @@ export enum ServicePrimaryCategory {
 /**
  * Primary category display names
  */
-export const SERVICE_PRIMARY_CATEGORY_NAMES: Record<ServicePrimaryCategory, { en: string; zh: string; icon: string }> = {
-  [ServicePrimaryCategory.DEVICE]: { en: 'Device Service', zh: '设备服务', icon: '🔧' },
-  [ServicePrimaryCategory.LABOR]: { en: 'Labor Service', zh: '劳务服务', icon: '👷' },
-  [ServicePrimaryCategory.CONSULTING]: { en: 'Consulting & Training', zh: '咨询培训', icon: '💼' },
+export const SERVICE_PRIMARY_CATEGORY_NAMES: Record<ServicePrimaryCategory, { en: string; zh: string; vi: string; icon: string }> = {
+  [ServicePrimaryCategory.DEVICE]: { en: 'Device Service', zh: '设备服务', vi: 'Dịch vụ thiết bị', icon: '🔧' },
+  [ServicePrimaryCategory.LABOR]: { en: 'Labor Service', zh: '劳务服务', vi: 'Dịch vụ lao động', icon: '👷' },
+  [ServicePrimaryCategory.CONSULTING]: { en: 'Consulting & Training', zh: '咨询培训', vi: 'Tư vấn & Đào tạo', icon: '💼' },
 };
 
 /**
@@ -1198,19 +1198,19 @@ export const PRIMARY_TO_CATEGORIES: Record<ServicePrimaryCategory, ServiceReques
 /**
  * Service request category display names
  */
-export const SERVICE_REQUEST_CATEGORY_NAMES: Record<ServiceRequestCategory, { en: string; zh: string }> = {
-  [ServiceRequestCategory.DEVICE_REPAIR]: { en: 'Fault Repair', zh: '故障维修' },
-  [ServiceRequestCategory.DEVICE_MAINTENANCE]: { en: 'Regular Maintenance', zh: '定期保养' },
-  [ServiceRequestCategory.DEVICE_INSTALLATION]: { en: 'Device Installation', zh: '设备安装' },
-  [ServiceRequestCategory.DEVICE_INSPECTION]: { en: 'Inspection & Testing', zh: '检测检验' },
-  [ServiceRequestCategory.DEVICE_TAKEOVER]: { en: 'Device Registration', zh: '设备绑定' },
-  [ServiceRequestCategory.LABOR_ELECTRICAL]: { en: 'Electrical Engineering', zh: '电气工程' },
-  [ServiceRequestCategory.LABOR_MECHANICAL]: { en: 'Mechanical Engineering', zh: '机械工程' },
-  [ServiceRequestCategory.LABOR_PLUMBING]: { en: 'Plumbing Engineering', zh: '管道工程' },
-  [ServiceRequestCategory.LABOR_GENERAL]: { en: 'General Labor', zh: '综合劳务' },
-  [ServiceRequestCategory.CONSULTING_TECHNICAL]: { en: 'Technical Consulting', zh: '技术咨询' },
-  [ServiceRequestCategory.CONSULTING_TRAINING]: { en: 'Operation Training', zh: '操作培训' },
-  [ServiceRequestCategory.CONSULTING_CERTIFICATION]: { en: 'Certification Support', zh: '认证辅导' },
+export const SERVICE_REQUEST_CATEGORY_NAMES: Record<ServiceRequestCategory, { en: string; zh: string; vi: string }> = {
+  [ServiceRequestCategory.DEVICE_REPAIR]: { en: 'Fault Repair', zh: '故障维修', vi: 'Sửa chữa' },
+  [ServiceRequestCategory.DEVICE_MAINTENANCE]: { en: 'Regular Maintenance', zh: '定期保养', vi: 'Bảo trì' },
+  [ServiceRequestCategory.DEVICE_INSTALLATION]: { en: 'Device Installation', zh: '设备安装', vi: 'Lắp đặt' },
+  [ServiceRequestCategory.DEVICE_INSPECTION]: { en: 'Inspection & Testing', zh: '检测检验', vi: 'Kiểm tra' },
+  [ServiceRequestCategory.DEVICE_TAKEOVER]: { en: 'Device Registration', zh: '设备绑定', vi: 'Đăng ký' },
+  [ServiceRequestCategory.LABOR_ELECTRICAL]: { en: 'Electrical Engineering', zh: '电气工程', vi: 'Điện' },
+  [ServiceRequestCategory.LABOR_MECHANICAL]: { en: 'Mechanical Engineering', zh: '机械工程', vi: 'Cơ khí' },
+  [ServiceRequestCategory.LABOR_PLUMBING]: { en: 'Plumbing Engineering', zh: '管道工程', vi: 'Đường ống' },
+  [ServiceRequestCategory.LABOR_GENERAL]: { en: 'General Labor', zh: '综合劳务', vi: 'Tổng hợp' },
+  [ServiceRequestCategory.CONSULTING_TECHNICAL]: { en: 'Technical Consulting', zh: '技术咨询', vi: 'Tư vấn KT' },
+  [ServiceRequestCategory.CONSULTING_TRAINING]: { en: 'Operation Training', zh: '操作培训', vi: 'Đào tạo' },
+  [ServiceRequestCategory.CONSULTING_CERTIFICATION]: { en: 'Certification Support', zh: '认证辅导', vi: 'Chứng nhận' },
 };
 
 /**
@@ -1259,21 +1259,21 @@ export enum CommonIssueType {
 /**
  * Common issue display names
  */
-export const COMMON_ISSUE_NAMES: Record<CommonIssueType, { en: string; zh: string }> = {
-  [CommonIssueType.CANNOT_START]: { en: 'Cannot Start', zh: '设备无法启动' },
-  [CommonIssueType.UNEXPECTED_STOP]: { en: 'Unexpected Stop', zh: '运行中异常停机' },
-  [CommonIssueType.PRECISION_DROP]: { en: 'Precision Drop', zh: '精度下降/误差增大' },
-  [CommonIssueType.ABNORMAL_SOUND]: { en: 'Abnormal Sound/Vibration', zh: '异响/振动异常' },
-  [CommonIssueType.ALARM_CODE]: { en: 'Alarm/Error Code', zh: '报警/故障代码' },
-  [CommonIssueType.OVERHEATING]: { en: 'Overheating', zh: '过热' },
-  [CommonIssueType.LEAKAGE]: { en: 'Leakage', zh: '泄漏' },
-  [CommonIssueType.FIRST_MAINTENANCE]: { en: 'First Maintenance', zh: '首次保养' },
-  [CommonIssueType.REGULAR_MAINTENANCE]: { en: 'Regular Maintenance', zh: '定期例行保养' },
-  [CommonIssueType.DEEP_MAINTENANCE]: { en: 'Deep Maintenance', zh: '深度保养/大修' },
-  [CommonIssueType.NEW_INSTALL]: { en: 'New Installation', zh: '新设备开箱安装' },
-  [CommonIssueType.RELOCATION]: { en: 'Relocation', zh: '设备移机安装' },
-  [CommonIssueType.UPGRADE_INSTALL]: { en: 'Upgrade Installation', zh: '升级改造安装' },
-  [CommonIssueType.OTHER]: { en: 'Other', zh: '其他' },
+export const COMMON_ISSUE_NAMES: Record<CommonIssueType, { en: string; zh: string; vi: string }> = {
+  [CommonIssueType.CANNOT_START]: { en: 'Cannot Start', zh: '设备无法启动', vi: 'Không khởi động' },
+  [CommonIssueType.UNEXPECTED_STOP]: { en: 'Unexpected Stop', zh: '运行中异常停机', vi: 'Dừng đột ngột' },
+  [CommonIssueType.PRECISION_DROP]: { en: 'Precision Drop', zh: '精度下降/误差增大', vi: 'Giảm độ chính xác' },
+  [CommonIssueType.ABNORMAL_SOUND]: { en: 'Abnormal Sound/Vibration', zh: '异响/振动异常', vi: 'Tiếng ồn/Rung' },
+  [CommonIssueType.ALARM_CODE]: { en: 'Alarm/Error Code', zh: '报警/故障代码', vi: 'Mã lỗi' },
+  [CommonIssueType.OVERHEATING]: { en: 'Overheating', zh: '过热', vi: 'Quá nhiệt' },
+  [CommonIssueType.LEAKAGE]: { en: 'Leakage', zh: '泄漏', vi: 'Rò rỉ' },
+  [CommonIssueType.FIRST_MAINTENANCE]: { en: 'First Maintenance', zh: '首次保养', vi: 'Bảo trì lần đầu' },
+  [CommonIssueType.REGULAR_MAINTENANCE]: { en: 'Regular Maintenance', zh: '定期例行保养', vi: 'Bảo trì định kỳ' },
+  [CommonIssueType.DEEP_MAINTENANCE]: { en: 'Deep Maintenance', zh: '深度保养/大修', vi: 'Đại tu' },
+  [CommonIssueType.NEW_INSTALL]: { en: 'New Installation', zh: '新设备开箱安装', vi: 'Lắp đặt mới' },
+  [CommonIssueType.RELOCATION]: { en: 'Relocation', zh: '设备移机安装', vi: 'Di dời' },
+  [CommonIssueType.UPGRADE_INSTALL]: { en: 'Upgrade Installation', zh: '升级改造安装', vi: 'Nâng cấp' },
+  [CommonIssueType.OTHER]: { en: 'Other', zh: '其他', vi: 'Khác' },
 };
 
 /**
@@ -1327,12 +1327,12 @@ export enum PreferredTimeOption {
 /**
  * Preferred time option display names
  */
-export const PREFERRED_TIME_NAMES: Record<PreferredTimeOption, { en: string; zh: string }> = {
-  [PreferredTimeOption.ASAP]: { en: 'ASAP', zh: '尽快' },
-  [PreferredTimeOption.THIS_WEEK]: { en: 'This Week', zh: '本周内' },
-  [PreferredTimeOption.NEXT_WEEK]: { en: 'Next Week', zh: '下周' },
-  [PreferredTimeOption.FLEXIBLE]: { en: 'Flexible', zh: '灵活' },
-  [PreferredTimeOption.SPECIFIC]: { en: 'Specific Date', zh: '指定日期' },
+export const PREFERRED_TIME_NAMES: Record<PreferredTimeOption, { en: string; zh: string; vi: string }> = {
+  [PreferredTimeOption.ASAP]: { en: 'ASAP', zh: '尽快', vi: 'Ngay' },
+  [PreferredTimeOption.THIS_WEEK]: { en: 'This Week', zh: '本周内', vi: 'Tuần này' },
+  [PreferredTimeOption.NEXT_WEEK]: { en: 'Next Week', zh: '下周', vi: 'Tuần sau' },
+  [PreferredTimeOption.FLEXIBLE]: { en: 'Flexible', zh: '灵活', vi: 'Linh hoạt' },
+  [PreferredTimeOption.SPECIFIC]: { en: 'Specific Date', zh: '指定日期', vi: 'Ngày cụ thể' },
 };
 
 /**
@@ -1350,13 +1350,13 @@ export enum BudgetRangeOption {
 /**
  * Budget range option display names
  */
-export const BUDGET_RANGE_NAMES: Record<BudgetRangeOption, { en: string; zh: string }> = {
-  [BudgetRangeOption.NO_LIMIT]: { en: 'No Limit', zh: '不限' },
-  [BudgetRangeOption.UNDER_500]: { en: 'Under 500', zh: '500以下' },
-  [BudgetRangeOption.RANGE_500_2000]: { en: '500 - 2,000', zh: '500-2000' },
-  [BudgetRangeOption.RANGE_2000_5000]: { en: '2,000 - 5,000', zh: '2000-5000' },
-  [BudgetRangeOption.OVER_5000]: { en: 'Over 5,000', zh: '5000以上' },
-  [BudgetRangeOption.CUSTOM]: { en: 'Custom', zh: '自定义' },
+export const BUDGET_RANGE_NAMES: Record<BudgetRangeOption, { en: string; zh: string; vi: string }> = {
+  [BudgetRangeOption.NO_LIMIT]: { en: 'No Limit', zh: '不限', vi: 'Không giới hạn' },
+  [BudgetRangeOption.UNDER_500]: { en: 'Under 500', zh: '500以下', vi: 'Dưới 500' },
+  [BudgetRangeOption.RANGE_500_2000]: { en: '500 - 2,000', zh: '500-2000', vi: '500 - 2,000' },
+  [BudgetRangeOption.RANGE_2000_5000]: { en: '2,000 - 5,000', zh: '2000-5000', vi: '2,000 - 5,000' },
+  [BudgetRangeOption.OVER_5000]: { en: 'Over 5,000', zh: '5000以上', vi: 'Trên 5,000' },
+  [BudgetRangeOption.CUSTOM]: { en: 'Custom', zh: '自定义', vi: 'Tùy chỉnh' },
 };
 
 // ============================================
@@ -1377,12 +1377,12 @@ export enum TakeoverReason {
 /**
  * Takeover reason display names
  */
-export const TAKEOVER_REASON_NAMES: Record<TakeoverReason, { en: string; zh: string }> = {
-  [TakeoverReason.NEW_PURCHASE]: { en: 'New Purchase', zh: '新购设备' },
-  [TakeoverReason.TRANSFER]: { en: 'Device Transfer', zh: '设备转让' },
-  [TakeoverReason.NO_SUPPORT]: { en: 'No Vendor Support', zh: '原厂商不再支持' },
-  [TakeoverReason.SYSTEM_MIGRATION]: { en: 'System Migration', zh: '系统迁移' },
-  [TakeoverReason.OTHER]: { en: 'Other', zh: '其他' },
+export const TAKEOVER_REASON_NAMES: Record<TakeoverReason, { en: string; zh: string; vi: string }> = {
+  [TakeoverReason.NEW_PURCHASE]: { en: 'New Purchase', zh: '新购设备', vi: 'Mua mới' },
+  [TakeoverReason.TRANSFER]: { en: 'Device Transfer', zh: '设备转让', vi: 'Chuyển nhượng' },
+  [TakeoverReason.NO_SUPPORT]: { en: 'No Vendor Support', zh: '原厂商不再支持', vi: 'Không hỗ trợ' },
+  [TakeoverReason.SYSTEM_MIGRATION]: { en: 'System Migration', zh: '系统迁移', vi: 'Di chuyển HT' },
+  [TakeoverReason.OTHER]: { en: 'Other', zh: '其他', vi: 'Khác' },
 };
 
 /**
@@ -1399,12 +1399,12 @@ export enum TakeoverStatus {
 /**
  * Takeover status display names
  */
-export const TAKEOVER_STATUS_NAMES: Record<TakeoverStatus, { en: string; zh: string }> = {
-  [TakeoverStatus.PENDING]: { en: 'Pending', zh: '待处理' },
-  [TakeoverStatus.INSPECTING]: { en: 'Inspecting', zh: '验机中' },
-  [TakeoverStatus.REVIEWING]: { en: 'Reviewing', zh: '审核中' },
-  [TakeoverStatus.APPROVED]: { en: 'Approved', zh: '已批准' },
-  [TakeoverStatus.REJECTED]: { en: 'Rejected', zh: '已拒绝' },
+export const TAKEOVER_STATUS_NAMES: Record<TakeoverStatus, { en: string; zh: string; vi: string }> = {
+  [TakeoverStatus.PENDING]: { en: 'Pending', zh: '待处理', vi: 'Đang chờ' },
+  [TakeoverStatus.INSPECTING]: { en: 'Inspecting', zh: '验机中', vi: 'Đang kiểm tra' },
+  [TakeoverStatus.REVIEWING]: { en: 'Reviewing', zh: '审核中', vi: 'Đang xét duyệt' },
+  [TakeoverStatus.APPROVED]: { en: 'Approved', zh: '已批准', vi: 'Đã duyệt' },
+  [TakeoverStatus.REJECTED]: { en: 'Rejected', zh: '已拒绝', vi: 'Đã từ chối' },
 };
 
 // ============================================
@@ -1425,12 +1425,12 @@ export enum MaintenanceType {
 /**
  * Maintenance type display names
  */
-export const MAINTENANCE_TYPE_NAMES: Record<MaintenanceType, { en: string; zh: string }> = {
-  [MaintenanceType.PREVENTIVE]: { en: 'Preventive', zh: '预防性维护' },
-  [MaintenanceType.CORRECTIVE]: { en: 'Corrective', zh: '纠正性维护' },
-  [MaintenanceType.EMERGENCY]: { en: 'Emergency', zh: '紧急维护' },
-  [MaintenanceType.UPGRADE]: { en: 'Upgrade', zh: '升级改造' },
-  [MaintenanceType.INSPECTION]: { en: 'Inspection', zh: '检测检验' },
+export const MAINTENANCE_TYPE_NAMES: Record<MaintenanceType, { en: string; zh: string; vi: string }> = {
+  [MaintenanceType.PREVENTIVE]: { en: 'Preventive', zh: '预防性维护', vi: 'Phòng ngừa' },
+  [MaintenanceType.CORRECTIVE]: { en: 'Corrective', zh: '纠正性维护', vi: 'Sửa chữa' },
+  [MaintenanceType.EMERGENCY]: { en: 'Emergency', zh: '紧急维护', vi: 'Khẩn cấp' },
+  [MaintenanceType.UPGRADE]: { en: 'Upgrade', zh: '升级改造', vi: 'Nâng cấp' },
+  [MaintenanceType.INSPECTION]: { en: 'Inspection', zh: '检测检验', vi: 'Kiểm tra' },
 };
 
 // ============================================
@@ -1449,10 +1449,10 @@ export enum PointType {
 /**
  * Point type display names
  */
-export const POINT_TYPE_NAMES: Record<PointType, { en: string; zh: string }> = {
-  [PointType.REWARD]: { en: 'Reward', zh: '奖励积分' },
-  [PointType.CREDIT]: { en: 'Credit', zh: '信用分' },
-  [PointType.PENALTY]: { en: 'Penalty', zh: '惩罚扣分' },
+export const POINT_TYPE_NAMES: Record<PointType, { en: string; zh: string; vi: string }> = {
+  [PointType.REWARD]: { en: 'Reward', zh: '奖励积分', vi: 'Thưởng' },
+  [PointType.CREDIT]: { en: 'Credit', zh: '信用分', vi: 'Tín dụng' },
+  [PointType.PENALTY]: { en: 'Penalty', zh: '惩罚扣分', vi: 'Phạt' },
 };
 
 /**
@@ -1469,12 +1469,12 @@ export enum CreditLevel {
 /**
  * Credit level display names
  */
-export const CREDIT_LEVEL_NAMES: Record<CreditLevel, { en: string; zh: string }> = {
-  [CreditLevel.BRONZE]: { en: 'Bronze', zh: '青铜' },
-  [CreditLevel.SILVER]: { en: 'Silver', zh: '白银' },
-  [CreditLevel.GOLD]: { en: 'Gold', zh: '黄金' },
-  [CreditLevel.PLATINUM]: { en: 'Platinum', zh: '铂金' },
-  [CreditLevel.DIAMOND]: { en: 'Diamond', zh: '钻石' },
+export const CREDIT_LEVEL_NAMES: Record<CreditLevel, { en: string; zh: string; vi: string }> = {
+  [CreditLevel.BRONZE]: { en: 'Bronze', zh: '青铜', vi: 'Đồng' },
+  [CreditLevel.SILVER]: { en: 'Silver', zh: '白银', vi: 'Bạc' },
+  [CreditLevel.GOLD]: { en: 'Gold', zh: '黄金', vi: 'Vàng' },
+  [CreditLevel.PLATINUM]: { en: 'Platinum', zh: '铂金', vi: 'Bạch kim' },
+  [CreditLevel.DIAMOND]: { en: 'Diamond', zh: '钻石', vi: 'Kim cương' },
 };
 
 /**

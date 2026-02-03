@@ -56,7 +56,7 @@ export default function MyInvitations() {
     expiresInDays: 30,
   });
 
-  const lang = i18n.language === 'zh' ? 'zh' : 'en';
+  const lang = i18n.language.startsWith('zh') ? 'zh' : i18n.language.startsWith('vi') ? 'vi' : 'en';
 
   // Fetch invitation codes
   const { data: codesData, isLoading: codesLoading } = useQuery({

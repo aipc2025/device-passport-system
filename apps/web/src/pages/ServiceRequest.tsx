@@ -119,7 +119,7 @@ export default function ServiceRequest() {
   const [selectedDevice, setSelectedDevice] = useState<DeviceInfo | null>(null);
   const [currentStep, setCurrentStep] = useState(1);
 
-  const lang = i18n.language === 'zh' ? 'zh' : 'en';
+  const lang = i18n.language.startsWith('zh') ? 'zh' : i18n.language.startsWith('vi') ? 'vi' : 'en';
 
   const {
     register,

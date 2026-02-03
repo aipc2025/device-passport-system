@@ -125,7 +125,9 @@
       "Bash(npm run:*)",
       "Bash(cmd /c test-core-features.bat)",
       "Bash(test-core-features.bat)",
-      "Bash(__NEW_LINE_253abc19bed31cc8__ echo \"\")"
+      "Bash(__NEW_LINE_253abc19bed31cc8__ echo \"\")",
+      "Bash(cmd /c \"taskkill /F /PID 66140\")",
+      "Bash(python:*)"
     ]
   }
 }

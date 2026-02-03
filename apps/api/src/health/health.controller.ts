@@ -42,7 +42,7 @@ export class HealthController {
       // Disk health - Storage should not exceed 90%
       () =>
         this.disk.checkStorage('disk', {
-          path: '/',
+          path: process.platform === 'win32' ? 'C:\\' : '/',
           thresholdPercent: 0.9,
         }),
     ]);
